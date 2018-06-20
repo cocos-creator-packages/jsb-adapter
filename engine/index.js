@@ -23,7 +23,6 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-require('../index');
 require('./jsb-node');
 require('./jsb-audio');
 require('./jsb-loader');
