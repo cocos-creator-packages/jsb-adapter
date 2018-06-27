@@ -34,7 +34,7 @@ gulp.task("default", ()=>{
   return browserify('./index.js')
          .transform(babelify)
          .bundle()
-         .pipe(source('jsb.js'))
+         .pipe(source('jsb-builtin.js'))
          .pipe(buffer())
          // .pipe(sourcemaps.init({ loadMaps: true }))
          // .pipe(uglify()) // Use any gulp plugins you want now
