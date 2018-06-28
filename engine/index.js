@@ -28,3 +28,4 @@ require('./jsb-audio');
 require('./jsb-loader');
 require('./jsb-reflection');
 require('./jsb-editbox');
+require('./jsb-cocosanalytics');

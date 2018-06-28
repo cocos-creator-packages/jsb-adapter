@@ -25,8 +25,6 @@
  ****************************************************************************/
 'use strict';
 
-require('../cocos2d/core/load-pipeline');
-
 function empty (item, callback) {
     return null;
 }

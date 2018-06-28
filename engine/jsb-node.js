@@ -25,8 +25,7 @@
  ****************************************************************************/
 'use strict';
 
-const Node = require('../cocos2d/core/CCNode');
-const math = require('../cocos2d/core/renderer/render-engine').math;
+const math = cc.vmath;
 
 let _typedArray_temp = new Float32Array(16);
 var _mat4_temp = math.mat4.create();
@@ -50,13 +49,13 @@ function _mat4ToArray(typedArray, mat4) {
     typedArray[15] = mat4.m15;
 }
 
-Node.prototype.getWorldRTInAB = function () {
+cc.Node.prototype.getWorldRTInAB = function () {
     this.getWorldRT(_mat4_temp);
     _mat4ToArray(_typedArray_temp, _mat4_temp);
     return _typedArray_temp;
 };
 
-Node.prototype.getWorldMatrixInAB = function () {
+cc.Node.prototype.getWorldMatrixInAB = function () {
     this._updateWorldMatrix();
     _mat4ToArray(_typedArray_temp, this._worldMatrix);
     return _typedArray_temp;
