@@ -23,9 +23,9 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-require('./jsb-node');
-require('./jsb-audio');
-require('./jsb-loader');
-require('./jsb-reflection');
-require('./jsb-editbox');
-require('./jsb-cocosanalytics');
+require('jsb-adapter/engine/jsb-node.js');
+require('jsb-adapter/engine/jsb-audio.js');
+require('jsb-adapter/engine/jsb-loader.js');
+require('jsb-adapter/engine/jsb-reflection.js');
+require('jsb-adapter/engine/jsb-editbox.js');
+require('jsb-adapter/engine/jsb-cocosanalytics.js');
