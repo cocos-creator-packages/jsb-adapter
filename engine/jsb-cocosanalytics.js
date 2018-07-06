@@ -25,6 +25,10 @@
 
 (function(){
 
+if (!jsb || !jsb.reflection) {
+    return;
+}
+
 var sys = cc.sys;
 var platform = sys.platform;
 
