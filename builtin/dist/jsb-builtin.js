@@ -1,4 +1,4 @@
-(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -1986,6 +1986,7 @@ require('./jsb_opengl');
 require('./jsb-adapter');
 require('./jsb_audioengine');
 require('./jsb_input');
+require('./jsb_assets_manager');
 
 var _oldRequestFrameCallback = null;
 var _requestAnimationFrameID = 0;
@@ -2186,7 +2187,7 @@ if (window.SocketIO) {
 
 window.gameTick = tick;
 
-},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":29,"./jsb_audioengine":34,"./jsb_input":35,"./jsb_opengl":36,"./jsb_prepare":38,"./xmldom/dom-parser":39}],5:[function(require,module,exports){
+},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":29,"./jsb_assets_manager":34,"./jsb_audioengine":35,"./jsb_input":36,"./jsb_opengl":37,"./jsb_prepare":39,"./xmldom/dom-parser":40}],5:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -2480,180 +2481,180 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @param {Event|{type:string}} event The original event to wrap.
  */
 var Event = function () {
-    function Event(type, eventInit) {
-        _classCallCheck(this, Event);
+  function Event(type, eventInit) {
+    _classCallCheck(this, Event);
 
-        this._type = type;
-        this._target = null;
-        this._eventPhase = 2;
-        this._currentTarget = null;
-        this._canceled = false;
-        this._stopped = false; // The flag to stop propagation immediately.
-        this._passiveListener = null;
-        this._timeStamp = Date.now();
+    this._type = type;
+    this._target = null;
+    this._eventPhase = 2;
+    this._currentTarget = null;
+    this._canceled = false;
+    this._stopped = false; // The flag to stop propagation immediately.
+    this._passiveListener = null;
+    this._timeStamp = Date.now();
+  }
+
+  /**
+   * The type of this event.
+   * @type {string}
+   */
+
+
+  _createClass(Event, [{
+    key: "composedPath",
+
+
+    /**
+     * @returns {EventTarget[]} The composed path of this event.
+     */
+    value: function composedPath() {
+      var currentTarget = this._currentTarget;
+      if (currentTarget === null) {
+        return [];
+      }
+      return [currentTarget];
     }
 
     /**
-     * The type of this event.
-     * @type {string}
+     * The target of this event.
+     * @type {number}
      */
 
-
-    _createClass(Event, [{
-        key: "composedPath",
-
-
-        /**
-         * @returns {EventTarget[]} The composed path of this event.
-         */
-        value: function composedPath() {
-            var currentTarget = this._currentTarget;
-            if (currentTarget === null) {
-                return [];
-            }
-            return [currentTarget];
-        }
-
-        /**
-         * The target of this event.
-         * @type {number}
-         */
-
-    }, {
-        key: "stopPropagation",
+  }, {
+    key: "stopPropagation",
 
 
-        /**
-         * Stop event bubbling.
-         * @returns {void}
-         */
-        value: function stopPropagation() {}
+    /**
+     * Stop event bubbling.
+     * @returns {void}
+     */
+    value: function stopPropagation() {}
 
-        /**
-         * Stop event bubbling.
-         * @returns {void}
-         */
+    /**
+     * Stop event bubbling.
+     * @returns {void}
+     */
 
-    }, {
-        key: "stopImmediatePropagation",
-        value: function stopImmediatePropagation() {
-            this._stopped = true;
-        }
+  }, {
+    key: "stopImmediatePropagation",
+    value: function stopImmediatePropagation() {
+      this._stopped = true;
+    }
 
-        /**
-         * The flag to be bubbling.
-         * @type {boolean}
-         */
+    /**
+     * The flag to be bubbling.
+     * @type {boolean}
+     */
 
-    }, {
-        key: "preventDefault",
-
-
-        /**
-         * Cancel this event.
-         * @returns {void}
-         */
-        value: function preventDefault() {
-            if (this._passiveListener !== null) {
-                console.warn("Event#preventDefault() was called from a passive listener:", this._passiveListener);
-                return;
-            }
-            if (!this.cancelable) {
-                return;
-            }
-
-            this._canceled = true;
-        }
-
-        /**
-         * The flag to indicate cancellation state.
-         * @type {boolean}
-         */
-
-    }, {
-        key: "type",
-        get: function get() {
-            return this._type;
-        }
-
-        /**
-         * The target of this event.
-         * @type {EventTarget}
-         */
-
-    }, {
-        key: "target",
-        get: function get() {
-            return this._target;
-        }
-
-        /**
-         * The target of this event.
-         * @type {EventTarget}
-         */
-
-    }, {
-        key: "currentTarget",
-        get: function get() {
-            return this._currentTarget;
-        }
-    }, {
-        key: "isTrusted",
-        get: function get() {
-            // https://heycam.github.io/webidl/#Unforgeable
-            return false;
-        }
-    }, {
-        key: "timeStamp",
+  }, {
+    key: "preventDefault",
 
 
-        /**
-         * The unix time of this event.
-         * @type {number}
-         */
-        get: function get() {
-            return this._timeStamp;
-        }
-    }, {
-        key: "eventPhase",
-        get: function get() {
-            return this._eventPhase;
-        }
-    }, {
-        key: "bubbles",
-        get: function get() {
-            return false;
-        }
+    /**
+     * Cancel this event.
+     * @returns {void}
+     */
+    value: function preventDefault() {
+      if (this._passiveListener !== null) {
+        console.warn("Event#preventDefault() was called from a passive listener:", this._passiveListener);
+        return;
+      }
+      if (!this.cancelable) {
+        return;
+      }
 
-        /**
-         * The flag to be cancelable.
-         * @type {boolean}
-         */
+      this._canceled = true;
+    }
 
-    }, {
-        key: "cancelable",
-        get: function get() {
-            return true;
-        }
-    }, {
-        key: "defaultPrevented",
-        get: function get() {
-            return this._canceled;
-        }
+    /**
+     * The flag to indicate cancellation state.
+     * @type {boolean}
+     */
 
-        /**
-         * The flag to be composed.
-         * @type {boolean}
-         */
+  }, {
+    key: "type",
+    get: function get() {
+      return this._type;
+    }
 
-    }, {
-        key: "composed",
-        get: function get() {
-            return false;
-        }
-    }]);
+    /**
+     * The target of this event.
+     * @type {EventTarget}
+     */
 
-    return Event;
+  }, {
+    key: "target",
+    get: function get() {
+      return this._target;
+    }
+
+    /**
+     * The target of this event.
+     * @type {EventTarget}
+     */
+
+  }, {
+    key: "currentTarget",
+    get: function get() {
+      return this._currentTarget;
+    }
+  }, {
+    key: "isTrusted",
+    get: function get() {
+      // https://heycam.github.io/webidl/#Unforgeable
+      return false;
+    }
+  }, {
+    key: "timeStamp",
+
+
+    /**
+     * The unix time of this event.
+     * @type {number}
+     */
+    get: function get() {
+      return this._timeStamp;
+    }
+  }, {
+    key: "eventPhase",
+    get: function get() {
+      return this._eventPhase;
+    }
+  }, {
+    key: "bubbles",
+    get: function get() {
+      return false;
+    }
+
+    /**
+     * The flag to be cancelable.
+     * @type {boolean}
+     */
+
+  }, {
+    key: "cancelable",
+    get: function get() {
+      return true;
+    }
+  }, {
+    key: "defaultPrevented",
+    get: function get() {
+      return this._canceled;
+    }
+
+    /**
+     * The flag to be composed.
+     * @type {boolean}
+     */
+
+  }, {
+    key: "composed",
+    get: function get() {
+      return false;
+    }
+  }]);
+
+  return Event;
 }();
 
 /**
@@ -4067,27 +4068,27 @@ var HTMLElement = require('./HTMLElement');
 var Event = require('./Event');
 
 var HTMLScriptElement = function (_HTMLElement) {
-  _inherits(HTMLScriptElement, _HTMLElement);
+    _inherits(HTMLScriptElement, _HTMLElement);
 
-  function HTMLScriptElement(width, height) {
-    _classCallCheck(this, HTMLScriptElement);
+    function HTMLScriptElement(width, height) {
+        _classCallCheck(this, HTMLScriptElement);
 
-    return _possibleConstructorReturn(this, (HTMLScriptElement.__proto__ || Object.getPrototypeOf(HTMLScriptElement)).call(this, 'script'));
-  }
-
-  _createClass(HTMLScriptElement, [{
-    key: 'src',
-    set: function set(url) {
-      var _this2 = this;
-
-      setTimeout(function () {
-        require(url);
-        _this2.dispatchEvent(new Event('load'));
-      }, 0);
+        return _possibleConstructorReturn(this, (HTMLScriptElement.__proto__ || Object.getPrototypeOf(HTMLScriptElement)).call(this, 'script'));
     }
-  }]);
 
-  return HTMLScriptElement;
+    _createClass(HTMLScriptElement, [{
+        key: 'src',
+        set: function set(url) {
+            var _this2 = this;
+
+            setTimeout(function () {
+                require(url);
+                _this2.dispatchEvent(new Event('load'));
+            }, 0);
+        }
+    }]);
+
+    return HTMLScriptElement;
 }(HTMLElement);
 
 module.exports = HTMLScriptElement;
@@ -5365,6 +5366,69 @@ window.localStorage = sys.localStorage;
 "use strict";
 
 /*
+ * Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+if (jsb.AssetsManager) {
+    jsb.AssetsManager.State = {
+        UNINITED: 0,
+        UNCHECKED: 1,
+        PREDOWNLOAD_VERSION: 2,
+        DOWNLOADING_VERSION: 3,
+        VERSION_LOADED: 4,
+        PREDOWNLOAD_MANIFEST: 5,
+        DOWNLOADING_MANIFEST: 6,
+        MANIFEST_LOADED: 7,
+        NEED_UPDATE: 8,
+        READY_TO_UPDATE: 9,
+        UPDATING: 10,
+        UNZIPPING: 11,
+        UP_TO_DATE: 12,
+        FAIL_TO_UPDATE: 13
+    };
+
+    jsb.Manifest.DownloadState = {
+        UNSTARTED: 0,
+        DOWNLOADING: 1,
+        SUCCESSED: 2,
+        UNMARKED: 3
+    };
+
+    jsb.EventAssetsManager.ERROR_NO_LOCAL_MANIFEST = 0;
+    jsb.EventAssetsManager.ERROR_DOWNLOAD_MANIFEST = 1;
+    jsb.EventAssetsManager.ERROR_PARSE_MANIFEST = 2;
+    jsb.EventAssetsManager.NEW_VERSION_FOUND = 3;
+    jsb.EventAssetsManager.ALREADY_UP_TO_DATE = 4;
+    jsb.EventAssetsManager.UPDATE_PROGRESSION = 5;
+    jsb.EventAssetsManager.ASSET_UPDATED = 6;
+    jsb.EventAssetsManager.ERROR_UPDATING = 7;
+    jsb.EventAssetsManager.UPDATE_FINISHED = 8;
+    jsb.EventAssetsManager.UPDATE_FAILED = 9;
+    jsb.EventAssetsManager.ERROR_DECOMPRESS = 10;
+}
+
+},{}],35:[function(require,module,exports){
+"use strict";
+
+/*
  * Copyright (c) 2015-2016 Chukong Technologies Inc.
  * Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
  *
@@ -5402,7 +5466,7 @@ window.localStorage = sys.localStorage;
     jsb.AudioEngine.TIME_UNKNOWN = -1;
 })(jsb);
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -5527,7 +5591,7 @@ jsb.onTextInput = function (eventName, text) {
 	eventTarget.dispatchEvent(event);
 };
 
-},{"./jsb-adapter/Event":9,"./jsb-adapter/EventTarget":10}],36:[function(require,module,exports){
+},{"./jsb-adapter/Event":9,"./jsb-adapter/EventTarget":10}],37:[function(require,module,exports){
 'use strict';
 
 /*
@@ -5722,7 +5786,7 @@ gl.isContextLost = function () {
     return false;
 };
 
-},{"./jsb-adapter/HTMLCanvasElement":15,"./jsb-adapter/HTMLImageElement":17,"./jsb-adapter/ImageData":22,"./jsb_opengl_constants":37}],37:[function(require,module,exports){
+},{"./jsb-adapter/HTMLCanvasElement":15,"./jsb-adapter/HTMLImageElement":17,"./jsb-adapter/ImageData":22,"./jsb_opengl_constants":38}],38:[function(require,module,exports){
 "use strict";
 
 /****************************************************************************
@@ -6585,7 +6649,7 @@ gl.CONTEXT_LOST_WEBGL = 0x9242;
 gl.UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
 gl.BROWSER_DEFAULT_WEBGL = 0x9244;
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -6829,7 +6893,7 @@ jsb.unregisterChildRefsForNode = function (node, recursive) {
     }
 };
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 'use strict';
 
 function DOMParser(options) {
@@ -7086,7 +7150,7 @@ exports.XMLSerializer = require('./dom').XMLSerializer;
 exports.DOMParser = DOMParser;
 //}
 
-},{"./dom":40,"./entities":41,"./sax":42}],40:[function(require,module,exports){
+},{"./dom":41,"./entities":42,"./sax":43}],41:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -8306,7 +8370,7 @@ exports.DOMImplementation = DOMImplementation;
 exports.XMLSerializer = XMLSerializer;
 //}
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict';
 
 exports.entityMap = {
@@ -8554,7 +8618,7 @@ exports.entityMap = {
 };
 //for(var  n in exports.entityMap){console.log(exports.entityMap[n].charCodeAt())}
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
