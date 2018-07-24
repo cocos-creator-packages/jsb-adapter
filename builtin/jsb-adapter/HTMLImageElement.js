@@ -22,7 +22,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
- 
+
 const HTMLElement = require('./HTMLElement');
 const Event = require('./Event');
 const gl = window.__ccgl;
@@ -46,6 +46,11 @@ class HTMLImageElement extends HTMLElement {
     set src(src) {
         this._src = src;
         jsb.loadImage(src, (info) => {
+            if (!info) {
+                var event = new Event('error');
+                this.dispatchEvent(event);
+                return;
+            }
             this.width = this.naturalWidth = info.width;
             this.height = this.naturalHeight = info.height;
             this._data = info.data;
