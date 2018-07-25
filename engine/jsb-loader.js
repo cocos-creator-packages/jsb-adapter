@@ -90,6 +90,25 @@ cc.loader.addDownloadHandlers({
     'ttc' : empty,
 });
 
+// reload image
+cc.game.on(cc.game.EVENT_SHOW, function () {
+    let _cache = cc.loader._cache;
+    for (let key in _cache) {
+        let item = _cache[key];
+        let image = item.content;
+        if (image && (image instanceof Image)) {
+            // reload cc.Texture2D
+            let rawUrl = item.rawUrl;
+            let tex = item.texture || new cc.Texture2D();
+            tex._uuid = item.uuid;
+            tex.url = rawUrl;
+            tex._setRawAsset(rawUrl, false);
+            tex._nativeAsset = image;
+        }
+    }
+    cc.renderer._forward._programLib._cache = {};
+});
+
 //cjh FIXME: remote image should still use jsb.loadRemoteImage.
 
 //function loadImage (item, callback) {
