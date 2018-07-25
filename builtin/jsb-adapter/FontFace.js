@@ -36,9 +36,9 @@ class FontFace {
         })
     }
 
-    // Promise load() {
-    //     jsb.loadFont(this.source);
-    // }
+    load() {
+        // class FontFaceSet, add(fontFace) have done the load work
+    }
 
     get status() {
         return this._status;
