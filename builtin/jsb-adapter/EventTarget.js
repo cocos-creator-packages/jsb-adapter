@@ -292,9 +292,11 @@ class EventTarget {
 
             // Call this listener
             event._passiveListener = node.passive ? node.listener : null
-            if (typeof node.listener === "function") {
-                node.listener.call(this, event)
-            }
+            try {
+                if (typeof node.listener === "function") {
+                    node.listener.call(this, event)
+                }
+            } catch (error) { }
 
             // Break if `event.stopImmediatePropagation` was called.
             if (event._stopped) {
