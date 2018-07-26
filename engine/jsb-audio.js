@@ -199,6 +199,10 @@ cc.Audio = function (src) {
         }
     };
 
+    // incompatible implementation for game pause & resume
+    audioEngine._break = audioEngine.pauseAll;
+    audioEngine._restore = audioEngine.resumeAll;
+
     // deprecated
 
     audioEngine._uncache = audioEngine.uncache;
