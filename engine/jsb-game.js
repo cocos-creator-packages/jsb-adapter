@@ -22,31 +22,15 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-class FontFace {
-    constructor(family, source, descriptors) {
-        this.family = family
-        this.source = source
-        this.descriptors = descriptors
 
-        this._status = 'unloaded'
-        
-        this._loaded = new Promise((resolve, reject) => {
-            this._resolveCB = resolve
-            this._rejectCB = reject
-        })
-    }
+cc.game.restart = function () {
+    __restartVM();
+};
 
-    load() {
-        // class FontFaceSet, add(fontFace) have done the load work
-    }
+jsb.onHide = function () {
+    cc.game.emit(cc.game.EVENT_HIDE);
+};
 
-    get status() {
-        return this._status;
-    }
-
-    get loaded() {
-        return this._loaded;
-    }
-}
-
-module.exports = FontFace;
+jsb.onShow = function () {
+    cc.game.emit(cc.game.EVENT_SHOW);
+};

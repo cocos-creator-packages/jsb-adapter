@@ -29,7 +29,7 @@ var eventTarget = new EventTarget();
 
 var callbackWrappers = {};
 var callbacks = {};
-var index = 0;
+var index = 1;
 var callbackWrapper = function(cb) {
     if (!cb)
     	return null;

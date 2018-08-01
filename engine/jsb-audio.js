@@ -115,16 +115,16 @@ cc.Audio = function (src) {
             // backward compatibility since 1.10
             cc.warnID(8401, 'cc.audioEngine', 'cc.AudioClip', 'AudioClip', 'cc.AudioClip', 'audio');
             path = clip;
+            var md5Pipe = cc.loader.md5Pipe;
+            if (md5Pipe) {
+                path = md5Pipe.transformURL(path);
+            }
         }
         else {
             if (!clip) {
                 return;
             }
             path = clip._nativeAsset;
-        }
-        var md5Pipe = cc.loader.md5Pipe;
-        if (md5Pipe) {
-            path = md5Pipe.transformURL(path);
         }
         return audioEngine.play2d(path, loop, volume);
     };
@@ -198,6 +198,10 @@ cc.Audio = function (src) {
             audioEngine.setCurrentTime(_music.id, currentTime);
         }
     };
+
+    // incompatible implementation for game pause & resume
+    audioEngine._break = audioEngine.pauseAll;
+    audioEngine._restore = audioEngine.resumeAll;
 
     // deprecated
 
