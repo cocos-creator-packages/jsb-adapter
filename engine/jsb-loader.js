@@ -73,6 +73,8 @@ cc.loader.addDownloadHandlers({
     'tiff' : downloadImage,
     'webp' : downloadImage,
     'image' : downloadImage,
+    'pvr' : downloadImage,
+    'etc' : downloadImage,
 
     // Audio
     'mp3' : downloadAudio,
