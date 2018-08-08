@@ -1,6 +1,6 @@
 cc.loader.downloader.loadSubpackage = function (name, completeCallback) {
     var rt = loadRuntime();
-    let pac = this._subpackages[name];
+    var pac = this._subpackages[name];
     var pos1 = pac.path.lastIndexOf('/');
     var pos2 = pac.path.lastIndexOf('\\');
     var posBegin  = Math.max(pos1, pos2);
