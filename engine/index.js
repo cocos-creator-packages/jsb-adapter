@@ -30,3 +30,6 @@ require('jsb-adapter/engine/jsb-loader.js');
 require('jsb-adapter/engine/jsb-reflection.js');
 require('jsb-adapter/engine/jsb-editbox.js');
 require('jsb-adapter/engine/jsb-cocosanalytics.js');
+if (CC_RUNTIME) {
+    require('jsb-adapter/engine/rt-loadSubpackage.js');
+}
