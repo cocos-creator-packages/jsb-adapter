@@ -38,4 +38,5 @@ jsb.onShow = function () {
 jsb.onResize = function () {
     window.resize();
     cc.view.setCanvasSize(window.innerWidth, window.innerHeight);
-}
+};
+
