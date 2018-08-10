@@ -34,3 +34,9 @@ jsb.onHide = function () {
 jsb.onShow = function () {
     cc.game.emit(cc.game.EVENT_SHOW);
 };
+
+jsb.onResize = function () {
+    window.resize();
+    cc.view.setCanvasSize(window.innerWidth, window.innerHeight);
+};
+
