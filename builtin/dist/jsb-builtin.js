@@ -3598,7 +3598,7 @@ var HTMLCanvasElement = function (_HTMLElement) {
             var self = this;
             // console.log(`==> Canvas getContext(${name})`);
             if (name === 'webgl' || name === 'experimental-webgl') {
-                return window.__ccgl;
+                if (this === window.__cccanvas) return window.__ccgl;else return null;
             } else if (name === '2d') {
                 if (!this._context2D) {
                     this._context2D = new CanvasRenderingContext2D(this._width, this._height);
@@ -5356,6 +5356,17 @@ function inject() {
         };
     };
 
+    window.resize = function () {
+        window.outerWidth = window.innerWidth;
+        window.outerHeight = window.innerHeight;
+        window.__cccanvas._width = window.innerWidth;
+        window.__cccanvas._height = window.innerHeight;
+        window.screen.availWidth = window.innerWidth;
+        window.screen.availHeight = window.innerHeight;
+        window.screen.width = window.innerWidth;
+        window.screen.height = window.innerHeight;
+    };
+
     window.focus = function () {};
     window.scroll = function () {};
 
@@ -5506,7 +5517,7 @@ var eventTarget = new EventTarget();
 
 var callbackWrappers = {};
 var callbacks = {};
-var index = 0;
+var index = 1;
 var callbackWrapper = function callbackWrapper(cb) {
 	if (!cb) return null;
 
