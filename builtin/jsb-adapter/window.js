@@ -124,6 +124,17 @@ function inject () {
         };
     };
 
+    window.resize = function () {
+        window.outerWidth = window.innerWidth;
+        window.outerHeight = window.innerHeight;
+        window.__cccanvas._width = window.innerWidth;
+        window.__cccanvas._height = window.innerHeight;
+        window.screen.availWidth = window.innerWidth;
+        window.screen.availHeight = window.innerHeight;
+        window.screen.width = window.innerWidth;
+        window.screen.height = window.innerHeight;
+    };
+
     window.focus = function() {};
     window.scroll = function() {};
 
