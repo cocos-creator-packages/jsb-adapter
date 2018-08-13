@@ -124,7 +124,7 @@ cc.Audio = function (src) {
             if (!clip) {
                 return;
             }
-            path = clip._nativeAsset;
+            path = clip.nativeUrl;
         }
         return audioEngine.play2d(path, loop, volume);
     };
