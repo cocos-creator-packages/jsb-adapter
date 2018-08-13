@@ -5356,7 +5356,9 @@ function inject() {
         };
     };
 
-    window.resize = function () {
+    window.resize = function (width, height) {
+        window.innerWidth = width;
+        window.innerHeight = height;
         window.outerWidth = window.innerWidth;
         window.outerHeight = window.innerHeight;
         window.__cccanvas._width = window.innerWidth;
