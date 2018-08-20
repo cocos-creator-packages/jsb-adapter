@@ -220,8 +220,6 @@ jsb.fileUtils = cc.fileUtils;
 delete cc.FileUtils;
 delete cc.fileUtils;
 
-jsb.urlRegExp = new RegExp("^(?:https?|ftp)://\\S*$", "i");
-
 XMLHttpRequest.prototype.addEventListener = function(eventName, listener, options) {
     this['on' + eventName] = listener;
 }
