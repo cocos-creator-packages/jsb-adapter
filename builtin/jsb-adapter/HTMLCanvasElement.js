@@ -69,7 +69,7 @@ class HTMLCanvasElement extends HTMLElement {
         // console.log(`==> Canvas getContext(${name})`);
         if (name === 'webgl' || name === 'experimental-webgl') {
             if (this === window.__cccanvas)
-                return window.__ccgl;
+                return window.__gl;
             else
                 return null;
         } else if (name === '2d') {
