@@ -41,6 +41,7 @@ require('./jsb_opengl');
 require('./jsb-adapter');
 require('./jsb_audioengine');
 require('./jsb_input');
+require('./jsb_assets_manager');
 
 let _oldRequestFrameCallback = null;
 let _requestAnimationFrameID = 0;
