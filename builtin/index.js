@@ -25,8 +25,6 @@
 
 window.CC_JSB = true;
 
-jsb.device = cc.Device; // cc namespace will be reset to {} in creator, use jsb namespace instead.
-
 const { btoa, atob } = require('./base64/base64.min');
 window.btoa = btoa;
 window.atob = atob;
@@ -155,22 +153,22 @@ var __motionCallbackID = 0;
 var __motionEnabled = false;
 var __motionInterval = 16.6; // milliseconds
 
-jsb.device.setMotionInterval = function(milliseconds) {
+Device.setMotionInterval = function(milliseconds) {
     __motionInterval = milliseconds;
     // convert to seconds
-    jsb.device.setAccelerometerInterval(__motionInterval / 1000);
+    Device.setAccelerometerInterval(__motionInterval / 1000);
     if (__motionEnabled) {
-        jsb.device.setMotionEnabled(false);
-        jsb.device.setMotionEnabled(true);
+        Device.setMotionEnabled(false);
+        Device.setMotionEnabled(true);
     }
 };
 
-jsb.device.setMotionEnabled = function(enabled) {
+Device.setMotionEnabled = function(enabled) {
     if (__motionEnabled === enabled)
         return;
 
     if (enabled) {
-        jsb.device.setAccelerometerEnabled(enabled);
+        Device.setAccelerometerEnabled(enabled);
         var motionValue;
         var event = new DeviceMotionEvent();
         __motionCallbackID = window.setInterval(function(){

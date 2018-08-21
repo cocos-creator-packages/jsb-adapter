@@ -67,7 +67,7 @@ function inject () {
     const ROTATION_180 = 2;
     const ROTATION_270 = 3;
     var orientation = 0;
-    var rotation = cc.Device.getDeviceRotation();
+    var rotation = Device.getDeviceRotation();
     switch (rotation) {
         case ROTATION_90:
             orientation = 90;
