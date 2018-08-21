@@ -45,10 +45,10 @@ function inject () {
     window.HTMLAudioElement = require('./HTMLAudioElement');
     window.HTMLVideoElement = require('./HTMLVideoElement');
     window.HTMLScriptElement = require('./HTMLScriptElement');
-    window.__cccanvas = new HTMLCanvasElement();
-    window.__cccanvas._width = window.innerWidth;
-    window.__cccanvas._height = window.innerHeight;
-    window.__gl.canvas = window.__cccanvas;
+    window.__canvas = new HTMLCanvasElement();
+    window.__canvas._width = window.innerWidth;
+    window.__canvas._height = window.innerHeight;
+    window.__gl.canvas = window.__canvas;
     window.navigator = require('./navigator');
     window.Image = require('./Image');
     window.Audio = require('./Audio');
@@ -104,15 +104,15 @@ function inject () {
     };
 
     window.addEventListener = function(eventName, listener, options) {
-        window.__cccanvas.addEventListener(eventName, listener, options);
+        window.__canvas.addEventListener(eventName, listener, options);
     };
 
     window.removeEventListener = function(eventName, listener, options) {
-        window.__cccanvas.removeEventListener(eventName, listener, options);
+        window.__canvas.removeEventListener(eventName, listener, options);
     };
 
     window.dispatchEvent = function(event) {
-        window.__cccanvas.dispatchEvent(event);
+        window.__canvas.dispatchEvent(event);
     };
 
     window.getComputedStyle = function(element) {
@@ -129,8 +129,8 @@ function inject () {
         window.innerHeight = height;
         window.outerWidth = window.innerWidth;
         window.outerHeight = window.innerHeight;
-        window.__cccanvas._width = window.innerWidth;
-        window.__cccanvas._height = window.innerHeight;
+        window.__canvas._width = window.innerWidth;
+        window.__canvas._height = window.innerHeight;
         window.screen.availWidth = window.innerWidth;
         window.screen.availHeight = window.innerHeight;
         window.screen.width = window.innerWidth;

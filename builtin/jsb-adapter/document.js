@@ -73,8 +73,8 @@ class Document extends Node {
   }
 
   getElementById(id) {
-    if (id === window.__cccanvas.id || id === 'canvas') {
-      return window.__cccanvas
+    if (id === window.__canvas.id || id === 'canvas') {
+      return window.__canvas
     }
     return new HTMLElement(id);
   }
@@ -85,7 +85,7 @@ class Document extends Node {
     } else if (tagName === 'body') {
       return [document.body]
     } else if (tagName === 'canvas') {
-      return [window.__cccanvas]
+      return [window.__canvas]
     }
     return [new HTMLElement(tagName)]
   }
@@ -96,7 +96,7 @@ class Document extends Node {
     } else if (tagName === 'body') {
       return [document.body]
     } else if (tagName === 'canvas') {
-      return [window.__cccanvas]
+      return [window.__canvas]
     }
     return [new HTMLElement(tagName)]
   }
@@ -107,9 +107,9 @@ class Document extends Node {
     } else if (query === 'body') {
       return document.body
     } else if (query === 'canvas') {
-      return window.__cccanvas
-    } else if (query === `#${window.__cccanvas.id}`) {
-      return window.__cccanvas
+      return window.__canvas
+    } else if (query === `#${window.__canvas.id}`) {
+      return window.__canvas
     }
     return new HTMLElement(query);
   }
@@ -120,7 +120,7 @@ class Document extends Node {
     } else if (query === 'body') {
       return [document.body]
     } else if (query === 'canvas') {
-      return [window.__cccanvas]
+      return [window.__canvas]
     }
     return [new HTMLElement(query)];
   }

@@ -40,7 +40,7 @@ class HTMLElement extends Element {
     }
 
     this.innerHTML = ''
-    this.parentElement = window.__cccanvas
+    this.parentElement = window.__canvas
   }
 
   setAttribute(name, value) {
