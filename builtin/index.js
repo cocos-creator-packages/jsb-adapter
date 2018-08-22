@@ -188,7 +188,7 @@ Device.setMotionEnabled = function(enabled) {
 
             event._interval = __motionInterval;
 
-            jsb.dispatchDeviceMotionEvent(event);
+            Device.dispatchDeviceMotionEvent(event);
         }, __motionInterval);
     }
     else {

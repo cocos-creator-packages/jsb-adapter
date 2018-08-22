@@ -393,7 +393,7 @@ function keyboardEventHandlerFactory(type) {
 jsb.onKeyDown = keyboardEventHandlerFactory('keydown');
 jsb.onKeyUp = keyboardEventHandlerFactory('keyup');
 
-jsb.dispatchDeviceMotionEvent = function(event) {
+Device.dispatchDeviceMotionEvent = function(event) {
     var target;
     var devicemotionListenerMap = __listenerMap.devicemotion;
     for (let key in devicemotionListenerMap) {
