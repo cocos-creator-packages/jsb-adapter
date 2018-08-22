@@ -172,7 +172,7 @@ Device.setMotionEnabled = function(enabled) {
         var motionValue;
         var event = new DeviceMotionEvent();
         __motionCallbackID = window.setInterval(function(){
-            motionValue = jsb.getDeviceMotionValue();
+            motionValue = Device.getDeviceMotionValue();
 
             event._acceleration.x = motionValue[0];
             event._acceleration.y = motionValue[1];
