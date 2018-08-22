@@ -23,8 +23,6 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-window.CC_JSB = true;
-
 const { btoa, atob } = require('./base64/base64.min');
 window.btoa = btoa;
 window.atob = atob;
