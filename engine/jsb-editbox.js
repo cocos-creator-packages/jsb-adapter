@@ -87,7 +87,7 @@
 
 		let rect = this._getRect();
 		
-		jsb.inputBox.show({
+		InputBox.show({
 			defaultValue: editBoxImpl._text,
 			maxLength: editBoxImpl._maxLength,
 			multiple: multiline,
@@ -109,7 +109,7 @@
 		function onConfirm(res) {
 			editBoxImpl._delegate && editBoxImpl._delegate.editBoxEditingReturn && editBoxImpl._delegate.editBoxEditingReturn();
 		}
-		jsb.inputBox.onConfirm(onConfirm);
+		InputBox.onConfirm(onConfirm);
 
 		function onInput(res) {
 			if (res.value.length > editBoxImpl._maxLength) {
@@ -122,15 +122,15 @@
 				}
 			}
 		}
-		jsb.inputBox.onInput(onInput);
+		InputBox.onInput(onInput);
 
 		function onComplete(res) {
 			editBoxImpl._endEditing();
-			jsb.inputBox.offConfirm(onConfirm);
-			jsb.inputBox.offInput(onInput);
-			jsb.inputBox.offComplete(onComplete);
+			InputBox.offConfirm(onConfirm);
+			InputBox.offInput(onInput);
+			InputBox.offComplete(onComplete);
 		}
-		jsb.inputBox.onComplete(onComplete);
+		InputBox.onComplete(onComplete);
 	};
 
 	_p.setTabIndex = function (index) {
