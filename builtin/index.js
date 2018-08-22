@@ -200,19 +200,8 @@ Device.setMotionEnabled = function(enabled) {
 };
 
 // File utils (Temporary, won't be accessible)
-cc.fileUtils = cc.FileUtils.getInstance();
-cc.fileUtils.setPopupNotify(false);
-
-/**
- * @type {Object}
- * @name jsb.fileUtils
- * jsb.fileUtils is the native file utils singleton object,
- * please refer to Cocos2d-x API to know how to use it.
- * Only available in JSB
- */
-jsb.fileUtils = cc.fileUtils;
-delete cc.FileUtils;
-delete cc.fileUtils;
+FileUtils = FileUtils.getInstance();
+FileUtils.setPopupNotify(false);
 
 XMLHttpRequest.prototype.addEventListener = function(eventName, listener, options) {
     this['on' + eventName] = listener;
