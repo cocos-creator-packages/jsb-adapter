@@ -214,12 +214,12 @@ XMLHttpRequest.prototype.removeEventListener = function(eventName, listener, opt
 // SocketIO
 if (window.SocketIO) {
     window.io = window.SocketIO;
-    SocketIO.prototype._jsbEmit = SocketIO.prototype.emit;
+    SocketIO.prototype._Emit = SocketIO.prototype.emit;
     SocketIO.prototype.emit = function (uri, delegate) {
         if (typeof delegate === 'object') {
             delegate = JSON.stringify(delegate);
         }
-        this._jsbEmit(uri, delegate);
+        this._Emit(uri, delegate);
     };
 }
 
