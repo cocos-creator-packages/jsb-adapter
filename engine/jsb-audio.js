@@ -228,4 +228,4 @@ cc.Audio = function (src) {
         audioEngine._preload(filePath, callback);
     };
 
-})(cc.Audio.prototype, jsb.AudioEngine);
+})(cc.Audio.prototype, AudioEngine);

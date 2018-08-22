@@ -23,10 +23,10 @@
 
 (function (jsb) {
 
-if (!jsb || !jsb.AudioEngine)
+if (!jsb || !AudioEngine)
     return
 
-jsb.AudioEngine.AudioState = {
+AudioEngine.AudioState = {
     ERROR: -1,
     INITIALZING: 0,
     PLAYING: 1,
@@ -34,7 +34,7 @@ jsb.AudioEngine.AudioState = {
     STOPPED: 3,
 }
 
-jsb.AudioEngine.INVALID_AUDIO_ID = -1
-jsb.AudioEngine.TIME_UNKNOWN = -1
+AudioEngine.INVALID_AUDIO_ID = -1
+AudioEngine.TIME_UNKNOWN = -1
 
 })(jsb)
