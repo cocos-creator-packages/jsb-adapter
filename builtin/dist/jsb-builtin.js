@@ -1,4 +1,4 @@
-(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -2162,8 +2162,6 @@ cc.fileUtils.setPopupNotify(false);
 jsb.fileUtils = cc.fileUtils;
 delete cc.FileUtils;
 delete cc.fileUtils;
-
-jsb.urlRegExp = new RegExp("^(?:https?|ftp)://\\S*$", "i");
 
 XMLHttpRequest.prototype.addEventListener = function (eventName, listener, options) {
     this['on' + eventName] = listener;
@@ -6671,8 +6669,6 @@ gl.BROWSER_DEFAULT_WEBGL = 0x9244;
 },{}],39:[function(require,module,exports){
 "use strict";
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 /*
  * Copyright (c) 2014-2016 Chukong Technologies Inc.
  * Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
@@ -6695,171 +6691,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-// Prepare JSB environment
-window.cc = window.cc || {};
-/**
- * @namespace jsb
- * @name jsb
- */
-window.jsb = window.jsb || {};
-
-/**
- * Common getter setter configuration function
- * @function
- * @param {Object}   proto      A class prototype or an object to config
- * @param {String}   prop       Property name
- * @param {function} getter     Getter function for the property
- * @param {function} setter     Setter function for the property
- */
-cc.defineGetterSetter = function (proto, prop, getter, setter) {
-    var desc = { enumerable: false, configurable: true };
-    getter && (desc.get = getter);
-    setter && (desc.set = setter);
-    Object.defineProperty(proto, prop, desc);
-};
-
-/**
- * Create a new object and copy all properties in an exist object to the new object
- * @method clone
- * @param {Object|Array} obj - The source object
- * @return {Array|Object} The created object
- */
-cc.clone = function (obj) {
-    // Cloning is better if the new object is having the same prototype chain
-    // as the copied obj (or otherwise, the cloned object is certainly going to
-    // have a different hidden class). Play with C1/C2 of the
-    // PerformanceVirtualMachineTests suite to see how this makes an impact
-    // under extreme conditions.
-    //
-    // Object.create(Object.getPrototypeOf(obj)) doesn't work well because the
-    // prototype lacks a link to the constructor (Carakan, V8) so the new
-    // object wouldn't have the hidden class that's associated with the
-    // constructor (also, for whatever reasons, utilizing
-    // Object.create(Object.getPrototypeOf(obj)) + Object.defineProperty is even
-    // slower than the original in V8). Therefore, we call the constructor, but
-    // there is a big caveat - it is possible that the this.init() in the
-    // constructor would throw with no argument. It is also possible that a
-    // derived class forgets to set "constructor" on the prototype. We ignore
-    // these possibities for and the ultimate solution is a standardized
-    // Object.clone(<object>).
-    var newObj = obj.constructor ? new obj.constructor() : {};
-
-    // Assuming that the constuctor above initialized all properies on obj, the
-    // following keyed assignments won't turn newObj into dictionary mode
-    // becasue they're not *appending new properties* but *assigning existing
-    // ones* (note that appending indexed properties is another story). See
-    // CCClass.js for a link to the devils when the assumption fails.
-    for (var key in obj) {
-        var copy = obj[key];
-        // Beware that typeof null == "object" !
-        if ((typeof copy === "undefined" ? "undefined" : _typeof(copy)) === "object" && copy && !(copy instanceof _ccsg.Node) && (CC_JSB || !(copy instanceof HTMLElement))) {
-            newObj[key] = cc.clone(copy);
-        } else {
-            newObj[key] = copy;
-        }
-    }
-    return newObj;
-};
-
-var ClassManager = {
-    id: 0 | Math.random() * 998,
-
-    instanceId: 0 | Math.random() * 998,
-
-    getNewID: function getNewID() {
-        return this.id++;
-    },
-
-    getNewInstanceId: function getNewInstanceId() {
-        return this.instanceId++;
-    }
-};
-//
-// 2) Using "extend" subclassing
-// Simple JavaScript Inheritance By John Resig http://ejohn.org/
-//
-cc.Class = function () {};
-cc.Class.extend = function (prop) {
-    var _super = this.prototype,
-        prototype = void 0,
-        Class = void 0,
-        classId = void 0,
-        className = prop._className || "",
-        name = void 0,
-        desc = void 0;
-
-    // Instantiate a base class (but only create the instance,
-    // don't run the init constructor)
-    initializing = true;
-    prototype = Object.create(_super);
-    initializing = false;
-    fnTest = /xyz/.test(function () {
-        xyz;
-    }) ? /\b_super\b/ : /.*/;
-
-    // Copy the properties over onto the new prototype
-    for (name in prop) {
-        // Check if we're overwriting an existing function
-        prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? function (name, fn) {
-            return function () {
-                var tmp = this._super;
-
-                // Add a new ._super() method that is the same method
-                // but on the super-class
-                this._super = _super[name];
-
-                // The method only need to be bound temporarily, so we
-                // remove it when we're done executing
-                var ret = fn.apply(this, arguments);
-                this._super = tmp;
-
-                return ret;
-            };
-        }(name, prop[name]) : prop[name];
-    }
-
-    Class = function Class() {
-        if (!initializing) {
-            this.__instanceId = ClassManager.getNewInstanceId();
-            if (this.ctor) {
-                switch (arguments.length) {
-                    case 0:
-                        this.ctor();break;
-                    case 1:
-                        this.ctor(arguments[0]);break;
-                    case 2:
-                        this.ctor(arguments[0], arguments[1]);break;
-                    case 3:
-                        this.ctor(arguments[0], arguments[1], arguments[2]);break;
-                    case 4:
-                        this.ctor(arguments[0], arguments[1], arguments[2], arguments[3]);break;
-                    case 5:
-                        this.ctor(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);break;
-                    default:
-                        this.ctor.apply(this, arguments);
-                }
-            }
-        }
-    };
-    // Populate our constructed prototype object
-    Class.prototype = prototype;
-
-    // Enforce the constructor to be what we expect
-    Class.prototype.constructor = Class;
-
-    // And make this class extendable
-    Class.extend = cc.Class.extend;
-
-    classId = ClassManager.getNewID();
-    ClassManager[classId] = _super;
-    desc = { writable: true, enumerable: false, configurable: true };
-    Class.id = classId;
-    desc.value = classId;
-    Object.defineProperty(prototype, '__pid', desc);
-
-    return Class;
-};
 
 jsb.__obj_ref_id = 0;
 
