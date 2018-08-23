@@ -37,7 +37,7 @@ cc.Audio = function (src) {
     cc.audioEngine = audioEngine;
     audioEngine.setMaxWebAudioSize = function () {};
 
-    proto.State = audioEngine.AudioState;
+    cc.Audio.State = audioEngine.AudioState;
 
     proto.play = function () {
         audioEngine.stop(this.id);

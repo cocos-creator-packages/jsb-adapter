@@ -30,7 +30,8 @@ jsb.AudioEngine.AudioState = {
     ERROR: -1,
     INITIALZING: 0,
     PLAYING: 1,
-    PAUSED: 2
+    PAUSED: 2,
+    STOPPED: 3,
 }
 
 jsb.AudioEngine.INVALID_AUDIO_ID = -1
