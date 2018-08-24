@@ -156,26 +156,26 @@ var __motionCallbackID = 0;
 var __motionEnabled = false;
 var __motionInterval = 16.6; // milliseconds
 
-Device.setMotionInterval = function(milliseconds) {
+jsb.device.setMotionInterval = function(milliseconds) {
     __motionInterval = milliseconds;
     // convert to seconds
-    Device.setAccelerometerInterval(__motionInterval / 1000);
+    jsb.device.setAccelerometerInterval(__motionInterval / 1000);
     if (__motionEnabled) {
-        Device.setMotionEnabled(false);
-        Device.setMotionEnabled(true);
+        jsb.device.setMotionEnabled(false);
+        jsb.device.setMotionEnabled(true);
     }
 };
 
-Device.setMotionEnabled = function(enabled) {
+jsb.device.setMotionEnabled = function(enabled) {
     if (__motionEnabled === enabled)
         return;
 
     if (enabled) {
-        Device.setAccelerometerEnabled(enabled);
+        jsb.device.setAccelerometerEnabled(enabled);
         var motionValue;
         var event = new DeviceMotionEvent();
         __motionCallbackID = window.setInterval(function(){
-            motionValue = Device.getDeviceMotionValue();
+            motionValue = jsb.device.getDeviceMotionValue();
 
             event._acceleration.x = motionValue[0];
             event._acceleration.y = motionValue[1];
@@ -191,7 +191,7 @@ Device.setMotionEnabled = function(enabled) {
 
             event._interval = __motionInterval;
 
-            Device.dispatchDeviceMotionEvent(event);
+            jsb.device.dispatchDeviceMotionEvent(event);
         }, __motionInterval);
     }
     else {

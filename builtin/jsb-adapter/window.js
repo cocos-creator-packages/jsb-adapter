@@ -67,7 +67,7 @@ function inject () {
     const ROTATION_180 = 2;
     const ROTATION_270 = 3;
     var orientation = 0;
-    var rotation = Device.getDeviceRotation();
+    var rotation = jsb.device.getDeviceRotation();
     switch (rotation) {
         case ROTATION_90:
             orientation = 90;
