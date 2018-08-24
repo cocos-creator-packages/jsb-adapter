@@ -203,7 +203,7 @@ jsb.device.setMotionEnabled = function(enabled) {
 };
 
 // File utils (Temporary, won't be accessible)
-if (typeof FileUtils !== 'undefined') {
+if (typeof jsb.FileUtils !== 'undefined') {
     jsb.fileUtils = jsb.FileUtils.getInstance();
     delete jsb.FileUtils;
 }

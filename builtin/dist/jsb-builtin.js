@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -332,7 +332,7 @@ var GL_COMMAND_VERTEX_ATTRIB_4FV = 95;
 var GL_COMMAND_VERTEX_ATTRIB_POINTER = 96;
 var GL_COMMAND_VIEW_PORT = 97;
 
-var gl = __ccgl;
+var gl = __gl;
 
 // _gl save the orignal gl functions.
 var _gl = {};
@@ -361,10 +361,10 @@ function batchGLCommandsToNative() {
 }
 
 function disableBatchGLCommandsToNative() {
-    // Reset __ccgl variable to the default one.
+    // Reset __gl variable to the default one.
     flushCommands();
     for (var k in _gl) {
-        __ccgl[k] = _gl[k];
+        __gl[k] = _gl[k];
     }
     console.log('Disable batch GL commands optimization！');
     jsb.disableBatchGLCommandsToNative();
@@ -1959,12 +1959,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  THE SOFTWARE.
  ****************************************************************************/
 
-window.CC_JSB = true;
+window.CanvasRenderingContext2D = jsb.CanvasRenderingContext2D;
+delete jsb.CanvasRenderingContext2D;
 
-window.CanvasRenderingContext2D = cc.CanvasRenderingContext2D;
-delete cc.CanvasRenderingContext2D;
-
-jsb.device = cc.Device; // cc namespace will be reset to {} in creator, use jsb namespace instead.
+jsb.device = jsb.Device; // cc namespace will be reset to {} in creator, use jsb namespace instead.
 
 var _require = require('./base64/base64.min'),
     btoa = _require.btoa,
@@ -1986,7 +1984,6 @@ require('./jsb_opengl');
 require('./jsb-adapter');
 require('./jsb_audioengine');
 require('./jsb_input');
-require('./jsb_assets_manager');
 
 var _oldRequestFrameCallback = null;
 var _requestAnimationFrameID = 0;
@@ -2122,7 +2119,7 @@ jsb.device.setMotionEnabled = function (enabled) {
         var motionValue;
         var event = new DeviceMotionEvent();
         __motionCallbackID = window.setInterval(function () {
-            motionValue = jsb.getDeviceMotionValue();
+            motionValue = jsb.device.getDeviceMotionValue();
 
             event._acceleration.x = motionValue[0];
             event._acceleration.y = motionValue[1];
@@ -2138,7 +2135,7 @@ jsb.device.setMotionEnabled = function (enabled) {
 
             event._interval = __motionInterval;
 
-            jsb.dispatchDeviceMotionEvent(event);
+            jsb.device.dispatchDeviceMotionEvent(event);
         }, __motionInterval);
     } else {
         window.clearInterval(__motionCallbackID);
@@ -2149,19 +2146,10 @@ jsb.device.setMotionEnabled = function (enabled) {
 };
 
 // File utils (Temporary, won't be accessible)
-cc.fileUtils = cc.FileUtils.getInstance();
-cc.fileUtils.setPopupNotify(false);
-
-/**
- * @type {Object}
- * @name jsb.fileUtils
- * jsb.fileUtils is the native file utils singleton object,
- * please refer to Cocos2d-x API to know how to use it.
- * Only available in JSB
- */
-jsb.fileUtils = cc.fileUtils;
-delete cc.FileUtils;
-delete cc.fileUtils;
+if (typeof jsb.FileUtils !== 'undefined') {
+    jsb.fileUtils = jsb.FileUtils.getInstance();
+    delete jsb.FileUtils;
+}
 
 XMLHttpRequest.prototype.addEventListener = function (eventName, listener, options) {
     this['on' + eventName] = listener;
@@ -2174,18 +2162,18 @@ XMLHttpRequest.prototype.removeEventListener = function (eventName, listener, op
 // SocketIO
 if (window.SocketIO) {
     window.io = window.SocketIO;
-    SocketIO.prototype._jsbEmit = SocketIO.prototype.emit;
+    SocketIO.prototype._Emit = SocketIO.prototype.emit;
     SocketIO.prototype.emit = function (uri, delegate) {
         if ((typeof delegate === 'undefined' ? 'undefined' : _typeof(delegate)) === 'object') {
             delegate = JSON.stringify(delegate);
         }
-        this._jsbEmit(uri, delegate);
+        this._Emit(uri, delegate);
     };
 }
 
 window.gameTick = tick;
 
-},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":29,"./jsb_assets_manager":34,"./jsb_audioengine":35,"./jsb_input":36,"./jsb_opengl":37,"./jsb_prepare":39,"./xmldom/dom-parser":40}],5:[function(require,module,exports){
+},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":29,"./jsb_audioengine":34,"./jsb_input":35,"./jsb_opengl":36,"./jsb_prepare":38,"./xmldom/dom-parser":39}],5:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -3095,7 +3083,7 @@ function keyboardEventHandlerFactory(type) {
 jsb.onKeyDown = keyboardEventHandlerFactory('keydown');
 jsb.onKeyUp = keyboardEventHandlerFactory('keyup');
 
-jsb.dispatchDeviceMotionEvent = function (event) {
+jsb.device.dispatchDeviceMotionEvent = function (event) {
     var target;
     var devicemotionListenerMap = __listenerMap.devicemotion;
     for (var key in devicemotionListenerMap) {
@@ -3596,7 +3584,7 @@ var HTMLCanvasElement = function (_HTMLElement) {
             var self = this;
             // console.log(`==> Canvas getContext(${name})`);
             if (name === 'webgl' || name === 'experimental-webgl') {
-                if (this === window.__cccanvas) return window.__ccgl;else return null;
+                if (this === window.__canvas) return window.__gl;else return null;
             } else if (name === '2d') {
                 if (!this._context2D) {
                     this._context2D = new CanvasRenderingContext2D(this._width, this._height);
@@ -3753,7 +3741,7 @@ var HTMLElement = function (_Element) {
     };
 
     _this.innerHTML = '';
-    _this.parentElement = window.__cccanvas;
+    _this.parentElement = window.__canvas;
     return _this;
   }
 
@@ -3815,7 +3803,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var HTMLElement = require('./HTMLElement');
 var Event = require('./Event');
-var gl = window.__ccgl;
+var gl = window.__gl;
 
 var HTMLImageElement = function (_HTMLElement) {
     _inherits(HTMLImageElement, _HTMLElement);
@@ -4790,7 +4778,7 @@ var Node = function (_EventTarget) {
     var _this = _possibleConstructorReturn(this, (Node.__proto__ || Object.getPrototypeOf(Node)).call(this));
 
     _this.childNodes = [];
-    _this.parentNode = window.__cccanvas;
+    _this.parentNode = window.__canvas;
     return _this;
   }
 
@@ -4995,8 +4983,8 @@ var Document = function (_Node) {
   }, {
     key: 'getElementById',
     value: function getElementById(id) {
-      if (id === window.__cccanvas.id || id === 'canvas') {
-        return window.__cccanvas;
+      if (id === window.__canvas.id || id === 'canvas') {
+        return window.__canvas;
       }
       return new HTMLElement(id);
     }
@@ -5008,7 +4996,7 @@ var Document = function (_Node) {
       } else if (tagName === 'body') {
         return [document.body];
       } else if (tagName === 'canvas') {
-        return [window.__cccanvas];
+        return [window.__canvas];
       }
       return [new HTMLElement(tagName)];
     }
@@ -5020,7 +5008,7 @@ var Document = function (_Node) {
       } else if (tagName === 'body') {
         return [document.body];
       } else if (tagName === 'canvas') {
-        return [window.__cccanvas];
+        return [window.__canvas];
       }
       return [new HTMLElement(tagName)];
     }
@@ -5032,9 +5020,9 @@ var Document = function (_Node) {
       } else if (query === 'body') {
         return document.body;
       } else if (query === 'canvas') {
-        return window.__cccanvas;
-      } else if (query === '#' + window.__cccanvas.id) {
-        return window.__cccanvas;
+        return window.__canvas;
+      } else if (query === '#' + window.__canvas.id) {
+        return window.__canvas;
       }
       return new HTMLElement(query);
     }
@@ -5046,7 +5034,7 @@ var Document = function (_Node) {
       } else if (query === 'body') {
         return [document.body];
       } else if (query === 'canvas') {
-        return [window.__cccanvas];
+        return [window.__canvas];
       }
       return [new HTMLElement(query)];
     }
@@ -5275,10 +5263,10 @@ function inject() {
     window.HTMLAudioElement = require('./HTMLAudioElement');
     window.HTMLVideoElement = require('./HTMLVideoElement');
     window.HTMLScriptElement = require('./HTMLScriptElement');
-    window.__cccanvas = new HTMLCanvasElement();
-    window.__cccanvas._width = window.innerWidth;
-    window.__cccanvas._height = window.innerHeight;
-    window.__ccgl.canvas = window.__cccanvas;
+    window.__canvas = new HTMLCanvasElement();
+    window.__canvas._width = window.innerWidth;
+    window.__canvas._height = window.innerHeight;
+    window.__gl.canvas = window.__canvas;
     window.navigator = require('./navigator');
     window.Image = require('./Image');
     window.Audio = require('./Audio');
@@ -5297,7 +5285,7 @@ function inject() {
     var ROTATION_180 = 2;
     var ROTATION_270 = 3;
     var orientation = 0;
-    var rotation = cc.Device.getDeviceRotation();
+    var rotation = jsb.device.getDeviceRotation();
     switch (rotation) {
         case ROTATION_90:
             orientation = 90;
@@ -5334,15 +5322,15 @@ function inject() {
     };
 
     window.addEventListener = function (eventName, listener, options) {
-        window.__cccanvas.addEventListener(eventName, listener, options);
+        window.__canvas.addEventListener(eventName, listener, options);
     };
 
     window.removeEventListener = function (eventName, listener, options) {
-        window.__cccanvas.removeEventListener(eventName, listener, options);
+        window.__canvas.removeEventListener(eventName, listener, options);
     };
 
     window.dispatchEvent = function (event) {
-        window.__cccanvas.dispatchEvent(event);
+        window.__canvas.dispatchEvent(event);
     };
 
     window.getComputedStyle = function (element) {
@@ -5359,8 +5347,8 @@ function inject() {
         window.innerHeight = height;
         window.outerWidth = window.innerWidth;
         window.outerHeight = window.innerHeight;
-        window.__cccanvas._width = window.innerWidth;
-        window.__cccanvas._height = window.innerHeight;
+        window.__canvas._width = window.innerWidth;
+        window.__canvas._height = window.innerHeight;
         window.screen.availWidth = window.innerWidth;
         window.screen.availHeight = window.innerHeight;
         window.screen.width = window.innerWidth;
@@ -5380,69 +5368,6 @@ if (!window._isInjected) {
 window.localStorage = sys.localStorage;
 
 },{"./Audio":5,"./DeviceMotionEvent":7,"./Element":8,"./Event":9,"./EventTarget":10,"./FileReader":11,"./FontFace":12,"./FontFaceSet":13,"./HTMLAudioElement":14,"./HTMLCanvasElement":15,"./HTMLElement":16,"./HTMLImageElement":17,"./HTMLMediaElement":18,"./HTMLScriptElement":19,"./HTMLVideoElement":20,"./Image":21,"./KeyboardEvent":23,"./MouseEvent":25,"./TouchEvent":27,"./document":28,"./location":30,"./navigator":31}],34:[function(require,module,exports){
-"use strict";
-
-/*
- * Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-if (jsb.AssetsManager) {
-    jsb.AssetsManager.State = {
-        UNINITED: 0,
-        UNCHECKED: 1,
-        PREDOWNLOAD_VERSION: 2,
-        DOWNLOADING_VERSION: 3,
-        VERSION_LOADED: 4,
-        PREDOWNLOAD_MANIFEST: 5,
-        DOWNLOADING_MANIFEST: 6,
-        MANIFEST_LOADED: 7,
-        NEED_UPDATE: 8,
-        READY_TO_UPDATE: 9,
-        UPDATING: 10,
-        UNZIPPING: 11,
-        UP_TO_DATE: 12,
-        FAIL_TO_UPDATE: 13
-    };
-
-    jsb.Manifest.DownloadState = {
-        UNSTARTED: 0,
-        DOWNLOADING: 1,
-        SUCCESSED: 2,
-        UNMARKED: 3
-    };
-
-    jsb.EventAssetsManager.ERROR_NO_LOCAL_MANIFEST = 0;
-    jsb.EventAssetsManager.ERROR_DOWNLOAD_MANIFEST = 1;
-    jsb.EventAssetsManager.ERROR_PARSE_MANIFEST = 2;
-    jsb.EventAssetsManager.NEW_VERSION_FOUND = 3;
-    jsb.EventAssetsManager.ALREADY_UP_TO_DATE = 4;
-    jsb.EventAssetsManager.UPDATE_PROGRESSION = 5;
-    jsb.EventAssetsManager.ASSET_UPDATED = 6;
-    jsb.EventAssetsManager.ERROR_UPDATING = 7;
-    jsb.EventAssetsManager.UPDATE_FINISHED = 8;
-    jsb.EventAssetsManager.UPDATE_FAILED = 9;
-    jsb.EventAssetsManager.ERROR_DECOMPRESS = 10;
-}
-
-},{}],35:[function(require,module,exports){
 "use strict";
 
 /*
@@ -5470,20 +5395,21 @@ if (jsb.AssetsManager) {
 
 (function (jsb) {
 
-    if (!jsb || !jsb.AudioEngine) return;
+  if (!jsb || !jsb.AudioEngine) return;
 
-    jsb.AudioEngine.AudioState = {
-        ERROR: -1,
-        INITIALZING: 0,
-        PLAYING: 1,
-        PAUSED: 2
-    };
+  jsb.AudioEngine.AudioState = {
+    ERROR: -1,
+    INITIALZING: 0,
+    PLAYING: 1,
+    PAUSED: 2,
+    STOPPED: 3
+  };
 
-    jsb.AudioEngine.INVALID_AUDIO_ID = -1;
-    jsb.AudioEngine.TIME_UNKNOWN = -1;
+  jsb.AudioEngine.INVALID_AUDIO_ID = -1;
+  jsb.AudioEngine.TIME_UNKNOWN = -1;
 })(jsb);
 
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -5608,7 +5534,7 @@ jsb.onTextInput = function (eventName, text) {
 	eventTarget.dispatchEvent(event);
 };
 
-},{"./jsb-adapter/Event":9,"./jsb-adapter/EventTarget":10}],37:[function(require,module,exports){
+},{"./jsb-adapter/Event":9,"./jsb-adapter/EventTarget":10}],36:[function(require,module,exports){
 'use strict';
 
 /*
@@ -5642,7 +5568,7 @@ jsb.onTextInput = function (eventName, text) {
 
 require('./jsb_opengl_constants');
 
-var gl = __ccgl;
+var gl = __gl;
 
 gl.drawingBufferWidth = window.innerWidth;
 gl.drawingBufferHeight = window.innerHeight;
@@ -5803,7 +5729,7 @@ gl.isContextLost = function () {
     return false;
 };
 
-},{"./jsb-adapter/HTMLCanvasElement":15,"./jsb-adapter/HTMLImageElement":17,"./jsb-adapter/ImageData":22,"./jsb_opengl_constants":38}],38:[function(require,module,exports){
+},{"./jsb-adapter/HTMLCanvasElement":15,"./jsb-adapter/HTMLImageElement":17,"./jsb-adapter/ImageData":22,"./jsb_opengl_constants":37}],37:[function(require,module,exports){
 "use strict";
 
 /****************************************************************************
@@ -5831,7 +5757,7 @@ gl.isContextLost = function () {
  THE SOFTWARE.
  ****************************************************************************/
 
-var gl = __ccgl;
+var gl = __gl;
 
 gl.GCCSO_SHADER_BINARY_FJ = 0x9260;
 gl._3DC_XY_AMD = 0x87fa;
@@ -6666,7 +6592,7 @@ gl.CONTEXT_LOST_WEBGL = 0x9242;
 gl.UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
 gl.BROWSER_DEFAULT_WEBGL = 0x9244;
 
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 /*
@@ -6692,22 +6618,6 @@ gl.BROWSER_DEFAULT_WEBGL = 0x9244;
  * THE SOFTWARE.
  */
 
-jsb.__obj_ref_id = 0;
-
-jsb.registerNativeRef = function (owner, target) {
-    if (owner && target && owner !== target) {
-        var targetID = target.__jsb_ref_id;
-        if (targetID === undefined) targetID = target.__jsb_ref_id = jsb.__obj_ref_id++;
-
-        var refs = owner.__nativeRefs;
-        if (!refs) {
-            refs = owner.__nativeRefs = {};
-        }
-
-        refs[targetID] = target;
-    }
-};
-
 jsb.unregisterNativeRef = function (owner, target) {
     if (owner && target && owner !== target) {
         var targetID = target.__jsb_ref_id;
@@ -6728,7 +6638,6 @@ jsb.unregisterAllNativeRefs = function (owner) {
 };
 
 jsb.unregisterChildRefsForNode = function (node, recursive) {
-    if (!(node instanceof cc.Node)) return;
     recursive = !!recursive;
     var children = node.getChildren(),
         i = void 0,
@@ -6743,7 +6652,7 @@ jsb.unregisterChildRefsForNode = function (node, recursive) {
     }
 };
 
-},{}],40:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict';
 
 function DOMParser(options) {
@@ -7000,7 +6909,7 @@ exports.XMLSerializer = require('./dom').XMLSerializer;
 exports.DOMParser = DOMParser;
 //}
 
-},{"./dom":41,"./entities":42,"./sax":43}],41:[function(require,module,exports){
+},{"./dom":40,"./entities":41,"./sax":42}],40:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -8220,7 +8129,7 @@ exports.DOMImplementation = DOMImplementation;
 exports.XMLSerializer = XMLSerializer;
 //}
 
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict';
 
 exports.entityMap = {
@@ -8468,7 +8377,7 @@ exports.entityMap = {
 };
 //for(var  n in exports.entityMap){console.log(exports.entityMap[n].charCodeAt())}
 
-},{}],43:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
