@@ -198,8 +198,10 @@ Device.setMotionEnabled = function(enabled) {
 };
 
 // File utils (Temporary, won't be accessible)
-FileUtils = FileUtils.getInstance();
-FileUtils.setPopupNotify(false);
+if (typeof FileUtils !== 'undefined') {
+    FileUtils = FileUtils.getInstance();
+    FileUtils.setPopupNotify(false);
+}
 
 XMLHttpRequest.prototype.addEventListener = function(eventName, listener, options) {
     this['on' + eventName] = listener;
