@@ -22,16 +22,53 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
+var rt = loadRuntime();
 
-if (CC_RUNTIME) {
-    require('jsb-adapter/engine/rt_input.js');
-    require('jsb-adapter/engine/rt-loadSubpackage.js');
-}
+window.InputBox = {
+	onConfirm: function(cb) {
+		console.log("InputBox onKeyboardConfirm");
+		rt.onKeyboardConfirm(cb);
+	},
+	offConfirm: function(cb) {
+		console.log("InputBox offKeyboardConfirm");
+		rt.offKeyboardConfirm(cb);
+	},
 
-require('jsb-adapter/engine/jsb-game.js');
-require('jsb-adapter/engine/jsb-node.js');
-require('jsb-adapter/engine/jsb-audio.js');
-require('jsb-adapter/engine/jsb-loader.js');
-require('jsb-adapter/engine/jsb-editbox.js');
-require('jsb-adapter/engine/jsb-reflection.js');
-require('jsb-adapter/engine/jsb-cocosanalytics.js');
+	onComplete: function(cb) {
+		console.log("InputBox onKeyboardComplete");
+		rt.onKeyboardComplete(cb);
+	},
+	offComplete: function(cb) {
+		console.log("InputBox offKeyboardComplete");
+		rt.offKeyboardComplete(cb);
+	},
+
+	onInput: function(cb) {
+		console.log("InputBox onKeyboardInput");
+		rt.onKeyboardInput(cb);
+	},
+	offInput: function(cb) {
+		console.log("InputBox offKeyboardInput");
+		rt.offKeyboardInput(cb);
+	},
+
+    /**
+     * @param {string}		options.defaultValue
+     * @param {number}		options.maxLength
+     * @param {bool}        options.multiple
+     * @param {bool}        options.confirmHold
+     * @param {string}      options.confirmType
+     * @param {string}      options.inputType
+     * 
+     * Values of options.confirmType can be [done|next|search|go|send].
+     * Values of options.inputType can be [text|email|number|phone|password].
+     */
+	show: function(options) {
+		console.log("InputBox showKeyboard");
+		rt.showKeyboard(options);
+	},
+	hide: function() {
+		console.log("hideInputBox");
+		rt.hideKeyboard();
+	},
+};
