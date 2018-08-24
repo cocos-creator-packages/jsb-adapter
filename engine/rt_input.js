@@ -26,29 +26,23 @@ var rt = loadRuntime();
 
 window.InputBox = {
 	onConfirm: function(cb) {
-		console.log("InputBox onKeyboardConfirm");
 		rt.onKeyboardConfirm(cb);
 	},
 	offConfirm: function(cb) {
-		console.log("InputBox offKeyboardConfirm");
 		rt.offKeyboardConfirm(cb);
 	},
 
 	onComplete: function(cb) {
-		console.log("InputBox onKeyboardComplete");
 		rt.onKeyboardComplete(cb);
 	},
 	offComplete: function(cb) {
-		console.log("InputBox offKeyboardComplete");
 		rt.offKeyboardComplete(cb);
 	},
 
 	onInput: function(cb) {
-		console.log("InputBox onKeyboardInput");
 		rt.onKeyboardInput(cb);
 	},
 	offInput: function(cb) {
-		console.log("InputBox offKeyboardInput");
 		rt.offKeyboardInput(cb);
 	},
 
@@ -64,11 +58,9 @@ window.InputBox = {
      * Values of options.inputType can be [text|email|number|phone|password].
      */
 	show: function(options) {
-		console.log("InputBox showKeyboard");
 		rt.showKeyboard(options);
 	},
 	hide: function() {
-		console.log("hideInputBox");
 		rt.hideKeyboard();
 	},
 };
