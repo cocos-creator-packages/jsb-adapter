@@ -23,6 +23,11 @@
  THE SOFTWARE.
  ****************************************************************************/
 
+window.CanvasRenderingContext2D = jsb.CanvasRenderingContext2D;
+delete jsb.CanvasRenderingContext2D;
+
+jsb.device = jsb.Device; // cc namespace will be reset to {} in creator, use jsb namespace instead.
+
 const { btoa, atob } = require('./base64/base64.min');
 window.btoa = btoa;
 window.atob = atob;
@@ -199,8 +204,8 @@ Device.setMotionEnabled = function(enabled) {
 
 // File utils (Temporary, won't be accessible)
 if (typeof FileUtils !== 'undefined') {
-    FileUtils = FileUtils.getInstance();
-    FileUtils.setPopupNotify(false);
+    jsb.fileUtils = jsb.FileUtils.getInstance();
+    delete jsb.FileUtils;
 }
 
 XMLHttpRequest.prototype.addEventListener = function(eventName, listener, options) {

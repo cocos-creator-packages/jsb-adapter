@@ -88,7 +88,7 @@ else {
     downloadText = function (item) {
         var url = item.url;
 
-        var result = FileUtils.getStringFromFile(url);
+        var result = jsb.fileUtils.getStringFromFile(url);
         if (typeof result === 'string' && result) {
             return result;
         }
@@ -100,7 +100,7 @@ else {
     downloadBinary = function (item) {
         var url = item.url;
 
-        var result = FileUtils.getDataFromFile(url);
+        var result = jsb.fileUtils.getDataFromFile(url);
         if (result) {
             return result;
         }
