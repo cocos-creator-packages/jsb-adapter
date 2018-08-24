@@ -76,7 +76,7 @@ var recordCallback = function(name, cb) {
 	callbacks[name].push(cb);
 }
 
-window.InputBox = {
+jsb.inputBox = {
 	onConfirm: function(cb) {
 		var newCb = callbackWrapper(cb);
 		eventTarget.addEventListener('confirm', newCb);

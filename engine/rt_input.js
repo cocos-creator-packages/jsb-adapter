@@ -24,7 +24,7 @@
  ****************************************************************************/
 var rt = loadRuntime();
 
-window.InputBox = {
+jsb.inputBox = {
 	onConfirm: function(cb) {
 		rt.onKeyboardConfirm(cb);
 	},
