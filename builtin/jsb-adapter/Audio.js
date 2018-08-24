@@ -29,8 +29,5 @@ function Audio(url) {
     return new HTMLAudioElement(url);
 }
 
-Audio.AudioEngine = jsb.AudioEngine;
-delete jsb.AudioEngine;
-
 module.exports = Audio;
 

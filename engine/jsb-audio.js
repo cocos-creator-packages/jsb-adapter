@@ -31,11 +31,6 @@ cc.Audio = function (src) {
     this.id = -1;
 };
 
-if (CC_RUNTIME) {
-    var rt = loadRuntime();
-    Audio.AudioEngine = rt.AudioEngine;
-}
-
 (function (proto, audioEngine) {
 
     // Using the new audioEngine
@@ -233,4 +228,4 @@ if (CC_RUNTIME) {
         audioEngine._preload(filePath, callback);
     };
 
-})(cc.Audio.prototype, Audio.AudioEngine);
+})(cc.Audio.prototype, jsb.AudioEngine);

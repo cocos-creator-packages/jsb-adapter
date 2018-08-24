@@ -21,12 +21,12 @@
  * THE SOFTWARE.
  */
 
-(function (Audio) {
+(function (jsb) {
 
-if (!Audio || !Audio.AudioEngine)
+if (!jsb || !jsb.AudioEngine)
     return
 
-Audio.AudioEngine.AudioState = {
+    jsb.AudioEngine.AudioState = {
     ERROR: -1,
     INITIALZING: 0,
     PLAYING: 1,
@@ -34,7 +34,7 @@ Audio.AudioEngine.AudioState = {
     STOPPED: 3,
 }
 
-Audio.AudioEngine.INVALID_AUDIO_ID = -1
-Audio.AudioEngine.TIME_UNKNOWN = -1
+jsb.AudioEngine.INVALID_AUDIO_ID = -1
+jsb.AudioEngine.TIME_UNKNOWN = -1
 
-})(Audio)
+})(jsb)
