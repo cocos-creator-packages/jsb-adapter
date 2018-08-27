@@ -26,9 +26,10 @@
 if (CC_RUNTIME) {
     require('jsb-adapter/engine/rt_input.js');
     require('jsb-adapter/engine/rt-loadSubpackage.js');
+    require('jsb-adapter/engine/rt-game.js');
+} else {
+    require('jsb-adapter/engine/jsb-game.js');
 }
-
-require('jsb-adapter/engine/jsb-game.js');
 require('jsb-adapter/engine/jsb-node.js');
 require('jsb-adapter/engine/jsb-audio.js');
 require('jsb-adapter/engine/jsb-loader.js');
