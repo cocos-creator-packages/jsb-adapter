@@ -1,34 +1,7 @@
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
+window.CanvasRenderingContext2D = jsb.CanvasRenderingContext2D;
+delete jsb.CanvasRenderingContext2D;
 
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
-window.CC_JSB = true;
-
-window.CanvasRenderingContext2D = cc.CanvasRenderingContext2D;
-delete cc.CanvasRenderingContext2D;
-
-jsb.device = cc.Device; // cc namespace will be reset to {} in creator, use jsb namespace instead.
+jsb.device = jsb.Device; // cc namespace will be reset to {} in creator, use jsb namespace instead.
 
 const { btoa, atob } = require('./base64/base64.min');
 window.btoa = btoa;
@@ -43,7 +16,6 @@ require('./jsb_opengl');
 require('./jsb-adapter');
 require('./jsb_audioengine');
 require('./jsb_input');
-require('./jsb_assets_manager');
 
 let _oldRequestFrameCallback = null;
 let _requestAnimationFrameID = 0;
@@ -178,7 +150,7 @@ jsb.device.setMotionEnabled = function(enabled) {
         var motionValue;
         var event = new DeviceMotionEvent();
         __motionCallbackID = window.setInterval(function(){
-            motionValue = jsb.getDeviceMotionValue();
+            motionValue = jsb.device.getDeviceMotionValue();
 
             event._acceleration.x = motionValue[0];
             event._acceleration.y = motionValue[1];
@@ -194,7 +166,7 @@ jsb.device.setMotionEnabled = function(enabled) {
 
             event._interval = __motionInterval;
 
-            jsb.dispatchDeviceMotionEvent(event);
+            jsb.device.dispatchDeviceMotionEvent(event);
         }, __motionInterval);
     }
     else {
@@ -206,19 +178,10 @@ jsb.device.setMotionEnabled = function(enabled) {
 };
 
 // File utils (Temporary, won't be accessible)
-cc.fileUtils = cc.FileUtils.getInstance();
-cc.fileUtils.setPopupNotify(false);
-
-/**
- * @type {Object}
- * @name jsb.fileUtils
- * jsb.fileUtils is the native file utils singleton object,
- * please refer to Cocos2d-x API to know how to use it.
- * Only available in JSB
- */
-jsb.fileUtils = cc.fileUtils;
-delete cc.FileUtils;
-delete cc.fileUtils;
+if (typeof jsb.FileUtils !== 'undefined') {
+    jsb.fileUtils = jsb.FileUtils.getInstance();
+    delete jsb.FileUtils;
+}
 
 XMLHttpRequest.prototype.addEventListener = function(eventName, listener, options) {
     this['on' + eventName] = listener;
@@ -231,12 +194,12 @@ XMLHttpRequest.prototype.removeEventListener = function(eventName, listener, opt
 // SocketIO
 if (window.SocketIO) {
     window.io = window.SocketIO;
-    SocketIO.prototype._jsbEmit = SocketIO.prototype.emit;
+    SocketIO.prototype._Emit = SocketIO.prototype.emit;
     SocketIO.prototype.emit = function (uri, delegate) {
         if (typeof delegate === 'object') {
             delegate = JSON.stringify(delegate);
         }
-        this._jsbEmit(uri, delegate);
+        this._Emit(uri, delegate);
     };
 }
 

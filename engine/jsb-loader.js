@@ -60,6 +60,29 @@ function downloadImage(item, callback) {
 
 let downloadBinary, downloadText;
 if (CC_RUNTIME) {
+    downloadText = function (item) {
+        var url = item.url;
+    
+        var result = loadRuntime().getFileSystemManager().readFileSync(url, "utf8");
+        if (typeof result === 'string' && result) {
+            return result;
+        }
+        else {
+            return new Error('Download text failed: ' + url);
+        }
+    };
+    
+    downloadBinary = function (item) {
+        var url = item.url;
+    
+        var result = loadRuntime().getFileSystemManager().readFileSync(url);
+        if (result) {
+            return result;
+        }
+        else {
+            return new Error('Download binary file failed: ' + url);
+        }
+    };
 }
 else {
     downloadText = function (item) {

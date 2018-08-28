@@ -22,18 +22,45 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
+var rt = loadRuntime();
 
-if (CC_RUNTIME) {
-    require('jsb-adapter/engine/rt_input.js');
-    require('jsb-adapter/engine/rt-loadSubpackage.js');
-    require('jsb-adapter/engine/rt-game.js');
-} else {
-    require('jsb-adapter/engine/jsb-game.js');
-}
-require('jsb-adapter/engine/jsb-node.js');
-require('jsb-adapter/engine/jsb-audio.js');
-require('jsb-adapter/engine/jsb-loader.js');
-require('jsb-adapter/engine/jsb-editbox.js');
-require('jsb-adapter/engine/jsb-reflection.js');
-require('jsb-adapter/engine/jsb-cocosanalytics.js');
-require('.jsb-adapter/engine/jsb_assets_manager');
+jsb.inputBox = {
+	onConfirm: function(cb) {
+		rt.onKeyboardConfirm(cb);
+	},
+	offConfirm: function(cb) {
+		rt.offKeyboardConfirm(cb);
+	},
+
+	onComplete: function(cb) {
+		rt.onKeyboardComplete(cb);
+	},
+	offComplete: function(cb) {
+		rt.offKeyboardComplete(cb);
+	},
+
+	onInput: function(cb) {
+		rt.onKeyboardInput(cb);
+	},
+	offInput: function(cb) {
+		rt.offKeyboardInput(cb);
+	},
+
+    /**
+     * @param {string}		options.defaultValue
+     * @param {number}		options.maxLength
+     * @param {bool}        options.multiple
+     * @param {bool}        options.confirmHold
+     * @param {string}      options.confirmType
+     * @param {string}      options.inputType
+     * 
+     * Values of options.confirmType can be [done|next|search|go|send].
+     * Values of options.inputType can be [text|email|number|phone|password].
+     */
+	show: function(options) {
+		rt.showKeyboard(options);
+	},
+	hide: function() {
+		rt.hideKeyboard();
+	},
+};
