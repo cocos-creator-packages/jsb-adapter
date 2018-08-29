@@ -79,6 +79,7 @@
 
 	_p.createInput = function() {
 		let editBoxImpl = this;
+		editBoxImpl._editing = true;
 
 		let multiline = this._inputMode === InputMode.ANY;
 		let inputTypeString = getInputType(editBoxImpl._inputMode);
