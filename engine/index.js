@@ -36,4 +36,4 @@ require('jsb-adapter/engine/jsb-loader.js');
 require('jsb-adapter/engine/jsb-editbox.js');
 require('jsb-adapter/engine/jsb-reflection.js');
 require('jsb-adapter/engine/jsb-cocosanalytics.js');
-require('.jsb-adapter/engine/jsb_assets_manager');
+require('jsb-adapter/engine/jsb_assets_manager.js');
