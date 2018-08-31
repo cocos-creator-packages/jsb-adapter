@@ -25,10 +25,6 @@
  ****************************************************************************/
 'use strict';
 
-function empty (item, callback) {
-    return null;
-}
-
 function downloadScript (item, callback) {
     require(item.url);
     return null;
@@ -58,7 +54,24 @@ function downloadImage(item, callback) {
     // Don't return anything to use async loading.
 }
 
-let downloadBinary, downloadText;
+function _getFontFamily (fontHandle) {
+    var ttfIndex = fontHandle.lastIndexOf(".ttf");
+    if (ttfIndex === -1) return fontHandle;
+
+    var slashPos = fontHandle.lastIndexOf("/");
+    var fontFamilyName;
+    if (slashPos === -1) {
+        fontFamilyName = fontHandle.substring(0, ttfIndex) + "_LABEL";
+    } else {
+        fontFamilyName = fontHandle.substring(slashPos + 1, ttfIndex) + "_LABEL";
+    }
+    if (fontFamilyName.indexOf(' ') !== -1) {
+        fontFamilyName = '"' + fontFamilyName + '"';
+    }
+    return fontFamilyName;
+}
+
+let downloadBinary, downloadText, loadFont;
 if (CC_RUNTIME) {
     downloadText = function (item) {
         var url = item.url;
@@ -82,6 +95,16 @@ if (CC_RUNTIME) {
         else {
             return new Error('Download binary file failed: ' + url);
         }
+    };
+
+    loadFont = function (item) {
+        let url = item.url;
+        let fontFamilyName = _getFontFamily(url);
+
+        // load from local font
+        let localPath = "url('" + url + "')";
+        jsb.loadFont(fontFamilyName, localPath);
+        return fontFamilyName;
     };
 }
 else {
@@ -107,6 +130,22 @@ else {
         else {
             return new Error('Download binary file failed: ' + url);
         }
+    };
+
+    loadFont = function (item, callback) {
+        let url = item.url;
+        let fontFamilyName = _getFontFamily(url);
+
+        let fontFace = new FontFace(fontFamilyName, "url('" + url + "')");
+        document.fonts.add(fontFace);
+
+        fontFace.load();
+        fontFace.loaded.then(function() {
+            callback(null, fontFamilyName);
+        }, function () {
+            cc.warnID(4933, fontFamilyName);
+            callback(null, fontFamilyName);
+        });
     };
 }
 
@@ -151,15 +190,17 @@ cc.loader.addDownloadHandlers({
 
     'fnt' : downloadText,
 
-    // Font
-    'font' : empty,
-    'eot' : empty,
-    'ttf' : empty,
-    'woff' : empty,
-    'svg' : empty,
-    'ttc' : empty,
-
     'binary' : downloadBinary,
 
     'default' : downloadText
+});
+
+cc.loader.addLoaderHandlers({
+    // Font
+    'font' : loadFont,
+    'eot' : loadFont,
+    'ttf' : loadFont,
+    'woff' : loadFont,
+    'svg' : loadFont,
+    'ttc' : loadFont,
 });
