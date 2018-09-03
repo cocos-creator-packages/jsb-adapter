@@ -195,7 +195,7 @@ cc.loader.addDownloadHandlers({
     'default' : downloadText
 });
 
-cc.loader.addLoaderHandlers({
+cc.loader.addLoadHandlers({
     // Font
     'font' : loadFont,
     'eot' : loadFont,
