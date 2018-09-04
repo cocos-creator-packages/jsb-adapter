@@ -30,7 +30,5 @@ const sys = cc.sys;
 sys.getNetworkType = jsb.Device.getNetworkType;
 sys.getBatteryLevel = jsb.Device.getBatteryLevel;
 sys.garbageCollect = jsb.garbageCollect;
-sys.dumpRoot = jsb.dumpRoot;
 sys.restartVM = __restartVM;
-sys.cleanScript = __cleanScript;
 sys.isObjectValid = __isObjectValid;
