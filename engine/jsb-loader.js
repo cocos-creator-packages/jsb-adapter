@@ -30,7 +30,11 @@ function downloadScript (item, callback) {
     return null;
 }
 
-function downloadAudio (item, callback) {
+function downloadAudio (item) {
+    return item.url;
+}
+
+function loadAudio (item, callback) {
     var loadByDeserializedAsset = item._owner instanceof cc.AudioClip;
     if (loadByDeserializedAsset) {
         return item.url;
@@ -203,4 +207,11 @@ cc.loader.addLoadHandlers({
     'woff' : loadFont,
     'svg' : loadFont,
     'ttc' : loadFont,
+
+    // Audio
+    'mp3' : loadAudio,
+    'ogg' : loadAudio,
+    'wav' : loadAudio,
+    'mp4' : loadAudio,
+    'm4a' : loadAudio,
 });
