@@ -332,7 +332,7 @@ var GL_COMMAND_VERTEX_ATTRIB_4FV = 95;
 var GL_COMMAND_VERTEX_ATTRIB_POINTER = 96;
 var GL_COMMAND_VIEW_PORT = 97;
 
-var gl = __ccgl;
+var gl = __gl;
 
 // _gl save the orignal gl functions.
 var _gl = {};
@@ -361,10 +361,10 @@ function batchGLCommandsToNative() {
 }
 
 function disableBatchGLCommandsToNative() {
-    // Reset __ccgl variable to the default one.
+    // Reset __gl variable to the default one.
     flushCommands();
     for (var k in _gl) {
-        __ccgl[k] = _gl[k];
+        __gl[k] = _gl[k];
     }
     console.log('Disable batch GL commands optimization！');
     jsb.disableBatchGLCommandsToNative();
@@ -1934,37 +1934,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
+window.CanvasRenderingContext2D = jsb.CanvasRenderingContext2D;
+delete jsb.CanvasRenderingContext2D;
 
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
-window.CC_JSB = true;
-
-window.CanvasRenderingContext2D = cc.CanvasRenderingContext2D;
-delete cc.CanvasRenderingContext2D;
-
-jsb.device = cc.Device; // cc namespace will be reset to {} in creator, use jsb namespace instead.
+jsb.device = jsb.Device; // cc namespace will be reset to {} in creator, use jsb namespace instead.
 
 var _require = require('./base64/base64.min'),
     btoa = _require.btoa,
@@ -1986,7 +1959,6 @@ require('./jsb_opengl');
 require('./jsb-adapter');
 require('./jsb_audioengine');
 require('./jsb_input');
-require('./jsb_assets_manager');
 
 var _oldRequestFrameCallback = null;
 var _requestAnimationFrameID = 0;
@@ -2122,7 +2094,7 @@ jsb.device.setMotionEnabled = function (enabled) {
         var motionValue;
         var event = new DeviceMotionEvent();
         __motionCallbackID = window.setInterval(function () {
-            motionValue = jsb.getDeviceMotionValue();
+            motionValue = jsb.device.getDeviceMotionValue();
 
             event._acceleration.x = motionValue[0];
             event._acceleration.y = motionValue[1];
@@ -2138,7 +2110,7 @@ jsb.device.setMotionEnabled = function (enabled) {
 
             event._interval = __motionInterval;
 
-            jsb.dispatchDeviceMotionEvent(event);
+            jsb.device.dispatchDeviceMotionEvent(event);
         }, __motionInterval);
     } else {
         window.clearInterval(__motionCallbackID);
@@ -2149,21 +2121,10 @@ jsb.device.setMotionEnabled = function (enabled) {
 };
 
 // File utils (Temporary, won't be accessible)
-cc.fileUtils = cc.FileUtils.getInstance();
-cc.fileUtils.setPopupNotify(false);
-
-/**
- * @type {Object}
- * @name jsb.fileUtils
- * jsb.fileUtils is the native file utils singleton object,
- * please refer to Cocos2d-x API to know how to use it.
- * Only available in JSB
- */
-jsb.fileUtils = cc.fileUtils;
-delete cc.FileUtils;
-delete cc.fileUtils;
-
-jsb.urlRegExp = new RegExp("^(?:https?|ftp)://\\S*$", "i");
+if (typeof jsb.FileUtils !== 'undefined') {
+    jsb.fileUtils = jsb.FileUtils.getInstance();
+    delete jsb.FileUtils;
+}
 
 XMLHttpRequest.prototype.addEventListener = function (eventName, listener, options) {
     this['on' + eventName] = listener;
@@ -2176,49 +2137,24 @@ XMLHttpRequest.prototype.removeEventListener = function (eventName, listener, op
 // SocketIO
 if (window.SocketIO) {
     window.io = window.SocketIO;
-    SocketIO.prototype._jsbEmit = SocketIO.prototype.emit;
+    SocketIO.prototype._Emit = SocketIO.prototype.emit;
     SocketIO.prototype.emit = function (uri, delegate) {
         if ((typeof delegate === 'undefined' ? 'undefined' : _typeof(delegate)) === 'object') {
             delegate = JSON.stringify(delegate);
         }
-        this._jsbEmit(uri, delegate);
+        this._Emit(uri, delegate);
     };
 }
 
 window.gameTick = tick;
 
-},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":29,"./jsb_assets_manager":34,"./jsb_audioengine":35,"./jsb_input":36,"./jsb_opengl":37,"./jsb_prepare":39,"./xmldom/dom-parser":40}],5:[function(require,module,exports){
+},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":29,"./jsb_audioengine":34,"./jsb_input":35,"./jsb_opengl":36,"./jsb_prepare":38,"./xmldom/dom-parser":39}],5:[function(require,module,exports){
 'use strict';
-
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 
 var HTMLAudioElement = require('./HTMLAudioElement');
 
 function Audio(url) {
-  return new HTMLAudioElement(url);
+    return new HTMLAudioElement(url);
 }
 
 module.exports = Audio;
@@ -2228,42 +2164,17 @@ module.exports = Audio;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
 var DOMRect = function DOMRect(x, y, width, height) {
-  _classCallCheck(this, DOMRect);
+	_classCallCheck(this, DOMRect);
 
-  this.x = x ? x : 0;
-  this.y = y ? y : 0;
-  this.width = width ? width : 0;
-  this.height = height ? height : 0;
-  this.left = this.x;
-  this.top = this.y;
-  this.right = this.x + this.width;
-  this.bottom = this.y + this.height;
+	this.x = x ? x : 0;
+	this.y = y ? y : 0;
+	this.width = width ? width : 0;
+	this.height = height ? height : 0;
+	this.left = this.x;
+	this.top = this.y;
+	this.right = this.x + this.width;
+	this.bottom = this.y + this.height;
 };
 
 module.exports = DOMRect;
@@ -2279,30 +2190,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 var Event = require('./Event');
 
 var DeviceMotionEvent = function (_Event) {
@@ -2365,31 +2252,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
 var Node = require('./Node');
 var DOMRect = require('./DOMRect');
 
@@ -2444,31 +2306,6 @@ module.exports = Element;
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 
 /**
  * @see https://dom.spec.whatwg.org/#interface-event
@@ -2693,31 +2530,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 
 var __targetID = 0;
 
@@ -3097,7 +2909,7 @@ function keyboardEventHandlerFactory(type) {
 jsb.onKeyDown = keyboardEventHandlerFactory('keydown');
 jsb.onKeyUp = keyboardEventHandlerFactory('keyup');
 
-jsb.dispatchDeviceMotionEvent = function (event) {
+jsb.device.dispatchDeviceMotionEvent = function (event) {
     var target;
     var devicemotionListenerMap = __listenerMap.devicemotion;
     for (var key in devicemotionListenerMap) {
@@ -3119,78 +2931,53 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
 var EventTarget = require('./EventTarget');
 
 var FileReader = function (_EventTarget) {
-  _inherits(FileReader, _EventTarget);
+	_inherits(FileReader, _EventTarget);
 
-  function FileReader() {
-    _classCallCheck(this, FileReader);
+	function FileReader() {
+		_classCallCheck(this, FileReader);
 
-    return _possibleConstructorReturn(this, (FileReader.__proto__ || Object.getPrototypeOf(FileReader)).apply(this, arguments));
-  }
+		return _possibleConstructorReturn(this, (FileReader.__proto__ || Object.getPrototypeOf(FileReader)).apply(this, arguments));
+	}
 
-  _createClass(FileReader, [{
-    key: 'construct',
-    value: function construct() {
-      this.result = null;
-    }
+	_createClass(FileReader, [{
+		key: 'construct',
+		value: function construct() {
+			this.result = null;
+		}
 
-    // Aborts the read operation. Upon return, the readyState will be DONE.
+		// Aborts the read operation. Upon return, the readyState will be DONE.
 
-  }, {
-    key: 'abort',
-    value: function abort() {}
+	}, {
+		key: 'abort',
+		value: function abort() {}
 
-    // Starts reading the contents of the specified Blob, once finished, the result attribute contains an ArrayBuffer representing the file's data.
+		// Starts reading the contents of the specified Blob, once finished, the result attribute contains an ArrayBuffer representing the file's data.
 
-  }, {
-    key: 'readAsArrayBuffer',
-    value: function readAsArrayBuffer() {}
+	}, {
+		key: 'readAsArrayBuffer',
+		value: function readAsArrayBuffer() {}
 
-    // Starts reading the contents of the specified Blob, once finished, the result attribute contains a data: URL representing the file's data.
+		// Starts reading the contents of the specified Blob, once finished, the result attribute contains a data: URL representing the file's data.
 
-  }, {
-    key: 'readAsDataURL',
-    value: function readAsDataURL(blob) {
-      this.result = 'data:image/png;base64,' + window.btoa(blob);
-      var event = new Event('load');
-      this.dispatchEvent(event);
-    }
+	}, {
+		key: 'readAsDataURL',
+		value: function readAsDataURL(blob) {
+			this.result = 'data:image/png;base64,' + window.btoa(blob);
+			var event = new Event('load');
+			this.dispatchEvent(event);
+		}
 
-    // Starts reading the contents of the specified Blob, once finished, the result attribute contains the contents of the file as a text string.
+		// Starts reading the contents of the specified Blob, once finished, the result attribute contains the contents of the file as a text string.
 
-  }, {
-    key: 'readAsText',
-    value: function readAsText() {}
-  }]);
+	}, {
+		key: 'readAsText',
+		value: function readAsText() {}
+	}]);
 
-  return FileReader;
+	return FileReader;
 }(EventTarget);
 
 module.exports = FileReader;
@@ -3202,30 +2989,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 var FontFace = function () {
     function FontFace(family, source, descriptors) {
         var _this = this;
@@ -3276,31 +3039,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 
 var EventTarget = require('./EventTarget');
 var Event = require('./Event');
@@ -3387,31 +3125,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 
 var HTMLMediaElement = require('./HTMLMediaElement');
 
@@ -3505,31 +3218,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
 var HTMLElement = require('./HTMLElement');
 var ImageData = require('./ImageData');
 var DOMRect = require('./DOMRect');
@@ -3598,7 +3286,7 @@ var HTMLCanvasElement = function (_HTMLElement) {
             var self = this;
             // console.log(`==> Canvas getContext(${name})`);
             if (name === 'webgl' || name === 'experimental-webgl') {
-                if (this === window.__cccanvas) return window.__ccgl;else return null;
+                if (this === window.__canvas) return window.__gl;else return null;
             } else if (name === '2d') {
                 if (!this._context2D) {
                     this._context2D = new CanvasRenderingContext2D(this._width, this._height);
@@ -3705,31 +3393,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
 var Element = require('./Element');
 
 var _require = require('./util'),
@@ -3755,7 +3418,7 @@ var HTMLElement = function (_Element) {
     };
 
     _this.innerHTML = '';
-    _this.parentElement = window.__cccanvas;
+    _this.parentElement = window.__canvas;
     return _this;
   }
 
@@ -3790,34 +3453,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
 var HTMLElement = require('./HTMLElement');
 var Event = require('./Event');
-var gl = window.__ccgl;
+var gl = window.__gl;
 
 var HTMLImageElement = function (_HTMLElement) {
     _inherits(HTMLImageElement, _HTMLElement);
@@ -3914,31 +3552,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 
 var HTMLElement = require('./HTMLElement');
 var MediaError = require('./MediaError');
@@ -4045,31 +3658,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
 var HTMLElement = require('./HTMLElement');
 var Event = require('./Event');
 
@@ -4110,31 +3698,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
 var HTMLMediaElement = require('./HTMLMediaElement');
 
 var HTMLVideoElement = function (_HTMLMediaElement) {
@@ -4168,43 +3731,18 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
 var HTMLImageElement = require('./HTMLImageElement');
 
 var Image = function (_HTMLImageElement) {
-  _inherits(Image, _HTMLImageElement);
+    _inherits(Image, _HTMLImageElement);
 
-  function Image(width, height) {
-    _classCallCheck(this, Image);
+    function Image(width, height) {
+        _classCallCheck(this, Image);
 
-    return _possibleConstructorReturn(this, (Image.__proto__ || Object.getPrototypeOf(Image)).call(this, width, height, true));
-  }
+        return _possibleConstructorReturn(this, (Image.__proto__ || Object.getPrototypeOf(Image)).call(this, width, height, true));
+    }
 
-  return Image;
+    return Image;
 }(HTMLImageElement);
 
 module.exports = Image;
@@ -4215,31 +3753,6 @@ module.exports = Image;
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 
 var ImageData = function () {
 
@@ -4297,30 +3810,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 var Event = require('./Event');
 
 var __numberShiftMap = {
@@ -4647,30 +4136,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 var Event = require('./Event');
 
 var MouseEvent = function (_Event) {
@@ -4756,31 +4221,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
 var EventTarget = require('./EventTarget');
 
 var Node = function (_EventTarget) {
@@ -4792,7 +4232,7 @@ var Node = function (_EventTarget) {
     var _this = _possibleConstructorReturn(this, (Node.__proto__ || Object.getPrototypeOf(Node)).call(this));
 
     _this.childNodes = [];
-    _this.parentNode = window.__cccanvas;
+    _this.parentNode = window.__canvas;
     return _this;
   }
 
@@ -4858,47 +4298,23 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 var Event = require('./Event');
 
 var TouchEvent = function (_Event) {
-  _inherits(TouchEvent, _Event);
+    _inherits(TouchEvent, _Event);
 
-  function TouchEvent(type, touchEventInit) {
-    _classCallCheck(this, TouchEvent);
+    function TouchEvent(type, touchEventInit) {
+        _classCallCheck(this, TouchEvent);
 
-    var _this = _possibleConstructorReturn(this, (TouchEvent.__proto__ || Object.getPrototypeOf(TouchEvent)).call(this, type));
+        var _this = _possibleConstructorReturn(this, (TouchEvent.__proto__ || Object.getPrototypeOf(TouchEvent)).call(this, type));
 
-    _this.touches = [];
-    _this.targetTouches = [];
-    _this.changedTouches = [];
-    return _this;
-  }
+        _this.touches = [];
+        _this.targetTouches = [];
+        _this.changedTouches = [];
+        return _this;
+    }
 
-  return TouchEvent;
+    return TouchEvent;
 }(Event);
 
 module.exports = TouchEvent;
@@ -4913,31 +4329,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 
 var HTMLElement = require('./HTMLElement');
 var Image = require('./Image');
@@ -4997,8 +4388,8 @@ var Document = function (_Node) {
   }, {
     key: 'getElementById',
     value: function getElementById(id) {
-      if (id === window.__cccanvas.id || id === 'canvas') {
-        return window.__cccanvas;
+      if (id === window.__canvas.id || id === 'canvas') {
+        return window.__canvas;
       }
       return new HTMLElement(id);
     }
@@ -5010,7 +4401,7 @@ var Document = function (_Node) {
       } else if (tagName === 'body') {
         return [document.body];
       } else if (tagName === 'canvas') {
-        return [window.__cccanvas];
+        return [window.__canvas];
       }
       return [new HTMLElement(tagName)];
     }
@@ -5022,7 +4413,7 @@ var Document = function (_Node) {
       } else if (tagName === 'body') {
         return [document.body];
       } else if (tagName === 'canvas') {
-        return [window.__cccanvas];
+        return [window.__canvas];
       }
       return [new HTMLElement(tagName)];
     }
@@ -5034,9 +4425,9 @@ var Document = function (_Node) {
       } else if (query === 'body') {
         return document.body;
       } else if (query === 'canvas') {
-        return window.__cccanvas;
-      } else if (query === '#' + window.__cccanvas.id) {
-        return window.__cccanvas;
+        return window.__canvas;
+      } else if (query === '#' + window.__canvas.id) {
+        return window.__canvas;
       }
       return new HTMLElement(query);
     }
@@ -5048,7 +4439,7 @@ var Document = function (_Node) {
       } else if (query === 'body') {
         return [document.body];
       } else if (query === 'canvas') {
-        return [window.__cccanvas];
+        return [window.__canvas];
       }
       return [new HTMLElement(query)];
     }
@@ -5082,97 +4473,23 @@ module.exports = document;
 },{"./Audio":5,"./FontFaceSet":13,"./HTMLCanvasElement":15,"./HTMLElement":16,"./HTMLScriptElement":19,"./HTMLVideoElement":20,"./Image":21,"./Node":26,"./location":30}],29:[function(require,module,exports){
 'use strict';
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 require('./window');
 
 },{"./window":33}],30:[function(require,module,exports){
 'use strict';
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
 var location = {
-  href: 'game.js',
-  pathname: 'game.js',
-  search: '',
-  hash: '',
-  reload: function reload() {}
+    href: 'game.js',
+    pathname: 'game.js',
+    search: '',
+    hash: '',
+    reload: function reload() {}
 };
 
 module.exports = location;
 
 },{}],31:[function(require,module,exports){
 'use strict';
-
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 
 var _require = require('./util'),
     noop = _require.noop;
@@ -5198,62 +4515,12 @@ module.exports = navigator;
 },{"./util":32}],32:[function(require,module,exports){
 "use strict";
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
 function noop() {}
 
 module.exports = noop;
 
 },{}],33:[function(require,module,exports){
 'use strict';
-
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 
 function inject() {
     window.top = window.parent = window;
@@ -5277,10 +4544,10 @@ function inject() {
     window.HTMLAudioElement = require('./HTMLAudioElement');
     window.HTMLVideoElement = require('./HTMLVideoElement');
     window.HTMLScriptElement = require('./HTMLScriptElement');
-    window.__cccanvas = new HTMLCanvasElement();
-    window.__cccanvas._width = window.innerWidth;
-    window.__cccanvas._height = window.innerHeight;
-    window.__ccgl.canvas = window.__cccanvas;
+    window.__canvas = new HTMLCanvasElement();
+    window.__canvas._width = window.innerWidth;
+    window.__canvas._height = window.innerHeight;
+    window.__gl.canvas = window.__canvas;
     window.navigator = require('./navigator');
     window.Image = require('./Image');
     window.Audio = require('./Audio');
@@ -5299,7 +4566,7 @@ function inject() {
     var ROTATION_180 = 2;
     var ROTATION_270 = 3;
     var orientation = 0;
-    var rotation = cc.Device.getDeviceRotation();
+    var rotation = jsb.device.getDeviceRotation();
     switch (rotation) {
         case ROTATION_90:
             orientation = 90;
@@ -5336,15 +4603,15 @@ function inject() {
     };
 
     window.addEventListener = function (eventName, listener, options) {
-        window.__cccanvas.addEventListener(eventName, listener, options);
+        window.__canvas.addEventListener(eventName, listener, options);
     };
 
     window.removeEventListener = function (eventName, listener, options) {
-        window.__cccanvas.removeEventListener(eventName, listener, options);
+        window.__canvas.removeEventListener(eventName, listener, options);
     };
 
     window.dispatchEvent = function (event) {
-        window.__cccanvas.dispatchEvent(event);
+        window.__canvas.dispatchEvent(event);
     };
 
     window.getComputedStyle = function (element) {
@@ -5361,8 +4628,8 @@ function inject() {
         window.innerHeight = height;
         window.outerWidth = window.innerWidth;
         window.outerHeight = window.innerHeight;
-        window.__cccanvas._width = window.innerWidth;
-        window.__cccanvas._height = window.innerHeight;
+        window.__canvas._width = window.innerWidth;
+        window.__canvas._height = window.innerHeight;
         window.screen.availWidth = window.innerWidth;
         window.screen.availHeight = window.innerHeight;
         window.screen.width = window.innerWidth;
@@ -5384,92 +4651,6 @@ window.localStorage = sys.localStorage;
 },{"./Audio":5,"./DeviceMotionEvent":7,"./Element":8,"./Event":9,"./EventTarget":10,"./FileReader":11,"./FontFace":12,"./FontFaceSet":13,"./HTMLAudioElement":14,"./HTMLCanvasElement":15,"./HTMLElement":16,"./HTMLImageElement":17,"./HTMLMediaElement":18,"./HTMLScriptElement":19,"./HTMLVideoElement":20,"./Image":21,"./KeyboardEvent":23,"./MouseEvent":25,"./TouchEvent":27,"./document":28,"./location":30,"./navigator":31}],34:[function(require,module,exports){
 "use strict";
 
-/*
- * Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-if (jsb.AssetsManager) {
-    jsb.AssetsManager.State = {
-        UNINITED: 0,
-        UNCHECKED: 1,
-        PREDOWNLOAD_VERSION: 2,
-        DOWNLOADING_VERSION: 3,
-        VERSION_LOADED: 4,
-        PREDOWNLOAD_MANIFEST: 5,
-        DOWNLOADING_MANIFEST: 6,
-        MANIFEST_LOADED: 7,
-        NEED_UPDATE: 8,
-        READY_TO_UPDATE: 9,
-        UPDATING: 10,
-        UNZIPPING: 11,
-        UP_TO_DATE: 12,
-        FAIL_TO_UPDATE: 13
-    };
-
-    jsb.Manifest.DownloadState = {
-        UNSTARTED: 0,
-        DOWNLOADING: 1,
-        SUCCESSED: 2,
-        UNMARKED: 3
-    };
-
-    jsb.EventAssetsManager.ERROR_NO_LOCAL_MANIFEST = 0;
-    jsb.EventAssetsManager.ERROR_DOWNLOAD_MANIFEST = 1;
-    jsb.EventAssetsManager.ERROR_PARSE_MANIFEST = 2;
-    jsb.EventAssetsManager.NEW_VERSION_FOUND = 3;
-    jsb.EventAssetsManager.ALREADY_UP_TO_DATE = 4;
-    jsb.EventAssetsManager.UPDATE_PROGRESSION = 5;
-    jsb.EventAssetsManager.ASSET_UPDATED = 6;
-    jsb.EventAssetsManager.ERROR_UPDATING = 7;
-    jsb.EventAssetsManager.UPDATE_FINISHED = 8;
-    jsb.EventAssetsManager.UPDATE_FAILED = 9;
-    jsb.EventAssetsManager.ERROR_DECOMPRESS = 10;
-}
-
-},{}],35:[function(require,module,exports){
-"use strict";
-
-/*
- * Copyright (c) 2015-2016 Chukong Technologies Inc.
- * Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
 (function (jsb) {
 
     if (!jsb || !jsb.AudioEngine) return;
@@ -5478,40 +4659,17 @@ if (jsb.AssetsManager) {
         ERROR: -1,
         INITIALZING: 0,
         PLAYING: 1,
-        PAUSED: 2
+        PAUSED: 2,
+        STOPPED: 3
     };
 
     jsb.AudioEngine.INVALID_AUDIO_ID = -1;
     jsb.AudioEngine.TIME_UNKNOWN = -1;
 })(jsb);
 
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
 var EventTarget = require('./jsb-adapter/EventTarget');
 var Event = require('./jsb-adapter/Event');
 
@@ -5610,41 +4768,12 @@ jsb.onTextInput = function (eventName, text) {
 	eventTarget.dispatchEvent(event);
 };
 
-},{"./jsb-adapter/Event":9,"./jsb-adapter/EventTarget":10}],37:[function(require,module,exports){
+},{"./jsb-adapter/Event":9,"./jsb-adapter/EventTarget":10}],36:[function(require,module,exports){
 'use strict';
-
-/*
- * OpenGL ES 2.0 / WebGL helper functions
- *
- * According to the WebGL specification ( For further info see:s http://www.khronos.org/registry/webgl/specs/latest/webgl.idl ),
- * the API should work with objects like WebGLTexture, WebGLBuffer, WebGLRenderBuffer, WebGLFramebuffer, WebGLProgram, WebGLShader.
- * OpenGL ES 2.0 doesn't have "objects" concepts: Instead it uses ids (GLints). So, these objects are emulated in this thin wrapper.
- *
- * Copyright (c) 2013-2016 Chukong Technologies Inc.
- * Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 
 require('./jsb_opengl_constants');
 
-var gl = __ccgl;
+var gl = __gl;
 
 gl.drawingBufferWidth = window.innerWidth;
 gl.drawingBufferHeight = window.innerHeight;
@@ -5805,35 +4934,10 @@ gl.isContextLost = function () {
     return false;
 };
 
-},{"./jsb-adapter/HTMLCanvasElement":15,"./jsb-adapter/HTMLImageElement":17,"./jsb-adapter/ImageData":22,"./jsb_opengl_constants":38}],38:[function(require,module,exports){
+},{"./jsb-adapter/HTMLCanvasElement":15,"./jsb-adapter/HTMLImageElement":17,"./jsb-adapter/ImageData":22,"./jsb_opengl_constants":37}],37:[function(require,module,exports){
 "use strict";
 
-/****************************************************************************
- Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
- worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
- not use Cocos Creator software for developing other software or tools that's
- used for developing games. You are not granted to publish, distribute,
- sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
-var gl = __ccgl;
+var gl = __gl;
 
 gl.GCCSO_SHADER_BINARY_FJ = 0x9260;
 gl._3DC_XY_AMD = 0x87fa;
@@ -6668,198 +5772,8 @@ gl.CONTEXT_LOST_WEBGL = 0x9242;
 gl.UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
 gl.BROWSER_DEFAULT_WEBGL = 0x9244;
 
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-/*
- * Copyright (c) 2014-2016 Chukong Technologies Inc.
- * Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-// Prepare JSB environment
-window.cc = window.cc || {};
-/**
- * @namespace jsb
- * @name jsb
- */
-window.jsb = window.jsb || {};
-
-/**
- * Common getter setter configuration function
- * @function
- * @param {Object}   proto      A class prototype or an object to config
- * @param {String}   prop       Property name
- * @param {function} getter     Getter function for the property
- * @param {function} setter     Setter function for the property
- */
-cc.defineGetterSetter = function (proto, prop, getter, setter) {
-    var desc = { enumerable: false, configurable: true };
-    getter && (desc.get = getter);
-    setter && (desc.set = setter);
-    Object.defineProperty(proto, prop, desc);
-};
-
-/**
- * Create a new object and copy all properties in an exist object to the new object
- * @method clone
- * @param {Object|Array} obj - The source object
- * @return {Array|Object} The created object
- */
-cc.clone = function (obj) {
-    // Cloning is better if the new object is having the same prototype chain
-    // as the copied obj (or otherwise, the cloned object is certainly going to
-    // have a different hidden class). Play with C1/C2 of the
-    // PerformanceVirtualMachineTests suite to see how this makes an impact
-    // under extreme conditions.
-    //
-    // Object.create(Object.getPrototypeOf(obj)) doesn't work well because the
-    // prototype lacks a link to the constructor (Carakan, V8) so the new
-    // object wouldn't have the hidden class that's associated with the
-    // constructor (also, for whatever reasons, utilizing
-    // Object.create(Object.getPrototypeOf(obj)) + Object.defineProperty is even
-    // slower than the original in V8). Therefore, we call the constructor, but
-    // there is a big caveat - it is possible that the this.init() in the
-    // constructor would throw with no argument. It is also possible that a
-    // derived class forgets to set "constructor" on the prototype. We ignore
-    // these possibities for and the ultimate solution is a standardized
-    // Object.clone(<object>).
-    var newObj = obj.constructor ? new obj.constructor() : {};
-
-    // Assuming that the constuctor above initialized all properies on obj, the
-    // following keyed assignments won't turn newObj into dictionary mode
-    // becasue they're not *appending new properties* but *assigning existing
-    // ones* (note that appending indexed properties is another story). See
-    // CCClass.js for a link to the devils when the assumption fails.
-    for (var key in obj) {
-        var copy = obj[key];
-        // Beware that typeof null == "object" !
-        if ((typeof copy === "undefined" ? "undefined" : _typeof(copy)) === "object" && copy && !(copy instanceof _ccsg.Node) && (CC_JSB || !(copy instanceof HTMLElement))) {
-            newObj[key] = cc.clone(copy);
-        } else {
-            newObj[key] = copy;
-        }
-    }
-    return newObj;
-};
-
-var ClassManager = {
-    id: 0 | Math.random() * 998,
-
-    instanceId: 0 | Math.random() * 998,
-
-    getNewID: function getNewID() {
-        return this.id++;
-    },
-
-    getNewInstanceId: function getNewInstanceId() {
-        return this.instanceId++;
-    }
-};
-//
-// 2) Using "extend" subclassing
-// Simple JavaScript Inheritance By John Resig http://ejohn.org/
-//
-cc.Class = function () {};
-cc.Class.extend = function (prop) {
-    var _super = this.prototype,
-        prototype = void 0,
-        Class = void 0,
-        classId = void 0,
-        className = prop._className || "",
-        name = void 0,
-        desc = void 0;
-
-    // Instantiate a base class (but only create the instance,
-    // don't run the init constructor)
-    initializing = true;
-    prototype = Object.create(_super);
-    initializing = false;
-    fnTest = /xyz/.test(function () {
-        xyz;
-    }) ? /\b_super\b/ : /.*/;
-
-    // Copy the properties over onto the new prototype
-    for (name in prop) {
-        // Check if we're overwriting an existing function
-        prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? function (name, fn) {
-            return function () {
-                var tmp = this._super;
-
-                // Add a new ._super() method that is the same method
-                // but on the super-class
-                this._super = _super[name];
-
-                // The method only need to be bound temporarily, so we
-                // remove it when we're done executing
-                var ret = fn.apply(this, arguments);
-                this._super = tmp;
-
-                return ret;
-            };
-        }(name, prop[name]) : prop[name];
-    }
-
-    Class = function Class() {
-        if (!initializing) {
-            this.__instanceId = ClassManager.getNewInstanceId();
-            if (this.ctor) {
-                switch (arguments.length) {
-                    case 0:
-                        this.ctor();break;
-                    case 1:
-                        this.ctor(arguments[0]);break;
-                    case 2:
-                        this.ctor(arguments[0], arguments[1]);break;
-                    case 3:
-                        this.ctor(arguments[0], arguments[1], arguments[2]);break;
-                    case 4:
-                        this.ctor(arguments[0], arguments[1], arguments[2], arguments[3]);break;
-                    case 5:
-                        this.ctor(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);break;
-                    default:
-                        this.ctor.apply(this, arguments);
-                }
-            }
-        }
-    };
-    // Populate our constructed prototype object
-    Class.prototype = prototype;
-
-    // Enforce the constructor to be what we expect
-    Class.prototype.constructor = Class;
-
-    // And make this class extendable
-    Class.extend = cc.Class.extend;
-
-    classId = ClassManager.getNewID();
-    ClassManager[classId] = _super;
-    desc = { writable: true, enumerable: false, configurable: true };
-    Class.id = classId;
-    desc.value = classId;
-    Object.defineProperty(prototype, '__pid', desc);
-
-    return Class;
-};
 
 jsb.__obj_ref_id = 0;
 
@@ -6897,7 +5811,6 @@ jsb.unregisterAllNativeRefs = function (owner) {
 };
 
 jsb.unregisterChildRefsForNode = function (node, recursive) {
-    if (!(node instanceof cc.Node)) return;
     recursive = !!recursive;
     var children = node.getChildren(),
         i = void 0,
@@ -6912,7 +5825,7 @@ jsb.unregisterChildRefsForNode = function (node, recursive) {
     }
 };
 
-},{}],40:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict';
 
 function DOMParser(options) {
@@ -7169,7 +6082,7 @@ exports.XMLSerializer = require('./dom').XMLSerializer;
 exports.DOMParser = DOMParser;
 //}
 
-},{"./dom":41,"./entities":42,"./sax":43}],41:[function(require,module,exports){
+},{"./dom":40,"./entities":41,"./sax":42}],40:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -8389,7 +7302,7 @@ exports.DOMImplementation = DOMImplementation;
 exports.XMLSerializer = XMLSerializer;
 //}
 
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict';
 
 exports.entityMap = {
@@ -8637,7 +7550,7 @@ exports.entityMap = {
 };
 //for(var  n in exports.entityMap){console.log(exports.entityMap[n].charCodeAt())}
 
-},{}],43:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]

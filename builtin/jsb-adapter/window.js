@@ -1,28 +1,3 @@
-/****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
-
- http://www.cocos.com
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
-  not use Cocos Creator software for developing other software or tools that's
-  used for developing games. You are not granted to publish, distribute,
-  sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
- 
 function inject () {
     window.top = window.parent = window
 
@@ -45,10 +20,10 @@ function inject () {
     window.HTMLAudioElement = require('./HTMLAudioElement');
     window.HTMLVideoElement = require('./HTMLVideoElement');
     window.HTMLScriptElement = require('./HTMLScriptElement');
-    window.__cccanvas = new HTMLCanvasElement();
-    window.__cccanvas._width = window.innerWidth;
-    window.__cccanvas._height = window.innerHeight;
-    window.__ccgl.canvas = window.__cccanvas;
+    window.__canvas = new HTMLCanvasElement();
+    window.__canvas._width = window.innerWidth;
+    window.__canvas._height = window.innerHeight;
+    window.__gl.canvas = window.__canvas;
     window.navigator = require('./navigator');
     window.Image = require('./Image');
     window.Audio = require('./Audio');
@@ -67,7 +42,7 @@ function inject () {
     const ROTATION_180 = 2;
     const ROTATION_270 = 3;
     var orientation = 0;
-    var rotation = cc.Device.getDeviceRotation();
+    var rotation = jsb.device.getDeviceRotation();
     switch (rotation) {
         case ROTATION_90:
             orientation = 90;
@@ -104,15 +79,15 @@ function inject () {
     };
 
     window.addEventListener = function(eventName, listener, options) {
-        window.__cccanvas.addEventListener(eventName, listener, options);
+        window.__canvas.addEventListener(eventName, listener, options);
     };
 
     window.removeEventListener = function(eventName, listener, options) {
-        window.__cccanvas.removeEventListener(eventName, listener, options);
+        window.__canvas.removeEventListener(eventName, listener, options);
     };
 
     window.dispatchEvent = function(event) {
-        window.__cccanvas.dispatchEvent(event);
+        window.__canvas.dispatchEvent(event);
     };
 
     window.getComputedStyle = function(element) {
@@ -129,8 +104,8 @@ function inject () {
         window.innerHeight = height;
         window.outerWidth = window.innerWidth;
         window.outerHeight = window.innerHeight;
-        window.__cccanvas._width = window.innerWidth;
-        window.__cccanvas._height = window.innerHeight;
+        window.__canvas._width = window.innerWidth;
+        window.__canvas._height = window.innerHeight;
         window.screen.availWidth = window.innerWidth;
         window.screen.availHeight = window.innerHeight;
         window.screen.width = window.innerWidth;

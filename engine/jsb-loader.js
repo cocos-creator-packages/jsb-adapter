@@ -25,16 +25,16 @@
  ****************************************************************************/
 'use strict';
 
-function empty (item, callback) {
-    return null;
-}
-
 function downloadScript (item, callback) {
     require(item.url);
     return null;
 }
 
-function downloadAudio (item, callback) {
+function downloadAudio (item) {
+    return item.url;
+}
+
+function loadAudio (item, callback) {
     var loadByDeserializedAsset = item._owner instanceof cc.AudioClip;
     if (loadByDeserializedAsset) {
         return item.url;
@@ -56,6 +56,101 @@ function downloadImage(item, callback) {
         callback(null, img);
     }
     // Don't return anything to use async loading.
+}
+
+function _getFontFamily (fontHandle) {
+    var ttfIndex = fontHandle.lastIndexOf(".ttf");
+    if (ttfIndex === -1) return fontHandle;
+
+    var slashPos = fontHandle.lastIndexOf("/");
+    var fontFamilyName;
+    if (slashPos === -1) {
+        fontFamilyName = fontHandle.substring(0, ttfIndex) + "_LABEL";
+    } else {
+        fontFamilyName = fontHandle.substring(slashPos + 1, ttfIndex) + "_LABEL";
+    }
+    if (fontFamilyName.indexOf(' ') !== -1) {
+        fontFamilyName = '"' + fontFamilyName + '"';
+    }
+    return fontFamilyName;
+}
+
+let downloadBinary, downloadText, loadFont;
+if (CC_RUNTIME) {
+    downloadText = function (item) {
+        var url = item.url;
+    
+        var result = loadRuntime().getFileSystemManager().readFileSync(url, "utf8");
+        if (typeof result === 'string' && result) {
+            return result;
+        }
+        else {
+            return new Error('Download text failed: ' + url);
+        }
+    };
+    
+    downloadBinary = function (item) {
+        var url = item.url;
+    
+        var result = loadRuntime().getFileSystemManager().readFileSync(url);
+        if (result) {
+            return result;
+        }
+        else {
+            return new Error('Download binary file failed: ' + url);
+        }
+    };
+
+    loadFont = function (item) {
+        let url = item.url;
+        let fontFamilyName = _getFontFamily(url);
+
+        // load from local font
+        let localPath = "url('" + url + "')";
+        jsb.loadFont(fontFamilyName, localPath);
+        return fontFamilyName;
+    };
+}
+else {
+    downloadText = function (item) {
+        var url = item.url;
+
+        var result = jsb.fileUtils.getStringFromFile(url);
+        if (typeof result === 'string' && result) {
+            return result;
+        }
+        else {
+            return new Error('Download text failed: ' + url);
+        }
+    };
+
+    downloadBinary = function (item) {
+        var url = item.url;
+
+        var result = jsb.fileUtils.getDataFromFile(url);
+        if (result) {
+            return result;
+        }
+        else {
+            return new Error('Download binary file failed: ' + url);
+        }
+    };
+
+    loadFont = function (item, callback) {
+        let url = item.url;
+        let fontFamilyName = _getFontFamily(url);
+
+        let fontFace = new FontFace(fontFamilyName, "url('" + url + "')");
+        document.fonts.add(fontFace);
+
+        fontFace.load();
+        fontFace.loaded.then(function() {
+            callback(null, fontFamilyName);
+        }, function () {
+            cc.warnID(4933, fontFamilyName);
+            callback(null, fontFamilyName);
+        });
+    };
 }
 
 cc.loader.addDownloadHandlers({
@@ -83,61 +178,40 @@ cc.loader.addDownloadHandlers({
     'mp4' : downloadAudio,
     'm4a' : downloadAudio,
 
-    // Font
-    'font' : empty,
-    'eot' : empty,
-    'ttf' : empty,
-    'woff' : empty,
-    'svg' : empty,
-    'ttc' : empty,
+    // Text
+    'txt' : downloadText,
+    'xml' : downloadText,
+    'vsh' : downloadText,
+    'fsh' : downloadText,
+    'atlas' : downloadText,
+
+    'tmx' : downloadText,
+    'tsx' : downloadText,
+
+    'json' : downloadText,
+    'ExportJson' : downloadText,
+    'plist' : downloadText,
+
+    'fnt' : downloadText,
+
+    'binary' : downloadBinary,
+
+    'default' : downloadText
 });
 
-//cjh FIXME: remote image should still use jsb.loadRemoteImage.
+cc.loader.addLoadHandlers({
+    // Font
+    'font' : loadFont,
+    'eot' : loadFont,
+    'ttf' : loadFont,
+    'woff' : loadFont,
+    'svg' : loadFont,
+    'ttc' : loadFont,
 
-//function loadImage (item, callback) {
-//    var url = item.url;
-//
-//    var cachedTex = cc.textureCache.getTextureForKey(url);
-//    if (cachedTex) {
-//        return cachedTex;
-//    }
-//    else if (url.match(jsb.urlRegExp)) {
-//        jsb.loadRemoteImg(url, function(succeed, tex) {
-//            if (succeed) {
-//                tex.url = url;
-//                callback && callback(null, tex);
-//            }
-//            else {
-//                callback && callback(new Error('Load image failed: ' + url));
-//            }
-//        });
-//    }
-//    else {
-//        var addImageCallback = function (tex) {
-//            if (tex instanceof cc.Texture2D) {
-//                tex.url = url;
-//                callback && callback(null, tex);
-//            }
-//            else {
-//                callback && callback(new Error('Load image failed: ' + url));
-//            }
-//        };
-//        cc.textureCache._addImageAsync(url, addImageCallback);
-//    }
-//}
-
-//cc.loader.addLoadHandlers({
-//    // Images
-//    'png' : loadImage,
-//    'jpg' : loadImage,
-//    'bmp' : loadImage,
-//    'jpeg' : loadImage,
-//    'gif' : loadImage,
-//    'ico' : loadImage,
-//    'tiff' : loadImage,
-//    'webp' : loadImage,
-//    'image' : loadImage,
-//
-//    'default' : empty
-//});
-
+    // Audio
+    'mp3' : loadAudio,
+    'ogg' : loadAudio,
+    'wav' : loadAudio,
+    'mp4' : loadAudio,
+    'm4a' : loadAudio,
+});
