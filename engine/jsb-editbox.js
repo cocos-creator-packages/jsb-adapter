@@ -77,6 +77,20 @@
 		textLabel.node.active = displayText !== '';
 	}
 
+	cc.EditBox.prototype.editBoxEditingDidBegan = function () {
+		cc.Component.EventHandler.emitEvents(this.editingDidBegan, this);
+		this.node.emit('editing-did-began', this);
+	};
+
+	cc.EditBox.prototype.editBoxEditingDidEnded = function () {
+		cc.Component.EventHandler.emitEvents(this.editingDidEnded, this);
+		this.node.emit('editing-did-ended', this);
+	};
+
+	cc.EditBox.prototype._updateStayOnTop = function () {
+		// jsb not support
+	};
+
 	_p.createInput = function() {
 		let editBoxImpl = this;
 		editBoxImpl._editing = true;
@@ -139,11 +153,11 @@
 	};
 
 	_p.setFocus = function () {
-		// jsb not support 	
+		this._beginEditing();
 	};
 
 	_p.isFocused = function () {
-		// jsb not support 	
+		return this._editing;
 	},
 
 	_p.stayOnTop = function (flag) {	
@@ -151,7 +165,7 @@
 	};
 
 	_p._updateMatrix = function () {
-		
+		// jsb not support 			
 	};
 
 	_p._updateSize = function (newWidth, newHeight) {
@@ -235,7 +249,7 @@
 		this._returnType = returnType;
 	};
 
-	_p._onTouchEnded = function () {
+	_p._beginEditing = function () {
 		this.createInput();
 	};
 
