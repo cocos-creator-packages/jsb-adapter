@@ -17,7 +17,6 @@ function inject () {
     window.HTMLCanvasElement = require('./HTMLCanvasElement');
     window.HTMLImageElement = require('./HTMLImageElement');
     window.HTMLMediaElement = require('./HTMLMediaElement');
-    window.HTMLAudioElement = require('./HTMLAudioElement');
     window.HTMLVideoElement = require('./HTMLVideoElement');
     window.HTMLScriptElement = require('./HTMLScriptElement');
     window.__canvas = new HTMLCanvasElement();
@@ -26,7 +25,6 @@ function inject () {
     window.__gl.canvas = window.__canvas;
     window.navigator = require('./navigator');
     window.Image = require('./Image');
-    window.Audio = require('./Audio');
     window.FileReader = require('./FileReader');
     window.FontFace = require('./FontFace');
     window.FontFaceSet = require('./FontFaceSet');

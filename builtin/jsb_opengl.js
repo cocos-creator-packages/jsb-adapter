@@ -58,7 +58,7 @@ gl.getExtension = function(extension) {
         if (extension in extensionMap) {
             return extensionMap[extension];
         }
-        return {}; //TODO: Return an empty object to indicate this platform supports the extension. But we should not return an empty object actually.
+        return {}; //REFINE: Return an empty object to indicate this platform supports the extension. But we should not return an empty object actually.
     }
 
     return null;
@@ -155,7 +155,7 @@ gl.texSubImage2D = function(target, level, xoffset, yoffset, width, height, form
     }
 }
 
-//TODO:cjh get the real value
+//REFINE:cjh get the real value
 gl.getContextAttributes = function() {
     return {
       alpha: true, 

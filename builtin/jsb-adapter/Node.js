@@ -16,12 +16,12 @@ class Node extends EventTarget {
   }
 
   insertBefore(newNode, referenceNode) {
-    //TODO:
+    //REFINE:
     return newNode;
   }
 
   replaceChild(newChild, oldChild) {
-    //TODO:
+    //REFINE:
     return oldChild;
   }
 
