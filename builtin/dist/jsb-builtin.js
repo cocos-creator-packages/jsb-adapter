@@ -2148,18 +2148,7 @@ if (window.SocketIO) {
 
 window.gameTick = tick;
 
-},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":29,"./jsb_audioengine":34,"./jsb_input":35,"./jsb_opengl":36,"./jsb_prepare":38,"./xmldom/dom-parser":39}],5:[function(require,module,exports){
-'use strict';
-
-var HTMLAudioElement = require('./HTMLAudioElement');
-
-function Audio(url) {
-    return new HTMLAudioElement(url);
-}
-
-module.exports = Audio;
-
-},{"./HTMLAudioElement":14}],6:[function(require,module,exports){
+},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":27,"./jsb_audioengine":32,"./jsb_input":33,"./jsb_opengl":34,"./jsb_prepare":36,"./xmldom/dom-parser":37}],5:[function(require,module,exports){
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2179,7 +2168,7 @@ var DOMRect = function DOMRect(x, y, width, height) {
 
 module.exports = DOMRect;
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2241,7 +2230,7 @@ var DeviceMotionEvent = function (_Event) {
 
 module.exports = DeviceMotionEvent;
 
-},{"./Event":9}],8:[function(require,module,exports){
+},{"./Event":8}],7:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2300,7 +2289,7 @@ var Element = function (_Node) {
 
 module.exports = Element;
 
-},{"./DOMRect":6,"./Node":26}],9:[function(require,module,exports){
+},{"./DOMRect":5,"./Node":24}],8:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2522,7 +2511,7 @@ Event.BUBBLING_PHASE = 3;
 
 module.exports = Event;
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2920,7 +2909,7 @@ jsb.device.dispatchDeviceMotionEvent = function (event) {
 
 module.exports = EventTarget;
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2982,7 +2971,7 @@ var FileReader = function (_EventTarget) {
 
 module.exports = FileReader;
 
-},{"./EventTarget":10}],12:[function(require,module,exports){
+},{"./EventTarget":9}],11:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3029,7 +3018,7 @@ var FontFace = function () {
 
 module.exports = FontFace;
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3115,99 +3104,7 @@ var FontFaceSet = function (_EventTarget) {
 
 module.exports = FontFaceSet;
 
-},{"./Event":9,"./EventTarget":10}],14:[function(require,module,exports){
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var HTMLMediaElement = require('./HTMLMediaElement');
-
-var HAVE_NOTHING = 0;
-var HAVE_METADATA = 1;
-var HAVE_CURRENT_DATA = 2;
-var HAVE_FUTURE_DATA = 3;
-var HAVE_ENOUGH_DATA = 4;
-
-var _innerAudioContext = new WeakMap();
-var _src = new WeakMap();
-var _loop = new WeakMap();
-var _autoplay = new WeakMap();
-
-var HTMLAudioElement = function (_HTMLMediaElement) {
-    _inherits(HTMLAudioElement, _HTMLMediaElement);
-
-    function HTMLAudioElement(url) {
-        _classCallCheck(this, HTMLAudioElement);
-
-        var _this = _possibleConstructorReturn(this, (HTMLAudioElement.__proto__ || Object.getPrototypeOf(HTMLAudioElement)).call(this, 'audio'));
-
-        _src.set(_this, '');
-
-        //TODO:
-        return _this;
-    }
-
-    _createClass(HTMLAudioElement, [{
-        key: 'load',
-        value: function load() {
-            console.warn('HTMLAudioElement.load() is not implemented.');
-        }
-    }, {
-        key: 'play',
-        value: function play() {}
-    }, {
-        key: 'pause',
-        value: function pause() {}
-    }, {
-        key: 'canPlayType',
-        value: function canPlayType() {
-            var mediaType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-
-            if (typeof mediaType !== 'string') {
-                return '';
-            }
-
-            if (mediaType.indexOf('audio/mpeg') > -1 || mediaType.indexOf('audio/mp4')) {
-                return 'probably';
-            }
-            return '';
-        }
-    }, {
-        key: 'cloneNode',
-        value: function cloneNode() {}
-    }, {
-        key: 'currentTime',
-        get: function get() {},
-        set: function set(value) {}
-    }, {
-        key: 'src',
-        get: function get() {},
-        set: function set(value) {}
-    }, {
-        key: 'loop',
-        get: function get() {},
-        set: function set(value) {}
-    }, {
-        key: 'autoplay',
-        get: function get() {},
-        set: function set(value) {}
-    }, {
-        key: 'paused',
-        get: function get() {}
-    }]);
-
-    return HTMLAudioElement;
-}(HTMLMediaElement);
-
-module.exports = HTMLAudioElement;
-
-},{"./HTMLMediaElement":18}],15:[function(require,module,exports){
+},{"./Event":8,"./EventTarget":9}],13:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3277,7 +3174,7 @@ var HTMLCanvasElement = function (_HTMLElement) {
         return _this;
     }
 
-    //TODO: implement opts.
+    //REFINE: implement opts.
 
 
     _createClass(HTMLCanvasElement, [{
@@ -3302,13 +3199,6 @@ var HTMLCanvasElement = function (_HTMLElement) {
             }
 
             return null;
-        }
-    }, {
-        key: 'toDataURL',
-        value: function toDataURL() {
-            //TODO:
-            console.log("==> Canvas toDataURL");
-            return "";
         }
     }, {
         key: 'getBoundingClientRect',
@@ -3364,25 +3254,17 @@ ctx2DProto.createImageData = function (width, height) {
 };
 
 ctx2DProto.putImageData = function (imagedata, dx, dy) {
-    this._canvas._data = imagedata; //TODO: consider dx, dy?
+    this._canvas._data = imagedata; //REFINE: consider dx, dy?
 };
 
 ctx2DProto.getImageData = function (sx, sy, sw, sh) {
-    //TODO:cjh
+    //REFINE:cjh
     return this._canvas._data;
 };
 
-ctx2DProto.drawImage = function (image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {}
-//TODO:cjh
-
-
-//TODO:cjh
-;ctx2DProto.bezierCurveTo = function () {};
-ctx2DProto.fill = function () {};
-
 module.exports = HTMLCanvasElement;
 
-},{"./DOMRect":6,"./HTMLElement":16,"./ImageData":22}],16:[function(require,module,exports){
+},{"./DOMRect":5,"./HTMLElement":14,"./ImageData":20}],14:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3442,7 +3324,7 @@ var HTMLElement = function (_Element) {
 
 module.exports = HTMLElement;
 
-},{"./Element":8,"./util":32}],17:[function(require,module,exports){
+},{"./Element":7,"./util":30}],15:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3542,7 +3424,7 @@ var HTMLImageElement = function (_HTMLElement) {
 
 module.exports = HTMLImageElement;
 
-},{"./Event":9,"./HTMLElement":16}],18:[function(require,module,exports){
+},{"./Event":8,"./HTMLElement":14}],16:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3647,7 +3529,7 @@ var HTMLMediaElement = function (_HTMLElement) {
 
 module.exports = HTMLMediaElement;
 
-},{"./HTMLElement":16,"./MediaError":24}],19:[function(require,module,exports){
+},{"./HTMLElement":14,"./MediaError":22}],17:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3687,7 +3569,7 @@ var HTMLScriptElement = function (_HTMLElement) {
 
 module.exports = HTMLScriptElement;
 
-},{"./Event":9,"./HTMLElement":16}],20:[function(require,module,exports){
+},{"./Event":8,"./HTMLElement":14}],18:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3722,7 +3604,7 @@ var HTMLVideoElement = function (_HTMLMediaElement) {
 
 module.exports = HTMLVideoElement;
 
-},{"./HTMLMediaElement":18}],21:[function(require,module,exports){
+},{"./HTMLMediaElement":16}],19:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3747,7 +3629,7 @@ var Image = function (_HTMLImageElement) {
 
 module.exports = Image;
 
-},{"./HTMLImageElement":17}],22:[function(require,module,exports){
+},{"./HTMLImageElement":15}],20:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3797,7 +3679,7 @@ var ImageData = function () {
 
 module.exports = ImageData;
 
-},{}],23:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -4091,7 +3973,7 @@ var KeyboardEvent = function (_Event) {
 
 module.exports = KeyboardEvent;
 
-},{"./Event":9}],24:[function(require,module,exports){
+},{"./Event":8}],22:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4125,7 +4007,7 @@ var MediaError = function () {
 
 module.exports = MediaError;
 
-},{}],25:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4210,7 +4092,7 @@ var MouseEvent = function (_Event) {
 
 module.exports = MouseEvent;
 
-},{"./Event":9}],26:[function(require,module,exports){
+},{"./Event":8}],24:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4248,13 +4130,13 @@ var Node = function (_EventTarget) {
   }, {
     key: 'insertBefore',
     value: function insertBefore(newNode, referenceNode) {
-      //TODO:
+      //REFINE:
       return newNode;
     }
   }, {
     key: 'replaceChild',
     value: function replaceChild(newChild, oldChild) {
-      //TODO:
+      //REFINE:
       return oldChild;
     }
   }, {
@@ -4289,7 +4171,7 @@ var Node = function (_EventTarget) {
 
 module.exports = Node;
 
-},{"./EventTarget":10}],27:[function(require,module,exports){
+},{"./EventTarget":9}],25:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -4319,7 +4201,7 @@ var TouchEvent = function (_Event) {
 
 module.exports = TouchEvent;
 
-},{"./Event":9}],28:[function(require,module,exports){
+},{"./Event":8}],26:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4332,7 +4214,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var HTMLElement = require('./HTMLElement');
 var Image = require('./Image');
-var Audio = require('./Audio');
 var HTMLCanvasElement = require('./HTMLCanvasElement');
 var HTMLVideoElement = require('./HTMLVideoElement');
 var HTMLScriptElement = require('./HTMLScriptElement');
@@ -4373,8 +4254,6 @@ var Document = function (_Node) {
     value: function createElement(tagName) {
       if (tagName === 'canvas') {
         return new HTMLCanvasElement();
-      } else if (tagName === 'audio') {
-        return new Audio();
       } else if (tagName === 'img') {
         return new Image();
       } else if (tagName === 'video') {
@@ -4470,12 +4349,12 @@ var document = new Document();
 
 module.exports = document;
 
-},{"./Audio":5,"./FontFaceSet":13,"./HTMLCanvasElement":15,"./HTMLElement":16,"./HTMLScriptElement":19,"./HTMLVideoElement":20,"./Image":21,"./Node":26,"./location":30}],29:[function(require,module,exports){
+},{"./FontFaceSet":12,"./HTMLCanvasElement":13,"./HTMLElement":14,"./HTMLScriptElement":17,"./HTMLVideoElement":18,"./Image":19,"./Node":24,"./location":28}],27:[function(require,module,exports){
 'use strict';
 
 require('./window');
 
-},{"./window":33}],30:[function(require,module,exports){
+},{"./window":31}],28:[function(require,module,exports){
 'use strict';
 
 var location = {
@@ -4488,7 +4367,7 @@ var location = {
 
 module.exports = location;
 
-},{}],31:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict';
 
 var _require = require('./util'),
@@ -4512,14 +4391,14 @@ var navigator = {
 
 module.exports = navigator;
 
-},{"./util":32}],32:[function(require,module,exports){
+},{"./util":30}],30:[function(require,module,exports){
 "use strict";
 
 function noop() {}
 
 module.exports = noop;
 
-},{}],33:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict';
 
 function inject() {
@@ -4541,7 +4420,6 @@ function inject() {
     window.HTMLCanvasElement = require('./HTMLCanvasElement');
     window.HTMLImageElement = require('./HTMLImageElement');
     window.HTMLMediaElement = require('./HTMLMediaElement');
-    window.HTMLAudioElement = require('./HTMLAudioElement');
     window.HTMLVideoElement = require('./HTMLVideoElement');
     window.HTMLScriptElement = require('./HTMLScriptElement');
     window.__canvas = new HTMLCanvasElement();
@@ -4550,7 +4428,6 @@ function inject() {
     window.__gl.canvas = window.__canvas;
     window.navigator = require('./navigator');
     window.Image = require('./Image');
-    window.Audio = require('./Audio');
     window.FileReader = require('./FileReader');
     window.FontFace = require('./FontFace');
     window.FontFaceSet = require('./FontFaceSet');
@@ -4648,7 +4525,7 @@ if (!window._isInjected) {
 
 window.localStorage = sys.localStorage;
 
-},{"./Audio":5,"./DeviceMotionEvent":7,"./Element":8,"./Event":9,"./EventTarget":10,"./FileReader":11,"./FontFace":12,"./FontFaceSet":13,"./HTMLAudioElement":14,"./HTMLCanvasElement":15,"./HTMLElement":16,"./HTMLImageElement":17,"./HTMLMediaElement":18,"./HTMLScriptElement":19,"./HTMLVideoElement":20,"./Image":21,"./KeyboardEvent":23,"./MouseEvent":25,"./TouchEvent":27,"./document":28,"./location":30,"./navigator":31}],34:[function(require,module,exports){
+},{"./DeviceMotionEvent":6,"./Element":7,"./Event":8,"./EventTarget":9,"./FileReader":10,"./FontFace":11,"./FontFaceSet":12,"./HTMLCanvasElement":13,"./HTMLElement":14,"./HTMLImageElement":15,"./HTMLMediaElement":16,"./HTMLScriptElement":17,"./HTMLVideoElement":18,"./Image":19,"./KeyboardEvent":21,"./MouseEvent":23,"./TouchEvent":25,"./document":26,"./location":28,"./navigator":29}],32:[function(require,module,exports){
 "use strict";
 
 (function (jsb) {
@@ -4667,7 +4544,7 @@ window.localStorage = sys.localStorage;
     jsb.AudioEngine.TIME_UNKNOWN = -1;
 })(jsb);
 
-},{}],35:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 
 var EventTarget = require('./jsb-adapter/EventTarget');
@@ -4768,7 +4645,7 @@ jsb.onTextInput = function (eventName, text) {
 	eventTarget.dispatchEvent(event);
 };
 
-},{"./jsb-adapter/Event":9,"./jsb-adapter/EventTarget":10}],36:[function(require,module,exports){
+},{"./jsb-adapter/Event":8,"./jsb-adapter/EventTarget":9}],34:[function(require,module,exports){
 'use strict';
 
 require('./jsb_opengl_constants');
@@ -4831,7 +4708,7 @@ gl.getExtension = function (extension) {
         if (extension in extensionMap) {
             return extensionMap[extension];
         }
-        return {}; //TODO: Return an empty object to indicate this platform supports the extension. But we should not return an empty object actually.
+        return {}; //REFINE: Return an empty object to indicate this platform supports the extension. But we should not return an empty object actually.
     }
 
     return null;
@@ -4917,7 +4794,7 @@ gl.texSubImage2D = function (target, level, xoffset, yoffset, width, height, for
     }
 };
 
-//TODO:cjh get the real value
+//REFINE:cjh get the real value
 gl.getContextAttributes = function () {
     return {
         alpha: true,
@@ -4934,7 +4811,7 @@ gl.isContextLost = function () {
     return false;
 };
 
-},{"./jsb-adapter/HTMLCanvasElement":15,"./jsb-adapter/HTMLImageElement":17,"./jsb-adapter/ImageData":22,"./jsb_opengl_constants":37}],37:[function(require,module,exports){
+},{"./jsb-adapter/HTMLCanvasElement":13,"./jsb-adapter/HTMLImageElement":15,"./jsb-adapter/ImageData":20,"./jsb_opengl_constants":35}],35:[function(require,module,exports){
 "use strict";
 
 var gl = __gl;
@@ -5772,7 +5649,7 @@ gl.CONTEXT_LOST_WEBGL = 0x9242;
 gl.UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
 gl.BROWSER_DEFAULT_WEBGL = 0x9244;
 
-},{}],38:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 jsb.__obj_ref_id = 0;
@@ -5825,7 +5702,7 @@ jsb.unregisterChildRefsForNode = function (node, recursive) {
     }
 };
 
-},{}],39:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict';
 
 function DOMParser(options) {
@@ -6082,7 +5959,7 @@ exports.XMLSerializer = require('./dom').XMLSerializer;
 exports.DOMParser = DOMParser;
 //}
 
-},{"./dom":40,"./entities":41,"./sax":42}],40:[function(require,module,exports){
+},{"./dom":38,"./entities":39,"./sax":40}],38:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -6386,7 +6263,7 @@ DOMImplementation.prototype = {
 		// Introduced in DOM Level 2:
 		//readonly attribute DOMString        internalSubset;
 
-		//TODO:..
+		//REFINE:..
 		//  readonly attribute NamedNodeMap     entities;
 		//  readonly attribute NamedNodeMap     notations;
 		return node;
@@ -7281,7 +7158,7 @@ try {
 						}
 						break;
 					default:
-						//TODO:
+						//REFINE:
 						this.data = data;
 						this.value = data;
 						this.nodeValue = data;
@@ -7302,7 +7179,7 @@ exports.DOMImplementation = DOMImplementation;
 exports.XMLSerializer = XMLSerializer;
 //}
 
-},{}],41:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict';
 
 exports.entityMap = {
@@ -7550,7 +7427,7 @@ exports.entityMap = {
 };
 //for(var  n in exports.entityMap){console.log(exports.entityMap[n].charCodeAt())}
 
-},{}],42:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
@@ -7747,7 +7624,7 @@ function _parse(source, defaultNSMapCopy, entityMap, domBuilder, errorHandler) {
 		if (end > start) {
 			start = end;
 		} else {
-			//TODO: 这里有可能sax回退，有位置错误风险
+			//REFINE: 这里有可能sax回退，有位置错误风险
 			appendText(Math.max(tagStart, start) + 1);
 		}
 	}

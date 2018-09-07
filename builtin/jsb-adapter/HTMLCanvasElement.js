@@ -38,7 +38,7 @@ class HTMLCanvasElement extends HTMLElement {
         this._alignment = 4; // Canvas is used for rendering text only and we make sure the data format is RGBA.
     }
 
-    //TODO: implement opts.
+    //REFINE: implement opts.
     getContext(name, opts) {
         var self = this;
         // console.log(`==> Canvas getContext(${name})`);
@@ -62,12 +62,6 @@ class HTMLCanvasElement extends HTMLElement {
         }
 
         return null;
-    }
-
-    toDataURL() {
-        //TODO:
-        console.log("==> Canvas toDataURL");
-        return "";
     }
 
     set width(width) {
@@ -117,21 +111,13 @@ ctx2DProto.createImageData = function(width, height) {
 }
 
 ctx2DProto.putImageData = function(imagedata, dx, dy) {
-    this._canvas._data = imagedata; //TODO: consider dx, dy?
+    this._canvas._data = imagedata; //REFINE: consider dx, dy?
 }
 
 ctx2DProto.getImageData = function(sx, sy, sw, sh) {
-    //TODO:cjh
+    //REFINE:cjh
     return this._canvas._data;
 }
-
-ctx2DProto.drawImage = function(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {
-    //TODO:cjh
-}
-
-//TODO:cjh
-ctx2DProto.bezierCurveTo = function() {}
-ctx2DProto.fill = function() {}
 
 module.exports = HTMLCanvasElement;
 
