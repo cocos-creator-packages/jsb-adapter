@@ -42,13 +42,10 @@ sys.getSafeAreaRect = function() {
     var leftBottom = new cc.Vec2(edge.y, screenSize.height - edge.z);
     var rightTop = new cc.Vec2(screenSize.width - edge.w, edge.x);
 
-    // Convert a point from UI coordinates to which in design resolution coordinate.
-    cc.view._convertPointWithScale(leftBottom);
-    cc.view._convertPointWithScale(rightTop);
-
-    // Convert to GL coordinates
-    leftBottom = cc.director.convertToGL(leftBottom);
-    rightTop = cc.director.convertToGL(rightTop);
+    // Returns the real location in view.
+    var relatedPos = {left: 0, top: 0, width: screenSize.width, height: screenSize.height};
+    cc.view.convertToLocationInView(leftBottom.x, leftBottom.y, relatedPos, leftBottom);
+    cc.view.convertToLocationInView(rightTop.x, rightTop.y, relatedPos, rightTop);
 
     return cc.rect(leftBottom.x, leftBottom.y, rightTop.x - leftBottom.x, rightTop.y - leftBottom.y);
 }
