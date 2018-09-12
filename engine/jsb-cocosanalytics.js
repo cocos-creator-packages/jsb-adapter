@@ -51,9 +51,9 @@ if (platform === sys.ANDROID) {
     cocosAnalytics.init = function(info) {
 
         if (!info.channel) {
-            var anysdkChannelID = jsb.reflection.callStaticMethod(cls_CAAgentWrapper, "getChannelID", "()Ljava/lang/String;");
-            console.log("Found AnySDK channel ID: " + anysdkChannelID);
-            info.channel = anysdkChannelID;
+            var anysChannelID = jsb.reflection.callStaticMethod(cls_CAAgentWrapper, "getChannelID", "()Ljava/lang/String;");
+            console.log("Found ANYS channel ID: " + anysChannelID);
+            info.channel = anysChannelID;
         }
 
         if (info && info.appID && info.appSecret && info.channel) {
