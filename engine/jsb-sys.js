@@ -32,3 +32,20 @@ sys.getBatteryLevel = jsb.Device.getBatteryLevel;
 sys.garbageCollect = jsb.garbageCollect;
 sys.restartVM = __restartVM;
 sys.isObjectValid = __isObjectValid;
+
+sys.getSafeAreaRect = function() {
+    // x(top), y(left), z(bottom), w(right)
+    var edge = jsb.Device.getSafeAreaEdge();
+    var screenSize = cc.view.getFrameSize();
+
+    // Get leftBottom and rightTop point in UI coordinates
+    var leftBottom = new cc.Vec2(edge.y, screenSize.height - edge.z);
+    var rightTop = new cc.Vec2(screenSize.width - edge.w, edge.x);
+
+    // Returns the real location in view.
+    var relatedPos = {left: 0, top: 0, width: screenSize.width, height: screenSize.height};
+    cc.view.convertToLocationInView(leftBottom.x, leftBottom.y, relatedPos, leftBottom);
+    cc.view.convertToLocationInView(rightTop.x, rightTop.y, relatedPos, rightTop);
+
+    return cc.rect(leftBottom.x, leftBottom.y, rightTop.x - leftBottom.x, rightTop.y - leftBottom.y);
+}
