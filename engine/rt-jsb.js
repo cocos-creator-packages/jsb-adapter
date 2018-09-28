@@ -56,7 +56,25 @@ jsb.fileUtils = {
 };
 
 jsb.saveImageData = function (data, width, height, filePath) {
-    return rt.saveImageDataSync(data, width, height, filePath);
+    var index = filePath.lastIndexOf(".");
+    if (index === -1) {
+        return false;
+    }
+    var fileType = filePath.substr(index + 1);
+    var tempFilePath = rt.saveImageTempSync({
+        'data': data,
+        'width': width,
+        'height': height,
+        'fileType': fileType,
+    });
+    if (tempFilePath === '') {
+        return false;
+    }
+    var savedFilePath = rt.getFileSystemManager().saveFileSync(tempFilePath, filePath);
+    if (savedFilePath === filePath) {
+        return true;
+    }
+    return false;
 }
 
 jsb.setPreferredFramesPerSecond = function (fps) {
