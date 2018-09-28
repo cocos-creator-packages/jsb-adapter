@@ -56,5 +56,9 @@ jsb.fileUtils = {
 };
 
 jsb.saveImageData = function (data, width, height, filePath) {
-    return rt.saveImageData(data, width, height, filePath);
+    return rt.saveImageDataSync(data, width, height, filePath);
+}
+
+jsb.setPreferredFramesPerSecond = function (fps) {
+    rt.setPreferredFramesPerSecond(fps);
 }
