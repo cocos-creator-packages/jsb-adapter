@@ -36,6 +36,7 @@ require('jsb-adapter/engine/jsb-node.js');
 require('jsb-adapter/engine/jsb-audio.js');
 require('jsb-adapter/engine/jsb-loader.js');
 require('jsb-adapter/engine/jsb-editbox.js');
+require('jsb-adapter/engine/jsb-videoplayer.js');
 require('jsb-adapter/engine/jsb-reflection.js');
 require('jsb-adapter/engine/jsb-cocosanalytics.js');
 require('jsb-adapter/engine/jsb-assets-manager.js');
