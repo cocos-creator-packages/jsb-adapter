@@ -31,12 +31,13 @@ if (CC_RUNTIME) {
 } else {
     require('jsb-adapter/engine/jsb-sys.js');
     require('jsb-adapter/engine/jsb-game.js');
+    require('jsb-adapter/engine/jsb-videoplayer.js');
+    require('jsb-adapter/engine/jsb-webview.js');
 }
 require('jsb-adapter/engine/jsb-node.js');
 require('jsb-adapter/engine/jsb-audio.js');
 require('jsb-adapter/engine/jsb-loader.js');
 require('jsb-adapter/engine/jsb-editbox.js');
-require('jsb-adapter/engine/jsb-videoplayer.js');
 require('jsb-adapter/engine/jsb-reflection.js');
 require('jsb-adapter/engine/jsb-cocosanalytics.js');
 require('jsb-adapter/engine/jsb-assets-manager.js');
