@@ -33,97 +33,48 @@
     var _p = cc.WebView.Impl.prototype;
 
     _p._updateVisibility = function () {
-        if (!this._div) return;
-        let div = this._div;
-        if (this._visible) {
-            div.style.visibility = 'visible';
-        } else {
-            div.style.visibility = 'hidden';
-        }
+        if (!this._iframe) return;
+        this._video.setVisible(this._visible);
         this._forceUpdate = true;
-    },
+    };
     _p._updateSize = function (w, h) {
-        let div = this._div;
-        if (div) {
-            div.style.width = w + "px";
-            div.style.height = h + "px";
-        }
-    },
+
+    };
     _p._initEvent = function () {
         let iframe = this._iframe;
         if (iframe) {
             let cbs = this.__eventListeners,
                 self = this;
             cbs.load = function () {
-                self._dispatchEvent(WebViewImpl.EventType.LOADED);
+                self._dispatchEvent(_impl.EventType.LOADED);
             };
             cbs.error = function () {
-                self._dispatchEvent(WebViewImpl.EventType.ERROR);
+                self._dispatchEvent(_impl.EventType.ERROR);
             };
             iframe.addEventListener("load", cbs.load);
             iframe.addEventListener("error", cbs.error);
         }
-    },
+    };
     _p._initStyle = function () {
-        if (!this._div) return;
-        let div = this._div;
-        div.style.position = "absolute";
-        div.style.bottom = "0px";
-        div.style.left = "0px";
-    },
+
+    };
     _p._setOpacity = function (opacity) {
         let iframe = this._iframe;
         if (iframe && iframe.style) {
             iframe.style.opacity = opacity / 255;
         }
-    },
-    _p._createDom = function (w, h) {
-        if (WebViewImpl._polyfill.enableDiv) {
-            this._div = document.createElement("div");
-            this._div.style["-webkit-overflow"] = "auto";
-            this._div.style["-webkit-overflow-scrolling"] = "touch";
-            this._iframe = document.createElement("iframe");
-            this._div.appendChild(this._iframe);
-            this._iframe.style.width = "100%";
-            this._iframe.style.height = "100%";
-        } else {
-            this._div = this._iframe = document.createElement("iframe");
-        }
-        if (WebViewImpl._polyfill.enableBG)
-            this._div.style["background"] = "#FFF";
-        this._div.style["background"] = "#FFF";
-        this._div.style.height = h + "px";
-        this._div.style.width = w + "px";
-        this._div.style.overflow = "scroll";
-        this._iframe.style.border = "none";
-        cc.game.container.appendChild(this._div);
-        this._updateVisibility();
-    },
+    };
     _p._createNativeControl = function (w, h) {
-        this._createDom(w, h);
+        this.createDomElementIfNeeded(w, h);
         this._initStyle();
         this._initEvent();
-    },
+    };
     _p.createDomElementIfNeeded = function (w, h) {
-        this._div = document.createElement('div');
-        this._div.style.background = 'rgba(255, 255, 255, 0.8)';
-        this._div.style.color = 'rgb(51, 51, 51)';
-        this._div.style.height = w + 'px';
-        this._div.style.width = h + 'px';
-        this._div.style.position = 'absolute';
-        this._div.style.bottom = '0px';
-        this._div.style.left = '0px';
-        this._div.style['word-wrap'] = 'break-word';
-        cc.game.container.appendChild(this._div);
-    },
-    _p.removeDom = function () {
-        let div = this._div;
-        if (div) {
-            let hasChild = utils.contains(cc.game.container, div);
-            if (hasChild)
-                cc.game.container.removeChild(div);
-            this._div = null;
+        if (!this._iframe){
+            this._iframe = new jsb.WebView.create();
         }
+    };
+    _p.removeDom = function () {
         let iframe = this._iframe;
         if (iframe) {
             let cbs = this.__eventListeners;
@@ -133,11 +84,31 @@
             cbs.error = null;
             this._iframe = null;
         }
-    },
-    _p.setOnJSCallback = function (callback) {},
-    _p.setJavascriptInterfaceScheme = function (scheme) {},
-    _p.loadData = function (data, MIMEType, encoding, baseURL) {},
-    _p.loadHTMLString = function (string, baseURL) {},
+    };
+    _p.setOnJSCallback = function (callback) {
+        let iframe = this._iframe;
+        if (iframe) {
+            iframe.setOnJSCallback(callback);
+        }
+    };
+    _p.setJavascriptInterfaceScheme = function (scheme) {
+        let iframe = this._iframe;
+        if (iframe) {
+            iframe.setJavascriptInterfaceScheme(scheme);
+        }
+    };
+    _p.loadData = function (data, MIMEType, encoding, baseURL) {
+        let iframe = this._iframe;
+        if (iframe) {
+            iframe.loadData(data, MIMEType, encoding, baseURL);
+        }
+    };
+    _p.loadHTMLString = function (string, baseURL) {
+        let iframe = this._iframe;
+        if (iframe) {
+            iframe.loadHTMLString(string, baseURL);
+        }
+    };
     /**
      * Load an URL
      * @param {String} url
@@ -146,6 +117,7 @@
         let iframe = this._iframe;
         if (iframe) {
             iframe.src = url;
+            iframe.loadURL(url);
             let self = this;
             let cb = function () {
                 self._loaded = true;
@@ -153,74 +125,60 @@
                 iframe.removeEventListener("load", cb);
             };
             iframe.addEventListener("load", cb);
-            this._dispatchEvent(WebViewImpl.EventType.LOADING);
+            this._dispatchEvent(_impl.EventType.LOADING);
         }
-    },
+    };
     /**
      * Stop loading
      */
     _p.stopLoading = function () {
         cc.logID(7800);
-    },
+    };
     /**
      * Reload the WebView
      */
     _p.reload = function () {
         let iframe = this._iframe;
         if (iframe) {
-            let win = iframe.contentWindow;
-            if (win && win.location)
-                win.location.reload();
+            iframe.reload();
         }
-    },
+    };
     /**
      * Determine whether to go back
      */
     _p.canGoBack = function () {
-        cc.logID(7801);
-        return true;
-    },
+        let iframe = this._iframe;
+        if (iframe) {
+            return iframe.canGoBack();
+        }
+    };
     /**
      * Determine whether to go forward
      */
     _p.canGoForward = function () {
-        cc.logID(7802);
-        return true;
-    },
+        let iframe = this._iframe;
+        if (iframe) {
+            return iframe.canGoForward();
+        }
+    };
     /**
      * go back
      */
     _p.goBack = function () {
-        try {
-            if (WebViewImpl._polyfill.closeHistory)
-                return cc.logID(7803);
-            let iframe = this._iframe;
-            if (iframe) {
-                let win = iframe.contentWindow;
-                if (win && win.location)
-                    win.history.back.call(win);
-            }
-        } catch (err) {
-            cc.log(err);
+        let iframe = this._iframe;
+        if (iframe) {
+            return iframe.goBack();
         }
-    },
+    };
     /**
      * go forward
      */
     _p.goForward = function () {
-        try {
-            if (WebViewImpl._polyfill.closeHistory)
-                return cc.logID(7804);
-            let iframe = this._iframe;
-            if (iframe) {
-                let win = iframe.contentWindow;
-                if (win && win.location)
-                    win.history.forward.call(win);
-            }
-        } catch (err) {
-            cc.log(err);
+        let iframe = this._iframe;
+        if (iframe) {
+            return iframe.goForward();
         }
-    },
+    };
     /**
      * In the webview execution within a period of js string
      * @param {String} str
@@ -228,55 +186,52 @@
     _p.evaluateJS = function (str) {
         let iframe = this._iframe;
         if (iframe) {
-            let win = iframe.contentWindow;
-            try {
-                win.eval(str);
-                this._dispatchEvent(WebViewImpl.EventType.JS_EVALUATED);
-            } catch (err) {
-                console.error(err);
-            }
+            return iframe.evaluateJS();
         }
-    },
+    };
     /**
      * Limited scale
      */
     _p.setScalesPageToFit = function () {
-        cc.logID(7805);
-    },
+        let iframe = this._iframe;
+        if (iframe) {
+            return iframe.setScalesPageToFit();
+        }
+    };
     /**
      * The binding event
-     * @param {WebViewImpl.EventType} event
+     * @param {_impl.EventType} event
      * @param {Function} callback
      */
     _p.setEventListener = function (event, callback) {
         this._EventList[event] = callback;
-    },
+    };
     /**
      * Delete events
-     * @param {WebViewImpl.EventType} event
+     * @param {_impl.EventType} event
      */
     _p.removeEventListener = function (event) {
         this._EventList[event] = null;
-    },
+    };
     _p._dispatchEvent = function (event) {
         let callback = this._EventList[event];
         if (callback)
             callback.call(this, this, this._iframe.src);
-    },
+    };
     _p._createRenderCmd = function () {
-        return new WebViewImpl.RenderCmd(this);
-    },
+        return new _impl.RenderCmd(this);
+    };
     _p.destroy = function () {
         this.removeDom();
-    },
+    };
     _p.setVisible = function (visible) {
         if (this._visible !== visible) {
             this._visible = !!visible;
             this._updateVisibility();
         }
-    },
+    };
     _p.updateMatrix = function (node) {
-        if (!this._div || !this._visible) return;
+        if (!this._iframe || !this._visible) return;
         node.getWorldMatrix(_mat4_temp);
         if (!this._forceUpdate &&
             this._m00 === _mat4_temp.m00 && this._m01 === _mat4_temp.m01 &&
@@ -304,7 +259,7 @@
             b = _mat4_temp.m01,
             c = _mat4_temp.m04,
             d = _mat4_temp.m05 * scaleY;
-        let offsetX = container && container.style.paddingLeft ? parseInt(container.style.paddingLeft) :0;
+        let offsetX = container && container.style.paddingLeft ? parseInt(container.style.paddingLeft) : 0;
         let offsetY = container && container.style.paddingBottom ? parseIn(container.style.paddingBottom) : 0;
         this._updateSize(this._w, this._h);
         let w = this._div.clientWidth * scaleX;
@@ -314,10 +269,6 @@
         let tx = _mat4_temp.m12 * scaleX - appx + offsetX,
             ty = _mat4_temp.m13 * scaleY - appy + offsetY;
         let matrix = "matrix(" + a + "," + -b + "," + -c + "," + d + "," + tx + "," + -ty + ")";
-        this._div.style['transform'] = matrix;
-        this._div.style['-webkit-transform'] = matrix;
-        this._div.style['transform-origin'] = '0px 100% 0px';
-        this._div.style['-webkit-transform-origin'] = '0px 100% 0px';
         // chagned iframe opacity
         this._setOpacity(node.opacity);
     }
