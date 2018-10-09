@@ -281,6 +281,7 @@
             ty = _mat4_temp.m13 * scaleY - appy + offsetY;
 
         var height = cc.view.getFrameSize().height;
-        // how to set webview frame size on JSB
+        // set webview rect
+        this._iframe.setFrame(tx, height - h - ty, this._w * a, this._h * d)
     }
 })();
