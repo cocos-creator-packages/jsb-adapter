@@ -34,7 +34,7 @@
 
     _p._updateVisibility = function () {
         if (!this._iframe) return;
-        this._video.setVisible(this._visible);
+        this._iframe.setVisible(this._visible);
         this._forceUpdate = true;
     };
     _p._updateSize = function (w, h) {
@@ -51,8 +51,8 @@
             cbs.error = function () {
                 self._dispatchEvent(_impl.EventType.ERROR);
             };
-            iframe.addEventListener("load", cbs.load);
-            iframe.addEventListener("error", cbs.error);
+            this.setEventListener("load", cbs.load);
+            this.setEventListener("error", cbs.error);
         }
     };
     _p._initStyle = function () {
@@ -78,8 +78,8 @@
         let iframe = this._iframe;
         if (iframe) {
             let cbs = this.__eventListeners;
-            iframe.removeEventListener("load", cbs.load);
-            iframe.removeEventListener("error", cbs.error);
+            this.removeEventListener("load", cbs.load);
+            this.removeEventListener("error", cbs.error);
             cbs.load = null;
             cbs.error = null;
             this._iframe = null;
@@ -122,9 +122,9 @@
             let cb = function () {
                 self._loaded = true;
                 self._updateVisibility();
-                iframe.removeEventListener("load", cb);
+                this.removeEventListener("load", cb);
             };
-            iframe.addEventListener("load", cb);
+            this.setEventListener("load", cb);
             this._dispatchEvent(_impl.EventType.LOADING);
         }
     };
@@ -261,15 +261,26 @@
             d = _mat4_temp.m05 * scaleY;
         let offsetX = container && container.style.paddingLeft ? parseInt(container.style.paddingLeft) : 0;
         let offsetY = container && container.style.paddingBottom ? parseIn(container.style.paddingBottom) : 0;
-        this._updateSize(this._w, this._h);
-        let w = this._div.clientWidth * scaleX;
-        let h = this._div.clientHeight * scaleY;
+
+        let w, h;
+        if (_impl._polyfill.zoomInvalid) {
+            this._updateSize(this._w * a, this._h * d);
+            a = 1;
+            d = 1;
+            w = this._w * scaleX;
+            h = this._h * scaleY;
+        } else {
+            this._updateSize(this._w, this._h);
+            w = this._w * scaleX;
+            h = this._h * scaleY;
+        }
+
         let appx = (w * _mat4_temp.m00) * node._anchorPoint.x;
         let appy = (h * _mat4_temp.m05) * node._anchorPoint.y;
         let tx = _mat4_temp.m12 * scaleX - appx + offsetX,
             ty = _mat4_temp.m13 * scaleY - appy + offsetY;
-        let matrix = "matrix(" + a + "," + -b + "," + -c + "," + d + "," + tx + "," + -ty + ")";
-        // chagned iframe opacity
-        this._setOpacity(node.opacity);
+
+        var height = cc.view.getFrameSize().height;
+        // how to set webview frame size on JSB
     }
 })();
