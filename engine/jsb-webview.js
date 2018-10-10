@@ -71,7 +71,7 @@
     };
     _p.createDomElementIfNeeded = function (w, h) {
         if (!this._iframe){
-            this._iframe = new jsb.WebView.create();
+            this._iframe = jsb.WebView.create();
         }
     };
     _p.removeDom = function () {
