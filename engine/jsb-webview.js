@@ -46,17 +46,16 @@
             let cbs = this.__eventListeners,
                 self = this;
             cbs.load = function () {
+                self._loaded = true;
                 self._dispatchEvent(_impl.EventType.LOADED);
             };
             cbs.error = function () {
                 self._dispatchEvent(_impl.EventType.ERROR);
             };
-            this.setEventListener("load", cbs.load);
-            this.setEventListener("error", cbs.error);
+            // native event callback
+            this._iframe.setOnDidFinishLoading(cbs.load);
+            this._iframe.setOnDidFailLoading(cbs.error);
         }
-    };
-    _p._initStyle = function () {
-
     };
     _p._setOpacity = function (opacity) {
         let iframe = this._iframe;
@@ -64,22 +63,16 @@
             iframe.style.opacity = opacity / 255;
         }
     };
-    _p._createNativeControl = function (w, h) {
-        this.createDomElementIfNeeded(w, h);
-        this._initStyle();
-        this._initEvent();
-    };
     _p.createDomElementIfNeeded = function (w, h) {
         if (!this._iframe){
             this._iframe = jsb.WebView.create();
+            this._initEvent();
         }
     };
     _p.removeDom = function () {
         let iframe = this._iframe;
         if (iframe) {
             let cbs = this.__eventListeners;
-            this.removeEventListener("load", cbs.load);
-            this.removeEventListener("error", cbs.error);
             cbs.load = null;
             cbs.error = null;
             this._iframe = null;
@@ -118,13 +111,6 @@
         if (iframe) {
             iframe.src = url;
             iframe.loadURL(url);
-            let self = this;
-            let cb = function () {
-                self._loaded = true;
-                self._updateVisibility();
-                this.removeEventListener("load", cb);
-            };
-            this.setEventListener("load", cb);
             this._dispatchEvent(_impl.EventType.LOADING);
         }
     };
