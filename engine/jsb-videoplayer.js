@@ -107,7 +107,7 @@
 
     _p.createDomElementIfNeeded = function () {
         if (!this._video) {
-            this._video = new VideoPlayerCore();
+            this._video = new jsb.VideoPlayer();
         }
     };
 
@@ -118,15 +118,6 @@
             this._video.setVisible(false)
 
             let cbs = this.__eventListeners;
-            video.removeEventListener("loadedmetadata", cbs.loadedmetadata);
-            video.removeEventListener("ended", cbs.ended);
-            video.removeEventListener("play", cbs.play);
-            video.removeEventListener("pause", cbs.pause);
-            video.removeEventListener("click", cbs.click);
-            video.removeEventListener("canplay", cbs.onCanPlay);
-            video.removeEventListener("canplaythrough", cbs.onCanPlay);
-            video.removeEventListener("suspend", cbs.onCanPlay);
-            video.removeEventListener("stoped", cbs.stoped);
 
             cbs.loadedmetadata = null;
             cbs.ended = null;
@@ -187,7 +178,6 @@
         } else {
             let cb = function () {
                 video.seekTo(time)
-                video.removeEventListener(_impl._polyfill.event, cb);
             };
             video.addEventListener(_impl._polyfill.event, cb);
         }
