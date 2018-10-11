@@ -32,7 +32,8 @@
     var _p = cc.VideoPlayer.Impl.prototype;
 
     _p._bindEvent = function () {
-        let video = this._video, self = this;
+        let video = this._video,
+            self = this;
         //binding event
         let cbs = this.__eventListeners;
         cbs.loadedmetadata = function () {
@@ -92,8 +93,7 @@
         let video = this._video;
         if (this._visible) {
             this._video.setVisible(true);
-        }
-        else {
+        } else {
             this._video.setVisible(false);
             video.pause();
             this._playing = false;
@@ -107,7 +107,7 @@
 
     _p.createDomElementIfNeeded = function () {
         if (!this._video) {
-            this._video = new VideoPlayerCore();
+            this._video = new jsb.VideoPlayer();
         }
     };
 
@@ -118,15 +118,6 @@
             this._video.setVisible(false)
 
             let cbs = this.__eventListeners;
-            video.removeEventListener("loadedmetadata", cbs.loadedmetadata);
-            video.removeEventListener("ended", cbs.ended);
-            video.removeEventListener("play", cbs.play);
-            video.removeEventListener("pause", cbs.pause);
-            video.removeEventListener("click", cbs.click);
-            video.removeEventListener("canplay", cbs.onCanPlay);
-            video.removeEventListener("canplaythrough", cbs.onCanPlay);
-            video.removeEventListener("suspend", cbs.onCanPlay);
-            video.removeEventListener("stoped", cbs.stoped);
 
             cbs.loadedmetadata = null;
             cbs.ended = null;
@@ -184,11 +175,9 @@
 
         if (this._loaded) {
             video.seekTo(time)
-        }
-        else {
+        } else {
             let cb = function () {
                 video.seekTo(time)
-                video.removeEventListener(_impl._polyfill.event, cb);
             };
             video.addEventListener(_impl._polyfill.event, cb);
         }
@@ -262,14 +251,18 @@
         this._w = node._contentSize.width;
         this._h = node._contentSize.height;
 
-        let scaleX = cc.view._scaleX, scaleY = cc.view._scaleY;
+        let scaleX = cc.view._scaleX,
+            scaleY = cc.view._scaleY;
         let dpr = cc.view._devicePixelRatio;
 
         scaleX /= dpr;
         scaleY /= dpr;
 
         let container = cc.game.container;
-        let a = _mat4_temp.m00 * scaleX, b = _mat4_temp.m01, c = _mat4_temp.m04, d = _mat4_temp.m05 * scaleY;
+        let a = _mat4_temp.m00 * scaleX,
+            b = _mat4_temp.m01,
+            c = _mat4_temp.m04,
+            d = _mat4_temp.m05 * scaleY;
 
         let offsetX = container && container.style.paddingLeft ? parseInt(container.style.paddingLeft) : 0;
         let offsetY = container && container.style.paddingBottom ? parseInt(container.style.paddingBottom) : 0;
@@ -280,8 +273,7 @@
             d = 1;
             w = this._w * scaleX;
             h = this._h * scaleY;
-        }
-        else {
+        } else {
             this._updateSize(this._w, this._h);
             w = this._w * scaleX;
             h = this._h * scaleY;
@@ -289,7 +281,8 @@
 
         let appx = (w * _mat4_temp.m00) * node._anchorPoint.x;
         let appy = (h * _mat4_temp.m05) * node._anchorPoint.y;
-        let tx = _mat4_temp.m12 * scaleX - appx + offsetX, ty = _mat4_temp.m13 * scaleY - appy + offsetY;
+        let tx = _mat4_temp.m12 * scaleX - appx + offsetX,
+            ty = _mat4_temp.m13 * scaleY - appy + offsetY;
 
         var height = cc.view.getFrameSize().height;
         this._video.setFrame(tx, height - h - ty, this._w * a, this._h * d)
