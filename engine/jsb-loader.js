@@ -195,6 +195,7 @@ cc.loader.addDownloadHandlers({
     'fnt' : downloadText,
 
     'binary' : downloadBinary,
+    'bin' : downloadBinary,
 
     'default' : downloadText
 });
