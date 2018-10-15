@@ -1,4 +1,7 @@
 {
   "name": "jsb-adapter",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "reload":{
+    "ignore":["**/*"]
+  }
 }

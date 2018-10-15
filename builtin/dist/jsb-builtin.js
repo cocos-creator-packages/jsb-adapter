@@ -2026,8 +2026,12 @@ function fireTimeout(nowMilliSeconds) {
         info = _timeoutInfos[id];
         if (info && info.cb) {
             if (nowMilliSeconds - info.start >= info.delay) {
-                //                console.log(`fireTimeout: id ${id}, start: ${info.start}, delay: ${info.delay}, now: ${nowMilliSeconds}`);
-                info.cb.apply(info.target, info.args);
+                // console.log(`fireTimeout: id ${id}, start: ${info.start}, delay: ${info.delay}, now: ${nowMilliSeconds}`);
+                if (typeof info.cb === 'string') {
+                    Function(info.cb)();
+                } else if (typeof info.cb === 'function') {
+                    info.cb.apply(info.target, info.args);
+                }
                 if (info.isRepeat) {
                     info.start = nowMilliSeconds;
                 } else {
