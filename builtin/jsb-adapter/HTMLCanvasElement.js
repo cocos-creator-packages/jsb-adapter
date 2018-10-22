@@ -119,11 +119,11 @@ ctx2DProto.createImageData = function (args1, args2) {
 
 // void ctx.putImageData(imagedata, dx, dy);
 // void ctx.putImageData(imagedata, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
-ctx2DProto.putImageData = function (imagedata, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight) {
+ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight) {
     var height = imageData.height;
     var width = imageData.width;
     var imgBuffer = imageData.data;
-    var canvasWidth = this.canvas.width;
+    var canvasWidth = window.innerWidth;
     var canvasBuffer = this._canvas._data.data;
     dirtyX = dirtyX || 0;
     dirtyY = dirtyY || 0;
@@ -145,17 +145,17 @@ ctx2DProto.putImageData = function (imagedata, dx, dy, dirtyX, dirtyY, dirtyWidt
 
 // ImageData ctx.getImageData(sx, sy, sw, sh);
 ctx2DProto.getImageData = function (sx, sy, sw, sh) {
-    var canvasWidth = this.canvas.width;
+    var canvasWidth = window.innerWidth;
     var canvasBuffer = this._canvas._data.data;
     var imgBuffer = new Uint8ClampedArray(sw * sh * 4);
     for (var y = 0; y < sh; y++) {
         for (var x = 0; x < sw; x++) {
-            var canvasPos = (y + sh) * canvasWidth + (x + sw);
+            var canvasPos = (y + sy) * canvasWidth + (x + sx);
             var imgPos = y * sw + x;
-            imgBuffer[imgPos * 4 + 0] = canvasBuffer[imgPos * 4 + 0];
-            imgBuffer[imgPos * 4 + 1] = canvasBuffer[imgPos * 4 + 1];
-            imgBuffer[imgPos * 4 + 2] = canvasBuffer[imgPos * 4 + 2];
-            imgBuffer[imgPos * 4 + 3] = canvasBuffer[imgPos * 4 + 3];
+            imgBuffer[imgPos * 4 + 0] = canvasBuffer[canvasPos * 4 + 0];
+            imgBuffer[imgPos * 4 + 1] = canvasBuffer[canvasPos * 4 + 1];
+            imgBuffer[imgPos * 4 + 2] = canvasBuffer[canvasPos * 4 + 2];
+            imgBuffer[imgPos * 4 + 3] = canvasBuffer[canvasPos * 4 + 3];
         }
     }
     return new ImageData(imgBuffer);
