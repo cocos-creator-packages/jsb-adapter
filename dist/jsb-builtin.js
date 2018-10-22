@@ -1,9 +1,5 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 (function (global){
-"use strict";
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 /* Blob.js
  * A Blob implementation.
  * 2017-11-15
@@ -25,7 +21,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		if (typeof define === "function" && define.amd) {
 			// AMD. Register as an anonymous module.
 			define(["exports"], factory);
-		} else if ((typeof exports === "undefined" ? "undefined" : _typeof(exports)) === "object" && typeof exports.nodeName !== "string") {
+		} else if (typeof exports === "object" && typeof exports.nodeName !== "string") {
 			// CommonJS
 			factory(exports);
 		} else {
@@ -47,7 +43,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		// Internally we use a BlobBuilder implementation to base Blob off of
 		// in order to support older browsers that only have BlobBuilder
 		var BlobBuilder = global.BlobBuilder || global.WebKitBlobBuilder || global.MozBlobBuilder || function () {
-			var get_class = function get_class(object) {
+			var get_class = function (object) {
 				return Object.prototype.toString.call(object).match(/^\[object\s(.*)\]$/)[1];
 			},
 			    FakeBlobBuilder = function BlobBuilder() {
@@ -62,7 +58,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			    FBB_proto = FakeBlobBuilder.prototype,
 			    FB_proto = FakeBlob.prototype,
 			    FileReaderSync = global.FileReaderSync,
-			    FileException = function FileException(type) {
+			    FileException = function (type) {
 				this.code = this[this.name = type];
 			},
 			    file_ex_codes = ("NOT_FOUND_ERR SECURITY_ERR ABORT_ERR NOT_READABLE_ERR ENCODING_ERR " + "NO_MODIFICATION_ALLOWED_ERR INVALID_STATE_ERR SYNTAX_ERR").split(" "),
@@ -209,12 +205,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		};
 		exports.Blob.prototype = getPrototypeOf(new exports.Blob());
 	});
-})(typeof self !== "undefined" && self || typeof window !== "undefined" && window || typeof global !== "undefined" && global || undefined.content || undefined);
+})(typeof self !== "undefined" && self || typeof window !== "undefined" && window || typeof global !== "undefined" && global || this.content || this);
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],2:[function(require,module,exports){
-"use strict";
-
 !function () {
   function e(e) {
     this.message = e;
@@ -224,15 +218,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       if (n = a.charCodeAt(i += .75), n > 255) throw new e("'btoa' failed: The string to be encoded contains characters outside of the Latin1 range.");o = o << 8 | n;
     }return c;
   }), t.atob || (t.atob = function (t) {
-    var o = String(t).replace(/[=]+$/, "");if (o.length % 4 == 1) throw new e("'atob' failed: The string to be decoded is not correctly encoded.");for (var n, a, i = 0, f = 0, c = ""; a = o.charAt(f++); ~a && (n = i % 4 ? 64 * n + a : a, i++ % 4) ? c += String.fromCharCode(255 & n >> (-2 * i & 6)) : 0) {
-      a = r.indexOf(a);
-    }return c;
+    var o = String(t).replace(/[=]+$/, "");if (o.length % 4 == 1) throw new e("'atob' failed: The string to be decoded is not correctly encoded.");for (var n, a, i = 0, f = 0, c = ""; a = o.charAt(f++); ~a && (n = i % 4 ? 64 * n + a : a, i++ % 4) ? c += String.fromCharCode(255 & n >> (-2 * i & 6)) : 0) a = r.indexOf(a);return c;
   });
 }();
 
 },{}],3:[function(require,module,exports){
-'use strict';
-
 var GL_COMMAND_ACTIVE_TEXTURE = 0;
 var GL_COMMAND_ATTACH_SHADER = 1;
 var GL_COMMAND_BIND_ATTRIB_LOCATION = 2;
@@ -332,7 +322,7 @@ var GL_COMMAND_VERTEX_ATTRIB_4FV = 95;
 var GL_COMMAND_VERTEX_ATTRIB_POINTER = 96;
 var GL_COMMAND_VIEW_PORT = 97;
 
-var gl = __gl;
+const gl = __gl;
 
 // _gl save the orignal gl functions.
 var _gl = {};
@@ -353,10 +343,10 @@ function batchGLCommandsToNative() {
             attachMethodOpt();
             buffer_data = new Float32Array(total_size);
         } else {
-            console.log('Disable batch GL commands, TypedArray Native API isn\'t supported!');
+            console.log(`Disable batch GL commands, TypedArray Native API isn't supported!`);
         }
     } else {
-        console.log('Disable batch GL commands, _flushCommands isn\'t binded!');
+        console.log(`Disable batch GL commands, _flushCommands isn't binded!`);
     }
 }
 
@@ -1317,7 +1307,7 @@ function texImage2DOpt() {
     } else if (argCount === 9) {
         _gl.texImage2D(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8]);
     } else {
-        console.log('texImage2DOpt: Wrong number of arguments, expected 6 or 9 but got ' + argCount);
+        console.log(`texImage2DOpt: Wrong number of arguments, expected 6 or 9 but got ${argCount}`);
     }
 }
 
@@ -1356,7 +1346,7 @@ function texSubImage2DOpt(target, level, xoffset, yoffset, width, height, format
     } else if (argCount === 9) {
         _gl.texSubImage2D(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8]);
     } else {
-        console.log('texSubImage2DOpt: Wrong number of arguments, expected 7 or 9 but got ' + argCount);
+        console.log(`texSubImage2DOpt: Wrong number of arguments, expected 7 or 9 but got ${argCount}`);
     }
 }
 
@@ -1928,28 +1918,15 @@ module.exports = {
 };
 
 },{}],4:[function(require,module,exports){
-'use strict';
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 window.CanvasRenderingContext2D = jsb.CanvasRenderingContext2D;
 delete jsb.CanvasRenderingContext2D;
 
 jsb.device = jsb.Device; // cc namespace will be reset to {} in creator, use jsb namespace instead.
 
-var _require = require('./base64/base64.min'),
-    btoa = _require.btoa,
-    atob = _require.atob;
-
+const { btoa, atob } = require('./base64/base64.min');
 window.btoa = btoa;
 window.atob = atob;
-
-var _require2 = require('./Blob'),
-    Blob = _require2.Blob,
-    URL = _require2.URL;
-
+const { Blob, URL } = require('./Blob');
 window.Blob = Blob;
 window.URL = URL;
 window.DOMParser = require('./xmldom/dom-parser').DOMParser;
@@ -1960,13 +1937,13 @@ require('./jsb-adapter');
 require('./jsb_audioengine');
 require('./jsb_input');
 
-var _oldRequestFrameCallback = null;
-var _requestAnimationFrameID = 0;
-var _requestAnimationFrameCallbacks = {};
-var _firstTick = true;
+let _oldRequestFrameCallback = null;
+let _requestAnimationFrameID = 0;
+let _requestAnimationFrameCallbacks = {};
+let _firstTick = true;
 
 window.requestAnimationFrame = function (cb) {
-    var id = ++_requestAnimationFrameID;
+    let id = ++_requestAnimationFrameID;
     _requestAnimationFrameCallbacks[id] = cb;
     return id;
 };
@@ -1975,10 +1952,7 @@ window.cancelAnimationFrame = function (id) {
     delete _requestAnimationFrameCallbacks[id];
 };
 
-var _require3 = require('./glOptMode'),
-    disableBatchGLCommandsToNative = _require3.disableBatchGLCommandsToNative,
-    flushCommands = _require3.flushCommands;
-
+const { disableBatchGLCommandsToNative, flushCommands } = require('./glOptMode');
 window.optConfig = {
     disableBatchGLCommandsToNative: disableBatchGLCommandsToNative
 };
@@ -1994,7 +1968,7 @@ function tick(nowMilliSeconds) {
     }
     fireTimeout(nowMilliSeconds);
 
-    for (var id in _requestAnimationFrameCallbacks) {
+    for (let id in _requestAnimationFrameCallbacks) {
         _oldRequestFrameCallback = _requestAnimationFrameCallbacks[id];
         if (_oldRequestFrameCallback) {
             delete _requestAnimationFrameCallbacks[id];
@@ -2004,25 +1978,25 @@ function tick(nowMilliSeconds) {
     flushCommands();
 }
 
-var _timeoutIDIndex = 0;
+let _timeoutIDIndex = 0;
 
-var TimeoutInfo = function TimeoutInfo(cb, delay, isRepeat, target, args) {
-    _classCallCheck(this, TimeoutInfo);
+class TimeoutInfo {
+    constructor(cb, delay, isRepeat, target, args) {
+        this.cb = cb;
+        this.id = ++_timeoutIDIndex;
+        this.start = performance.now();
+        this.delay = delay;
+        this.isRepeat = isRepeat;
+        this.target = target;
+        this.args = args;
+    }
+}
 
-    this.cb = cb;
-    this.id = ++_timeoutIDIndex;
-    this.start = performance.now();
-    this.delay = delay;
-    this.isRepeat = isRepeat;
-    this.target = target;
-    this.args = args;
-};
-
-var _timeoutInfos = {};
+let _timeoutInfos = {};
 
 function fireTimeout(nowMilliSeconds) {
-    var info = void 0;
-    for (var id in _timeoutInfos) {
+    let info;
+    for (let id in _timeoutInfos) {
         info = _timeoutInfos[id];
         if (info && info.cb) {
             if (nowMilliSeconds - info.start >= info.delay) {
@@ -2043,20 +2017,20 @@ function fireTimeout(nowMilliSeconds) {
 }
 
 function createTimeoutInfo(prevFuncArgs, isRepeat) {
-    var cb = prevFuncArgs[0];
+    let cb = prevFuncArgs[0];
     if (!cb) {
         console.error("createTimeoutInfo doesn't pass a callback ...");
         return 0;
     }
 
-    var delay = prevFuncArgs.length > 1 ? prevFuncArgs[1] : 0;
-    var args = void 0;
+    let delay = prevFuncArgs.length > 1 ? prevFuncArgs[1] : 0;
+    let args;
 
     if (prevFuncArgs.length > 2) {
         args = Array.prototype.slice.call(prevFuncArgs, 2);
     }
 
-    var info = new TimeoutInfo(cb, delay, isRepeat, this, args);
+    let info = new TimeoutInfo(cb, delay, isRepeat, this, args);
     _timeoutInfos[info.id] = info;
     return info.id;
 }
@@ -2143,7 +2117,7 @@ if (window.SocketIO) {
     window.io = window.SocketIO;
     SocketIO.prototype._Emit = SocketIO.prototype.emit;
     SocketIO.prototype.emit = function (uri, delegate) {
-        if ((typeof delegate === 'undefined' ? 'undefined' : _typeof(delegate)) === 'object') {
+        if (typeof delegate === 'object') {
             delegate = JSON.stringify(delegate);
         }
         this._Emit(uri, delegate);
@@ -2153,9 +2127,7 @@ if (window.SocketIO) {
 window.gameTick = tick;
 
 },{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":29,"./jsb_audioengine":34,"./jsb_input":35,"./jsb_opengl":36,"./jsb_prepare":38,"./xmldom/dom-parser":39}],5:[function(require,module,exports){
-'use strict';
-
-var HTMLAudioElement = require('./HTMLAudioElement');
+const HTMLAudioElement = require('./HTMLAudioElement');
 
 function Audio(url) {
     return new HTMLAudioElement(url);
@@ -2164,153 +2136,93 @@ function Audio(url) {
 module.exports = Audio;
 
 },{"./HTMLAudioElement":14}],6:[function(require,module,exports){
-"use strict";
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var DOMRect = function DOMRect(x, y, width, height) {
-	_classCallCheck(this, DOMRect);
-
-	this.x = x ? x : 0;
-	this.y = y ? y : 0;
-	this.width = width ? width : 0;
-	this.height = height ? height : 0;
-	this.left = this.x;
-	this.top = this.y;
-	this.right = this.x + this.width;
-	this.bottom = this.y + this.height;
-};
+class DOMRect {
+	constructor(x, y, width, height) {
+		this.x = x ? x : 0;
+		this.y = y ? y : 0;
+		this.width = width ? width : 0;
+		this.height = height ? height : 0;
+		this.left = this.x;
+		this.top = this.y;
+		this.right = this.x + this.width;
+		this.bottom = this.y + this.height;
+	}
+}
 
 module.exports = DOMRect;
 
 },{}],7:[function(require,module,exports){
-'use strict';
+const Event = require('./Event');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Event = require('./Event');
-
-var DeviceMotionEvent = function (_Event) {
-    _inherits(DeviceMotionEvent, _Event);
-
-    function DeviceMotionEvent(initArgs) {
-        _classCallCheck(this, DeviceMotionEvent);
-
-        var _this = _possibleConstructorReturn(this, (DeviceMotionEvent.__proto__ || Object.getPrototypeOf(DeviceMotionEvent)).call(this, 'devicemotion'));
-
+class DeviceMotionEvent extends Event {
+    constructor(initArgs) {
+        super('devicemotion');
         if (initArgs) {
-            _this._acceleration = initArgs.acceleration ? initArgs.acceleration : { x: 0, y: 0, z: 0 };
-            _this._accelerationIncludingGravity = initArgs.accelerationIncludingGravity ? initArgs.accelerationIncludingGravity : { x: 0, y: 0, z: 0 };
-            _this._rotationRate = initArgs.rotationRate ? initArgs.rotationRate : { alpha: 0, beta: 0, gamma: 0 };
-            _this._interval = initArgs.interval;
+            this._acceleration = initArgs.acceleration ? initArgs.acceleration : { x: 0, y: 0, z: 0 };
+            this._accelerationIncludingGravity = initArgs.accelerationIncludingGravity ? initArgs.accelerationIncludingGravity : { x: 0, y: 0, z: 0 };
+            this._rotationRate = initArgs.rotationRate ? initArgs.rotationRate : { alpha: 0, beta: 0, gamma: 0 };
+            this._interval = initArgs.interval;
         } else {
-            _this._acceleration = { x: 0, y: 0, z: 0 };
-            _this._accelerationIncludingGravity = { x: 0, y: 0, z: 0 };
-            _this._rotationRate = { alpha: 0, beta: 0, gamma: 0 };
-            _this._interval = 0;
+            this._acceleration = { x: 0, y: 0, z: 0 };
+            this._accelerationIncludingGravity = { x: 0, y: 0, z: 0 };
+            this._rotationRate = { alpha: 0, beta: 0, gamma: 0 };
+            this._interval = 0;
         }
-        return _this;
     }
 
-    _createClass(DeviceMotionEvent, [{
-        key: 'acceleration',
-        get: function get() {
-            return this._acceleration;
-        }
-    }, {
-        key: 'accelerationIncludingGravity',
-        get: function get() {
-            return this._accelerationIncludingGravity;
-        }
-    }, {
-        key: 'rotationRate',
-        get: function get() {
-            return this._rotationRate;
-        }
-    }, {
-        key: 'interval',
-        get: function get() {
-            return this._interval;
-        }
-    }]);
+    get acceleration() {
+        return this._acceleration;
+    }
 
-    return DeviceMotionEvent;
-}(Event);
+    get accelerationIncludingGravity() {
+        return this._accelerationIncludingGravity;
+    }
+
+    get rotationRate() {
+        return this._rotationRate;
+    }
+
+    get interval() {
+        return this._interval;
+    }
+}
 
 module.exports = DeviceMotionEvent;
 
 },{"./Event":9}],8:[function(require,module,exports){
-'use strict';
+const Node = require('./Node');
+const DOMRect = require('./DOMRect');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Node = require('./Node');
-var DOMRect = require('./DOMRect');
-
-var Element = function (_Node) {
-    _inherits(Element, _Node);
-
-    function Element() {
-        _classCallCheck(this, Element);
-
-        var _this = _possibleConstructorReturn(this, (Element.__proto__ || Object.getPrototypeOf(Element)).call(this));
-
-        _this.className = '';
-        _this.children = [];
-        _this.clientLeft = 0;
-        _this.clientTop = 0;
-        _this.scrollLeft = 0;
-        _this.scrollTop = 0;
-        return _this;
+class Element extends Node {
+    constructor() {
+        super();
+        this.className = '';
+        this.children = [];
+        this.clientLeft = 0;
+        this.clientTop = 0;
+        this.scrollLeft = 0;
+        this.scrollTop = 0;
     }
 
-    _createClass(Element, [{
-        key: 'getBoundingClientRect',
-        value: function getBoundingClientRect() {
-            return new DOMRect(0, 0, window.innerWidth, window.innerHeight);
-        }
+    get clientWidth() {
+        return 0;
+    }
 
-        // attrName is a string that names the attribute to be removed from element.
+    get clientHeight() {
+        return 0;
+    }
 
-    }, {
-        key: 'removeAttribute',
-        value: function removeAttribute(attrName) {}
-    }, {
-        key: 'clientWidth',
-        get: function get() {
-            return 0;
-        }
-    }, {
-        key: 'clientHeight',
-        get: function get() {
-            return 0;
-        }
-    }]);
+    getBoundingClientRect() {
+        return new DOMRect(0, 0, window.innerWidth, window.innerHeight);
+    }
 
-    return Element;
-}(Node);
+    // attrName is a string that names the attribute to be removed from element.
+    removeAttribute(attrName) {}
+}
 
 module.exports = Element;
 
 },{"./DOMRect":6,"./Node":26}],9:[function(require,module,exports){
-"use strict";
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 /**
  * @see https://dom.spec.whatwg.org/#interface-event
  * @private
@@ -2321,10 +2233,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @param {EventTarget} eventTarget The event target of this dispatching.
  * @param {Event|{type:string}} event The original event to wrap.
  */
-var Event = function () {
-  function Event(type, eventInit) {
-    _classCallCheck(this, Event);
+class Event {
 
+  constructor(type, eventInit) {
     this._type = type;
     this._target = null;
     this._eventPhase = 2;
@@ -2339,171 +2250,129 @@ var Event = function () {
    * The type of this event.
    * @type {string}
    */
+  get type() {
+    return this._type;
+  }
 
+  /**
+   * The target of this event.
+   * @type {EventTarget}
+   */
+  get target() {
+    return this._target;
+  }
 
-  _createClass(Event, [{
-    key: "composedPath",
+  /**
+   * The target of this event.
+   * @type {EventTarget}
+   */
+  get currentTarget() {
+    return this._currentTarget;
+  }
 
+  get isTrusted() {
+    // https://heycam.github.io/webidl/#Unforgeable
+    return false;
+  }
 
-    /**
-     * @returns {EventTarget[]} The composed path of this event.
-     */
-    value: function composedPath() {
-      var currentTarget = this._currentTarget;
-      if (currentTarget === null) {
-        return [];
-      }
-      return [currentTarget];
+  get timeStamp() {
+    return this._timeStamp;
+  }
+
+  /**
+   * @returns {EventTarget[]} The composed path of this event.
+   */
+  composedPath() {
+    const currentTarget = this._currentTarget;
+    if (currentTarget === null) {
+      return [];
+    }
+    return [currentTarget];
+  }
+
+  /**
+   * The target of this event.
+   * @type {number}
+   */
+  get eventPhase() {
+    return this._eventPhase;
+  }
+
+  /**
+   * Stop event bubbling.
+   * @returns {void}
+   */
+  stopPropagation() {}
+
+  /**
+   * Stop event bubbling.
+   * @returns {void}
+   */
+  stopImmediatePropagation() {
+    this._stopped = true;
+  }
+
+  /**
+   * The flag to be bubbling.
+   * @type {boolean}
+   */
+  get bubbles() {
+    return false;
+  }
+
+  /**
+   * The flag to be cancelable.
+   * @type {boolean}
+   */
+  get cancelable() {
+    return true;
+  }
+
+  /**
+   * Cancel this event.
+   * @returns {void}
+   */
+  preventDefault() {
+    if (this._passiveListener !== null) {
+      console.warn("Event#preventDefault() was called from a passive listener:", this._passiveListener);
+      return;
+    }
+    if (!this.cancelable) {
+      return;
     }
 
-    /**
-     * The target of this event.
-     * @type {number}
-     */
+    this._canceled = true;
+  }
 
-  }, {
-    key: "stopPropagation",
+  /**
+   * The flag to indicate cancellation state.
+   * @type {boolean}
+   */
+  get defaultPrevented() {
+    return this._canceled;
+  }
 
+  /**
+   * The flag to be composed.
+   * @type {boolean}
+   */
+  get composed() {
+    return false;
+  }
 
-    /**
-     * Stop event bubbling.
-     * @returns {void}
-     */
-    value: function stopPropagation() {}
-
-    /**
-     * Stop event bubbling.
-     * @returns {void}
-     */
-
-  }, {
-    key: "stopImmediatePropagation",
-    value: function stopImmediatePropagation() {
-      this._stopped = true;
-    }
-
-    /**
-     * The flag to be bubbling.
-     * @type {boolean}
-     */
-
-  }, {
-    key: "preventDefault",
-
-
-    /**
-     * Cancel this event.
-     * @returns {void}
-     */
-    value: function preventDefault() {
-      if (this._passiveListener !== null) {
-        console.warn("Event#preventDefault() was called from a passive listener:", this._passiveListener);
-        return;
-      }
-      if (!this.cancelable) {
-        return;
-      }
-
-      this._canceled = true;
-    }
-
-    /**
-     * The flag to indicate cancellation state.
-     * @type {boolean}
-     */
-
-  }, {
-    key: "type",
-    get: function get() {
-      return this._type;
-    }
-
-    /**
-     * The target of this event.
-     * @type {EventTarget}
-     */
-
-  }, {
-    key: "target",
-    get: function get() {
-      return this._target;
-    }
-
-    /**
-     * The target of this event.
-     * @type {EventTarget}
-     */
-
-  }, {
-    key: "currentTarget",
-    get: function get() {
-      return this._currentTarget;
-    }
-  }, {
-    key: "isTrusted",
-    get: function get() {
-      // https://heycam.github.io/webidl/#Unforgeable
-      return false;
-    }
-  }, {
-    key: "timeStamp",
-
-
-    /**
-     * The unix time of this event.
-     * @type {number}
-     */
-    get: function get() {
-      return this._timeStamp;
-    }
-  }, {
-    key: "eventPhase",
-    get: function get() {
-      return this._eventPhase;
-    }
-  }, {
-    key: "bubbles",
-    get: function get() {
-      return false;
-    }
-
-    /**
-     * The flag to be cancelable.
-     * @type {boolean}
-     */
-
-  }, {
-    key: "cancelable",
-    get: function get() {
-      return true;
-    }
-  }, {
-    key: "defaultPrevented",
-    get: function get() {
-      return this._canceled;
-    }
-
-    /**
-     * The flag to be composed.
-     * @type {boolean}
-     */
-
-  }, {
-    key: "composed",
-    get: function get() {
-      return false;
-    }
-  }]);
-
-  return Event;
-}();
+  /**
+   * The unix time of this event.
+   * @type {number}
+   */
+  get timeStamp() {
+    return this._timeStamp;
+  }
+}
 
 /**
  * Constant of NONE.
  * @type {number}
  */
-
-
 Event.NONE = 0;
 
 /**
@@ -2527,14 +2396,6 @@ Event.BUBBLING_PHASE = 3;
 module.exports = Event;
 
 },{}],10:[function(require,module,exports){
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 var __targetID = 0;
 
 var __listenerMap = {
@@ -2577,16 +2438,16 @@ var __disableCallbackMap = {
     // }
 };
 
-var __handleEventNames = {
+const __handleEventNames = {
     touch: ['touchstart', 'touchmove', 'touchend', 'touchcancel'],
     mouse: ['mousedown', 'mousemove', 'mouseup', 'mousewheel'],
     keyboard: ['keydown', 'keyup', 'keypress'],
     devicemotion: ['devicemotion']
 
     // Listener types
-};var CAPTURE = 1;
-var BUBBLE = 2;
-var ATTRIBUTE = 3;
+};const CAPTURE = 1;
+const BUBBLE = 2;
+const ATTRIBUTE = 3;
 
 /**
  * Check whether a given value is an object or not.
@@ -2594,7 +2455,7 @@ var ATTRIBUTE = 3;
  * @returns {boolean} `true` if the value is an object.
  */
 function isObject(x) {
-    return x && (typeof x === 'undefined' ? 'undefined' : _typeof(x)) === "object"; //eslint-disable-line no-restricted-syntax
+    return x && typeof x === "object"; //eslint-disable-line no-restricted-syntax
 }
 
 /**
@@ -2607,11 +2468,8 @@ function isObject(x) {
  * 
  *     class A extends EventTarget {}
  */
-
-var EventTarget = function () {
-    function EventTarget() {
-        _classCallCheck(this, EventTarget);
-
+class EventTarget {
+    constructor() {
         this._targetID = ++__targetID;
         this._listenerCount = {
             touch: 0,
@@ -2622,218 +2480,203 @@ var EventTarget = function () {
         this._listeners = new Map();
     }
 
-    _createClass(EventTarget, [{
-        key: '_associateSystemEventListener',
-        value: function _associateSystemEventListener(eventName) {
-            var handleEventNames;
-            for (var key in __handleEventNames) {
-                handleEventNames = __handleEventNames[key];
-                if (handleEventNames.indexOf(eventName) > -1) {
-                    if (__enableCallbackMap[key] && __listenerCountMap[key] === 0) {
-                        __enableCallbackMap[key]();
-                    }
-
-                    if (this._listenerCount[key] === 0) __listenerMap[key][this._targetID] = this;
-                    ++this._listenerCount[key];
-                    ++__listenerCountMap[key];
-                    break;
+    _associateSystemEventListener(eventName) {
+        var handleEventNames;
+        for (var key in __handleEventNames) {
+            handleEventNames = __handleEventNames[key];
+            if (handleEventNames.indexOf(eventName) > -1) {
+                if (__enableCallbackMap[key] && __listenerCountMap[key] === 0) {
+                    __enableCallbackMap[key]();
                 }
+
+                if (this._listenerCount[key] === 0) __listenerMap[key][this._targetID] = this;
+                ++this._listenerCount[key];
+                ++__listenerCountMap[key];
+                break;
             }
         }
-    }, {
-        key: '_dissociateSystemEventListener',
-        value: function _dissociateSystemEventListener(eventName) {
-            var handleEventNames;
-            for (var key in __handleEventNames) {
-                handleEventNames = __handleEventNames[key];
-                if (handleEventNames.indexOf(eventName) > -1) {
-                    if (this._listenerCount[key] <= 0) delete __listenerMap[key][this._targetID];
-                    --__listenerCountMap[key];
+    }
 
-                    if (__disableCallbackMap[key] && __listenerCountMap[key] === 0) {
-                        __disableCallbackMap[key]();
-                    }
-                    break;
+    _dissociateSystemEventListener(eventName) {
+        var handleEventNames;
+        for (var key in __handleEventNames) {
+            handleEventNames = __handleEventNames[key];
+            if (handleEventNames.indexOf(eventName) > -1) {
+                if (this._listenerCount[key] <= 0) delete __listenerMap[key][this._targetID];
+                --__listenerCountMap[key];
+
+                if (__disableCallbackMap[key] && __listenerCountMap[key] === 0) {
+                    __disableCallbackMap[key]();
                 }
+                break;
             }
         }
+    }
 
-        /**
-         * Add a given listener to this event target.
-         * @param {string} eventName The event name to add.
-         * @param {Function} listener The listener to add.
-         * @param {boolean|{capture?:boolean,passive?:boolean,once?:boolean}} [options] The options for this listener.
-         * @returns {boolean} `true` if the listener was added actually.
-         */
+    /**
+     * Add a given listener to this event target.
+     * @param {string} eventName The event name to add.
+     * @param {Function} listener The listener to add.
+     * @param {boolean|{capture?:boolean,passive?:boolean,once?:boolean}} [options] The options for this listener.
+     * @returns {boolean} `true` if the listener was added actually.
+     */
+    addEventListener(eventName, listener, options) {
+        if (!listener) {
+            return false;
+        }
+        if (typeof listener !== "function" && !isObject(listener)) {
+            throw new TypeError("'listener' should be a function or an object.");
+        }
 
-    }, {
-        key: 'addEventListener',
-        value: function addEventListener(eventName, listener, options) {
-            if (!listener) {
-                return false;
-            }
-            if (typeof listener !== "function" && !isObject(listener)) {
-                throw new TypeError("'listener' should be a function or an object.");
-            }
+        const listeners = this._listeners;
+        const optionsIsObj = isObject(options);
+        const capture = optionsIsObj ? Boolean(options.capture) : Boolean(options);
+        const listenerType = capture ? CAPTURE : BUBBLE;
+        const newNode = {
+            listener,
+            listenerType,
+            passive: optionsIsObj && Boolean(options.passive),
+            once: optionsIsObj && Boolean(options.once),
+            next: null
 
-            var listeners = this._listeners;
-            var optionsIsObj = isObject(options);
-            var capture = optionsIsObj ? Boolean(options.capture) : Boolean(options);
-            var listenerType = capture ? CAPTURE : BUBBLE;
-            var newNode = {
-                listener: listener,
-                listenerType: listenerType,
-                passive: optionsIsObj && Boolean(options.passive),
-                once: optionsIsObj && Boolean(options.once),
-                next: null
-
-                // Set it as the first node if the first node is null.
-            };var node = listeners.get(eventName);
-            if (node === undefined) {
-                listeners.set(eventName, newNode);
-                this._associateSystemEventListener(eventName);
-                return true;
-            }
-
-            // Traverse to the tail while checking duplication..
-            var prev = null;
-            while (node) {
-                if (node.listener === listener && node.listenerType === listenerType) {
-                    // Should ignore duplication.
-                    return false;
-                }
-                prev = node;
-                node = node.next;
-            }
-
-            // Add it.
-            prev.next = newNode;
+            // Set it as the first node if the first node is null.
+        };let node = listeners.get(eventName);
+        if (node === undefined) {
+            listeners.set(eventName, newNode);
             this._associateSystemEventListener(eventName);
             return true;
         }
 
-        /**
-         * Remove a given listener from this event target.
-         * @param {string} eventName The event name to remove.
-         * @param {Function} listener The listener to remove.
-         * @param {boolean|{capture?:boolean,passive?:boolean,once?:boolean}} [options] The options for this listener.
-         * @returns {boolean} `true` if the listener was removed actually.
-         */
-
-    }, {
-        key: 'removeEventListener',
-        value: function removeEventListener(eventName, listener, options) {
-            if (!listener) {
+        // Traverse to the tail while checking duplication..
+        let prev = null;
+        while (node) {
+            if (node.listener === listener && node.listenerType === listenerType) {
+                // Should ignore duplication.
                 return false;
             }
+            prev = node;
+            node = node.next;
+        }
 
-            var listeners = this._listeners;
-            var capture = isObject(options) ? Boolean(options.capture) : Boolean(options);
-            var listenerType = capture ? CAPTURE : BUBBLE;
+        // Add it.
+        prev.next = newNode;
+        this._associateSystemEventListener(eventName);
+        return true;
+    }
 
-            var prev = null;
-            var node = listeners.get(eventName);
-            while (node) {
-                if (node.listener === listener && node.listenerType === listenerType) {
-                    if (prev) {
-                        prev.next = node.next;
-                    } else if (node.next) {
-                        listeners.set(eventName, node.next);
-                    } else {
-                        listeners.delete(eventName);
-                    }
-
-                    this._dissociateSystemEventListener(eventName);
-
-                    return true;
-                }
-
-                prev = node;
-                node = node.next;
-            }
-
+    /**
+     * Remove a given listener from this event target.
+     * @param {string} eventName The event name to remove.
+     * @param {Function} listener The listener to remove.
+     * @param {boolean|{capture?:boolean,passive?:boolean,once?:boolean}} [options] The options for this listener.
+     * @returns {boolean} `true` if the listener was removed actually.
+     */
+    removeEventListener(eventName, listener, options) {
+        if (!listener) {
             return false;
         }
 
-        /**
-         * Dispatch a given event.
-         * @param {Event|{type:string}} event The event to dispatch.
-         * @returns {boolean} `false` if canceled.
-         */
+        const listeners = this._listeners;
+        const capture = isObject(options) ? Boolean(options.capture) : Boolean(options);
+        const listenerType = capture ? CAPTURE : BUBBLE;
 
-    }, {
-        key: 'dispatchEvent',
-        value: function dispatchEvent(event) {
-            if (!event || typeof event.type !== "string") {
-                throw new TypeError("\"event.type\" should be a string.");
-            }
+        let prev = null;
+        let node = listeners.get(eventName);
+        while (node) {
+            if (node.listener === listener && node.listenerType === listenerType) {
+                if (prev) {
+                    prev.next = node.next;
+                } else if (node.next) {
+                    listeners.set(eventName, node.next);
+                } else {
+                    listeners.delete(eventName);
+                }
 
-            var eventName = event.type;
-            var onFunc = this['on' + eventName];
-            if (onFunc && typeof onFunc === 'function') {
-                event._target = event._currentTarget = this;
-                onFunc.call(this, event);
-                event._target = event._currentTarget = null;
-                event._eventPhase = 0;
-                event._passiveListener = null;
+                this._dissociateSystemEventListener(eventName);
 
-                if (event.defaultPrevented) return false;
-            }
-
-            // If listeners aren't registered, terminate.
-            var listeners = this._listeners;
-
-            var node = listeners.get(eventName);
-            if (!node) {
                 return true;
             }
 
+            prev = node;
+            node = node.next;
+        }
+
+        return false;
+    }
+
+    /**
+     * Dispatch a given event.
+     * @param {Event|{type:string}} event The event to dispatch.
+     * @returns {boolean} `false` if canceled.
+     */
+    dispatchEvent(event) {
+        if (!event || typeof event.type !== "string") {
+            throw new TypeError("\"event.type\" should be a string.");
+        }
+
+        const eventName = event.type;
+        var onFunc = this['on' + eventName];
+        if (onFunc && typeof onFunc === 'function') {
             event._target = event._currentTarget = this;
-
-            // This doesn't process capturing phase and bubbling phase.
-            // This isn't participating in a tree.
-            var prev = null;
-            while (node) {
-                // Remove this listener if it's once
-                if (node.once) {
-                    if (prev) {
-                        prev.next = node.next;
-                    } else if (node.next) {
-                        listeners.set(eventName, node.next);
-                    } else {
-                        listeners.delete(eventName);
-                    }
-                } else {
-                    prev = node;
-                }
-
-                // Call this listener
-                event._passiveListener = node.passive ? node.listener : null;
-                if (typeof node.listener === "function") {
-                    node.listener.call(this, event);
-                }
-
-                // Break if `event.stopImmediatePropagation` was called.
-                if (event._stopped) {
-                    break;
-                }
-
-                node = node.next;
-            }
+            onFunc.call(this, event);
             event._target = event._currentTarget = null;
             event._eventPhase = 0;
             event._passiveListener = null;
 
-            return !event.defaultPrevented;
+            if (event.defaultPrevented) return false;
         }
-    }]);
 
-    return EventTarget;
-}();
+        // If listeners aren't registered, terminate.
+        const listeners = this._listeners;
+
+        let node = listeners.get(eventName);
+        if (!node) {
+            return true;
+        }
+
+        event._target = event._currentTarget = this;
+
+        // This doesn't process capturing phase and bubbling phase.
+        // This isn't participating in a tree.
+        let prev = null;
+        while (node) {
+            // Remove this listener if it's once
+            if (node.once) {
+                if (prev) {
+                    prev.next = node.next;
+                } else if (node.next) {
+                    listeners.set(eventName, node.next);
+                } else {
+                    listeners.delete(eventName);
+                }
+            } else {
+                prev = node;
+            }
+
+            // Call this listener
+            event._passiveListener = node.passive ? node.listener : null;
+            if (typeof node.listener === "function") {
+                node.listener.call(this, event);
+            }
+
+            // Break if `event.stopImmediatePropagation` was called.
+            if (event._stopped) {
+                break;
+            }
+
+            node = node.next;
+        }
+        event._target = event._currentTarget = null;
+        event._eventPhase = 0;
+        event._passiveListener = null;
+
+        return !event.defaultPrevented;
+    }
+}
 
 function touchEventHandlerFactory(type) {
-    return function (touches) {
-        var touchEvent = new TouchEvent(type);
+    return touches => {
+        const touchEvent = new TouchEvent(type);
 
         touchEvent.touches = touches;
         touchEvent.targetTouches = Array.prototype.slice.call(touchEvent.touches);
@@ -2844,7 +2687,7 @@ function touchEventHandlerFactory(type) {
             touchCount = touches.length;
         var target;
         var touchListenerMap = __listenerMap.touch;
-        for (var key in touchListenerMap) {
+        for (let key in touchListenerMap) {
             target = touchListenerMap[key];
             for (i = 0; i < touchCount; ++i) {
                 touches[i].target = target;
@@ -2860,12 +2703,12 @@ jsb.onTouchEnd = touchEventHandlerFactory('touchend');
 jsb.onTouchCancel = touchEventHandlerFactory('touchcancel');
 
 function mouseEventHandlerFactory(type) {
-    return function (event) {
+    return event => {
         var button = event.button;
         var x = event.x;
         var y = event.y;
 
-        var mouseEvent = new MouseEvent(type, {
+        const mouseEvent = new MouseEvent(type, {
             button: button,
             which: button + 1,
             wheelDelta: event.wheelDeltaY,
@@ -2879,7 +2722,7 @@ function mouseEventHandlerFactory(type) {
 
         var target;
         var mouseListenerMap = __listenerMap.mouse;
-        for (var key in mouseListenerMap) {
+        for (let key in mouseListenerMap) {
             target = mouseListenerMap[key];
             target.dispatchEvent(mouseEvent);
         }
@@ -2892,8 +2735,8 @@ jsb.onMouseUp = mouseEventHandlerFactory('mouseup');
 jsb.onMouseWheel = mouseEventHandlerFactory('mousewheel');
 
 function keyboardEventHandlerFactory(type) {
-    return function (event) {
-        var keyboardEvent = new KeyboardEvent(type, {
+    return event => {
+        const keyboardEvent = new KeyboardEvent(type, {
             altKey: event.altKey,
             ctrlKey: event.ctrlKey,
             metaKey: event.metaKey,
@@ -2903,7 +2746,7 @@ function keyboardEventHandlerFactory(type) {
         });
         var target;
         var keyboardListenerMap = __listenerMap.keyboard;
-        for (var key in keyboardListenerMap) {
+        for (let key in keyboardListenerMap) {
             target = keyboardListenerMap[key];
             target.dispatchEvent(keyboardEvent);
         }
@@ -2916,7 +2759,7 @@ jsb.onKeyUp = keyboardEventHandlerFactory('keyup');
 jsb.device.dispatchDeviceMotionEvent = function (event) {
     var target;
     var devicemotionListenerMap = __listenerMap.devicemotion;
-    for (var key in devicemotionListenerMap) {
+    for (let key in devicemotionListenerMap) {
         target = devicemotionListenerMap[key];
         target.dispatchEvent(event);
     }
@@ -2925,442 +2768,292 @@ jsb.device.dispatchDeviceMotionEvent = function (event) {
 module.exports = EventTarget;
 
 },{}],11:[function(require,module,exports){
-'use strict';
+const EventTarget = require('./EventTarget');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var EventTarget = require('./EventTarget');
-
-var FileReader = function (_EventTarget) {
-	_inherits(FileReader, _EventTarget);
-
-	function FileReader() {
-		_classCallCheck(this, FileReader);
-
-		return _possibleConstructorReturn(this, (FileReader.__proto__ || Object.getPrototypeOf(FileReader)).apply(this, arguments));
+class FileReader extends EventTarget {
+	construct() {
+		this.result = null;
 	}
 
-	_createClass(FileReader, [{
-		key: 'construct',
-		value: function construct() {
-			this.result = null;
-		}
+	// Aborts the read operation. Upon return, the readyState will be DONE.
+	abort() {}
 
-		// Aborts the read operation. Upon return, the readyState will be DONE.
+	// Starts reading the contents of the specified Blob, once finished, the result attribute contains an ArrayBuffer representing the file's data.
+	readAsArrayBuffer() {}
 
-	}, {
-		key: 'abort',
-		value: function abort() {}
+	// Starts reading the contents of the specified Blob, once finished, the result attribute contains a data: URL representing the file's data.
+	readAsDataURL(blob) {
+		this.result = 'data:image/png;base64,' + window.btoa(blob);
+		var event = new Event('load');
+		this.dispatchEvent(event);
+	}
 
-		// Starts reading the contents of the specified Blob, once finished, the result attribute contains an ArrayBuffer representing the file's data.
-
-	}, {
-		key: 'readAsArrayBuffer',
-		value: function readAsArrayBuffer() {}
-
-		// Starts reading the contents of the specified Blob, once finished, the result attribute contains a data: URL representing the file's data.
-
-	}, {
-		key: 'readAsDataURL',
-		value: function readAsDataURL(blob) {
-			this.result = 'data:image/png;base64,' + window.btoa(blob);
-			var event = new Event('load');
-			this.dispatchEvent(event);
-		}
-
-		// Starts reading the contents of the specified Blob, once finished, the result attribute contains the contents of the file as a text string.
-
-	}, {
-		key: 'readAsText',
-		value: function readAsText() {}
-	}]);
-
-	return FileReader;
-}(EventTarget);
+	// Starts reading the contents of the specified Blob, once finished, the result attribute contains the contents of the file as a text string.
+	readAsText() {}
+}
 
 module.exports = FileReader;
 
 },{"./EventTarget":10}],12:[function(require,module,exports){
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var FontFace = function () {
-    function FontFace(family, source, descriptors) {
-        var _this = this;
-
-        _classCallCheck(this, FontFace);
-
+class FontFace {
+    constructor(family, source, descriptors) {
         this.family = family;
         this.source = source;
         this.descriptors = descriptors;
 
         this._status = 'unloaded';
 
-        this._loaded = new Promise(function (resolve, reject) {
-            _this._resolveCB = resolve;
-            _this._rejectCB = reject;
+        this._loaded = new Promise((resolve, reject) => {
+            this._resolveCB = resolve;
+            this._rejectCB = reject;
         });
     }
 
-    _createClass(FontFace, [{
-        key: 'load',
-        value: function load() {
-            // class FontFaceSet, add(fontFace) have done the load work
-        }
-    }, {
-        key: 'status',
-        get: function get() {
-            return this._status;
-        }
-    }, {
-        key: 'loaded',
-        get: function get() {
-            return this._loaded;
-        }
-    }]);
+    load() {
+        // class FontFaceSet, add(fontFace) have done the load work
+    }
 
-    return FontFace;
-}();
+    get status() {
+        return this._status;
+    }
+
+    get loaded() {
+        return this._loaded;
+    }
+}
 
 module.exports = FontFace;
 
 },{}],13:[function(require,module,exports){
-'use strict';
+const EventTarget = require('./EventTarget');
+const Event = require('./Event');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var EventTarget = require('./EventTarget');
-var Event = require('./Event');
-
-var FontFaceSet = function (_EventTarget) {
-    _inherits(FontFaceSet, _EventTarget);
-
-    function FontFaceSet() {
-        _classCallCheck(this, FontFaceSet);
-
-        var _this = _possibleConstructorReturn(this, (FontFaceSet.__proto__ || Object.getPrototypeOf(FontFaceSet)).call(this));
-
-        _this._status = 'loading';
-        return _this;
+class FontFaceSet extends EventTarget {
+    constructor() {
+        super();
+        this._status = 'loading';
     }
 
-    _createClass(FontFaceSet, [{
-        key: 'add',
-        value: function add(fontFace) {
-            var _this2 = this;
+    get status() {
+        return this._status;
+    }
 
-            this._status = fontFace._status = 'loading';
-            this.dispatchEvent(new Event('loading'));
-            // Call native binding method to set the ttf font to native platform.
-            var family = jsb.loadFont(fontFace.family, fontFace.source);
-            setTimeout(function () {
-                if (family) {
-                    fontFace._status = _this2._status = 'loaded';
-                    fontFace._resolveCB();
-                    _this2.dispatchEvent(new Event('loadingdone'));
-                } else {
-                    fontFace._status = _this2._status = 'error';
-                    fontFace._rejectCB();
-                    _this2.dispatchEvent(new Event('loadingerror'));
-                }
-            }, 0);
-        }
-    }, {
-        key: 'clear',
-        value: function clear() {}
-    }, {
-        key: 'delete',
-        value: function _delete() {}
-    }, {
-        key: 'load',
-        value: function load() {}
-    }, {
-        key: 'ready',
-        value: function ready() {}
-    }, {
-        key: 'status',
-        get: function get() {
-            return this._status;
-        }
-    }, {
-        key: 'onloading',
-        set: function set(listener) {
-            this.addEventListener('loading', listener);
-        }
-    }, {
-        key: 'onloadingdone',
-        set: function set(listener) {
-            this.addEventListener('loadingdone', listener);
-        }
-    }, {
-        key: 'onloadingerror',
-        set: function set(listener) {
-            this.addEventListener('loadingerror', listener);
-        }
-    }]);
+    set onloading(listener) {
+        this.addEventListener('loading', listener);
+    }
 
-    return FontFaceSet;
-}(EventTarget);
+    set onloadingdone(listener) {
+        this.addEventListener('loadingdone', listener);
+    }
+
+    set onloadingerror(listener) {
+        this.addEventListener('loadingerror', listener);
+    }
+
+    add(fontFace) {
+        this._status = fontFace._status = 'loading';
+        this.dispatchEvent(new Event('loading'));
+        // Call native binding method to set the ttf font to native platform.
+        let family = jsb.loadFont(fontFace.family, fontFace.source);
+        setTimeout(() => {
+            if (family) {
+                fontFace._status = this._status = 'loaded';
+                fontFace._resolveCB();
+                this.dispatchEvent(new Event('loadingdone'));
+            } else {
+                fontFace._status = this._status = 'error';
+                fontFace._rejectCB();
+                this.dispatchEvent(new Event('loadingerror'));
+            }
+        }, 0);
+    }
+
+    clear() {}
+
+    delete() {}
+
+    load() {}
+
+    ready() {}
+}
 
 module.exports = FontFaceSet;
 
 },{"./Event":9,"./EventTarget":10}],14:[function(require,module,exports){
-'use strict';
+const HTMLMediaElement = require('./HTMLMediaElement');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+const HAVE_NOTHING = 0;
+const HAVE_METADATA = 1;
+const HAVE_CURRENT_DATA = 2;
+const HAVE_FUTURE_DATA = 3;
+const HAVE_ENOUGH_DATA = 4;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+const _innerAudioContext = new WeakMap();
+const _src = new WeakMap();
+const _loop = new WeakMap();
+const _autoplay = new WeakMap();
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+class HTMLAudioElement extends HTMLMediaElement {
+    constructor(url) {
+        super('audio');
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var HTMLMediaElement = require('./HTMLMediaElement');
-
-var HAVE_NOTHING = 0;
-var HAVE_METADATA = 1;
-var HAVE_CURRENT_DATA = 2;
-var HAVE_FUTURE_DATA = 3;
-var HAVE_ENOUGH_DATA = 4;
-
-var _innerAudioContext = new WeakMap();
-var _src = new WeakMap();
-var _loop = new WeakMap();
-var _autoplay = new WeakMap();
-
-var HTMLAudioElement = function (_HTMLMediaElement) {
-    _inherits(HTMLAudioElement, _HTMLMediaElement);
-
-    function HTMLAudioElement(url) {
-        _classCallCheck(this, HTMLAudioElement);
-
-        var _this = _possibleConstructorReturn(this, (HTMLAudioElement.__proto__ || Object.getPrototypeOf(HTMLAudioElement)).call(this, 'audio'));
-
-        _src.set(_this, '');
+        _src.set(this, '');
 
         //TODO:
-        return _this;
     }
 
-    _createClass(HTMLAudioElement, [{
-        key: 'load',
-        value: function load() {
-            console.warn('HTMLAudioElement.load() is not implemented.');
-        }
-    }, {
-        key: 'play',
-        value: function play() {}
-    }, {
-        key: 'pause',
-        value: function pause() {}
-    }, {
-        key: 'canPlayType',
-        value: function canPlayType() {
-            var mediaType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    load() {
+        console.warn('HTMLAudioElement.load() is not implemented.');
+    }
 
-            if (typeof mediaType !== 'string') {
-                return '';
-            }
+    play() {}
 
-            if (mediaType.indexOf('audio/mpeg') > -1 || mediaType.indexOf('audio/mp4')) {
-                return 'probably';
-            }
+    pause() {}
+
+    canPlayType(mediaType = '') {
+        if (typeof mediaType !== 'string') {
             return '';
         }
-    }, {
-        key: 'cloneNode',
-        value: function cloneNode() {}
-    }, {
-        key: 'currentTime',
-        get: function get() {},
-        set: function set(value) {}
-    }, {
-        key: 'src',
-        get: function get() {},
-        set: function set(value) {}
-    }, {
-        key: 'loop',
-        get: function get() {},
-        set: function set(value) {}
-    }, {
-        key: 'autoplay',
-        get: function get() {},
-        set: function set(value) {}
-    }, {
-        key: 'paused',
-        get: function get() {}
-    }]);
 
-    return HTMLAudioElement;
-}(HTMLMediaElement);
+        if (mediaType.indexOf('audio/mpeg') > -1 || mediaType.indexOf('audio/mp4')) {
+            return 'probably';
+        }
+        return '';
+    }
+
+    get currentTime() {}
+
+    set currentTime(value) {}
+
+    get src() {}
+
+    set src(value) {}
+
+    get loop() {}
+
+    set loop(value) {}
+
+    get autoplay() {}
+
+    set autoplay(value) {}
+
+    get paused() {}
+
+    cloneNode() {}
+}
 
 module.exports = HTMLAudioElement;
 
 },{"./HTMLMediaElement":18}],15:[function(require,module,exports){
-'use strict';
+const HTMLElement = require('./HTMLElement');
+const ImageData = require('./ImageData');
+const DOMRect = require('./DOMRect');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var HTMLElement = require('./HTMLElement');
-var ImageData = require('./ImageData');
-var DOMRect = require('./DOMRect');
-
-var CanvasGradient = function () {
-    function CanvasGradient() {
-        _classCallCheck(this, CanvasGradient);
-
+class CanvasGradient {
+    constructor() {
         console.log("==> CanvasGradient constructor");
     }
 
-    _createClass(CanvasGradient, [{
-        key: 'addColorStop',
-        value: function addColorStop(offset, color) {
-            console.log("==> CanvasGradient addColorStop");
-        }
-    }]);
+    addColorStop(offset, color) {
+        console.log("==> CanvasGradient addColorStop");
+    }
+}
 
-    return CanvasGradient;
-}();
-
-var TextMetrics = function () {
-    function TextMetrics(width) {
-        _classCallCheck(this, TextMetrics);
-
+class TextMetrics {
+    constructor(width) {
         this._width = width;
     }
 
-    _createClass(TextMetrics, [{
-        key: 'width',
-        get: function get() {
-            return this._width;
-        }
-    }]);
+    get width() {
+        return this._width;
+    }
+}
 
-    return TextMetrics;
-}();
+class HTMLCanvasElement extends HTMLElement {
+    constructor(width, height) {
+        super('canvas');
 
-var HTMLCanvasElement = function (_HTMLElement) {
-    _inherits(HTMLCanvasElement, _HTMLElement);
+        this.id = 'glcanvas';
+        this.type = 'canvas';
 
-    function HTMLCanvasElement(width, height) {
-        _classCallCheck(this, HTMLCanvasElement);
-
-        var _this = _possibleConstructorReturn(this, (HTMLCanvasElement.__proto__ || Object.getPrototypeOf(HTMLCanvasElement)).call(this, 'canvas'));
-
-        _this.id = 'glcanvas';
-        _this.type = 'canvas';
-
-        _this.top = 0;
-        _this.left = 0;
-        _this._width = width ? Math.ceil(width) : 0;
-        _this._height = height ? Math.ceil(height) : 0;
-        _this._context2D = null;
-        _this._data = null;
-        _this._alignment = 4; // Canvas is used for rendering text only and we make sure the data format is RGBA.
-        return _this;
+        this.top = 0;
+        this.left = 0;
+        this._width = width ? Math.ceil(width) : 0;
+        this._height = height ? Math.ceil(height) : 0;
+        this._context2D = null;
+        this._data = null;
+        this._alignment = 4; // Canvas is used for rendering text only and we make sure the data format is RGBA.
     }
 
     //TODO: implement opts.
-
-
-    _createClass(HTMLCanvasElement, [{
-        key: 'getContext',
-        value: function getContext(name, opts) {
-            var self = this;
-            // console.log(`==> Canvas getContext(${name})`);
-            if (name === 'webgl' || name === 'experimental-webgl') {
-                if (this === window.__canvas) return window.__gl;else return null;
-            } else if (name === '2d') {
-                if (!this._context2D) {
-                    this._context2D = new CanvasRenderingContext2D(this._width, this._height);
-                    this._context2D._canvas = this;
-                    this._context2D._setCanvasBufferUpdatedCallback(function (data) {
-                        // FIXME: Canvas's data will take 2x memory size, one in C++, another is obtained by Uint8Array here.
-                        self._data = new ImageData(data, self._width, self._height);
-                        // If the width of canvas could be divided by 2, it means that the bytes per row could be divided by 8.
-                        self._alignment = self._width % 2 === 0 ? 8 : 4;
-                    });
-                }
-                return this._context2D;
+    getContext(name, opts) {
+        var self = this;
+        // console.log(`==> Canvas getContext(${name})`);
+        if (name === 'webgl' || name === 'experimental-webgl') {
+            if (this === window.__canvas) return window.__gl;else return null;
+        } else if (name === '2d') {
+            if (!this._context2D) {
+                this._context2D = new CanvasRenderingContext2D(this._width, this._height);
+                this._context2D._canvas = this;
+                this._context2D._setCanvasBufferUpdatedCallback(function (data) {
+                    // FIXME: Canvas's data will take 2x memory size, one in C++, another is obtained by Uint8Array here.
+                    self._data = new ImageData(data, self._width, self._height);
+                    // If the width of canvas could be divided by 2, it means that the bytes per row could be divided by 8.
+                    self._alignment = self._width % 2 === 0 ? 8 : 4;
+                });
             }
+            return this._context2D;
+        }
 
-            return null;
-        }
-    }, {
-        key: 'toDataURL',
-        value: function toDataURL() {
-            //TODO:
-            console.log("==> Canvas toDataURL");
-            return "";
-        }
-    }, {
-        key: 'getBoundingClientRect',
-        value: function getBoundingClientRect() {
-            return new DOMRect(0, 0, this._width, this._height);
-        }
-    }, {
-        key: 'width',
-        set: function set(width) {
-            width = Math.ceil(width);
-            if (this._width !== width) {
-                this._width = width;
-                if (this._context2D) {
-                    this._context2D._width = width;
-                }
-            }
-        },
-        get: function get() {
-            return this._width;
-        }
-    }, {
-        key: 'height',
-        set: function set(height) {
-            height = Math.ceil(height);
-            if (this._height !== height) {
-                this._height = height;
-                if (this._context2D) {
-                    this._context2D._height = height;
-                }
-            }
-        },
-        get: function get() {
-            return this._height;
-        }
-    }, {
-        key: 'clientWidth',
-        get: function get() {
-            return this._width;
-        }
-    }, {
-        key: 'clientHeight',
-        get: function get() {
-            return this._height;
-        }
-    }]);
+        return null;
+    }
 
-    return HTMLCanvasElement;
-}(HTMLElement);
+    toDataURL() {
+        //TODO:
+        console.log("==> Canvas toDataURL");
+        return "";
+    }
+
+    set width(width) {
+        width = Math.ceil(width);
+        if (this._width !== width) {
+            this._width = width;
+            if (this._context2D) {
+                this._context2D._width = width;
+            }
+        }
+    }
+
+    get width() {
+        return this._width;
+    }
+
+    set height(height) {
+        height = Math.ceil(height);
+        if (this._height !== height) {
+            this._height = height;
+            if (this._context2D) {
+                this._context2D._height = height;
+            }
+        }
+    }
+
+    get height() {
+        return this._height;
+    }
+
+    get clientWidth() {
+        return this._width;
+    }
+
+    get clientHeight() {
+        return this._height;
+    }
+
+    getBoundingClientRect() {
+        return new DOMRect(0, 0, this._width, this._height);
+    }
+}
 
 var ctx2DProto = CanvasRenderingContext2D.prototype;
 ctx2DProto.createImageData = function (width, height) {
@@ -3387,384 +3080,237 @@ ctx2DProto.fill = function () {};
 module.exports = HTMLCanvasElement;
 
 },{"./DOMRect":6,"./HTMLElement":16,"./ImageData":22}],16:[function(require,module,exports){
-'use strict';
+const Element = require('./Element');
+const { noop } = require('./util');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+class HTMLElement extends Element {
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+  constructor(tagName = '') {
+    super();
+    this.tagName = tagName.toUpperCase();
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Element = require('./Element');
-
-var _require = require('./util'),
-    noop = _require.noop;
-
-var HTMLElement = function (_Element) {
-  _inherits(HTMLElement, _Element);
-
-  function HTMLElement() {
-    var tagName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-
-    _classCallCheck(this, HTMLElement);
-
-    var _this = _possibleConstructorReturn(this, (HTMLElement.__proto__ || Object.getPrototypeOf(HTMLElement)).call(this));
-
-    _this.tagName = tagName.toUpperCase();
-
-    _this.className = '';
-    _this.children = [];
-    _this.style = {
-      width: window.innerWidth + 'px',
-      height: window.innerHeight + 'px'
+    this.className = '';
+    this.children = [];
+    this.style = {
+      width: `${window.innerWidth}px`,
+      height: `${window.innerHeight}px`
     };
 
-    _this.innerHTML = '';
-    _this.parentElement = window.__canvas;
-    return _this;
+    this.innerHTML = '';
+    this.parentElement = window.__canvas;
   }
 
-  _createClass(HTMLElement, [{
-    key: 'setAttribute',
-    value: function setAttribute(name, value) {
-      this[name] = value;
-    }
-  }, {
-    key: 'getAttribute',
-    value: function getAttribute(name) {
-      return this[name];
-    }
-  }, {
-    key: 'focus',
-    value: function focus() {}
-  }]);
+  setAttribute(name, value) {
+    this[name] = value;
+  }
 
-  return HTMLElement;
-}(Element);
+  getAttribute(name) {
+    return this[name];
+  }
+
+  focus() {}
+}
 
 module.exports = HTMLElement;
 
 },{"./Element":8,"./util":32}],17:[function(require,module,exports){
-'use strict';
+const HTMLElement = require('./HTMLElement');
+const Event = require('./Event');
+const gl = window.__gl;
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var HTMLElement = require('./HTMLElement');
-var Event = require('./Event');
-var gl = window.__gl;
-
-var HTMLImageElement = function (_HTMLElement) {
-    _inherits(HTMLImageElement, _HTMLElement);
-
-    function HTMLImageElement(width, height, isCalledFromImage) {
-        _classCallCheck(this, HTMLImageElement);
-
+class HTMLImageElement extends HTMLElement {
+    constructor(width, height, isCalledFromImage) {
         if (!isCalledFromImage) {
             throw new TypeError("Illegal constructor, use 'new Image(w, h); instead!'");
-            return _possibleConstructorReturn(_this);
+            return;
         }
-
-        var _this = _possibleConstructorReturn(this, (HTMLImageElement.__proto__ || Object.getPrototypeOf(HTMLImageElement)).call(this, 'img'));
-
-        _this.width = width ? width : 0;
-        _this.height = height ? height : 0;
-        _this._data = null;
-        _this._src = null;
-        _this.complete = false;
-        _this._glFormat = _this._glInternalFormat = gl.RGBA;
-        _this.crossOrigin = null;
-        return _this;
+        super('img');
+        this.width = width ? width : 0;
+        this.height = height ? height : 0;
+        this._data = null;
+        this._src = null;
+        this.complete = false;
+        this._glFormat = this._glInternalFormat = gl.RGBA;
+        this.crossOrigin = null;
     }
 
-    _createClass(HTMLImageElement, [{
-        key: 'getBoundingClientRect',
-        value: function getBoundingClientRect() {
-            return new DOMRect(0, 0, this.width, this.height);
-        }
-    }, {
-        key: 'src',
-        set: function set(src) {
-            var _this2 = this;
+    set src(src) {
+        this._src = src;
+        jsb.loadImage(src, info => {
+            if (!info) {
+                var event = new Event('error');
+                this.dispatchEvent(event);
+                return;
+            }
+            this.width = this.naturalWidth = info.width;
+            this.height = this.naturalHeight = info.height;
+            this._data = info.data;
+            // console.log(`glFormat: ${info.glFormat}, glInternalFormat: ${info.glInternalFormat}, glType: ${info.glType}`);
+            this._glFormat = info.glFormat;
+            this._glInternalFormat = info.glInternalFormat;
+            this._glType = info.glType;
+            this._numberOfMipmaps = info.numberOfMipmaps;
+            this._compressed = info.compressed;
+            this._bpp = info.bpp;
+            this._premultiplyAlpha = info.premultiplyAlpha;
 
-            this._src = src;
-            jsb.loadImage(src, function (info) {
-                if (!info) {
-                    var event = new Event('error');
-                    _this2.dispatchEvent(event);
-                    return;
-                }
-                _this2.width = _this2.naturalWidth = info.width;
-                _this2.height = _this2.naturalHeight = info.height;
-                _this2._data = info.data;
-                // console.log(`glFormat: ${info.glFormat}, glInternalFormat: ${info.glInternalFormat}, glType: ${info.glType}`);
-                _this2._glFormat = info.glFormat;
-                _this2._glInternalFormat = info.glInternalFormat;
-                _this2._glType = info.glType;
-                _this2._numberOfMipmaps = info.numberOfMipmaps;
-                _this2._compressed = info.compressed;
-                _this2._bpp = info.bpp;
-                _this2._premultiplyAlpha = info.premultiplyAlpha;
+            this._alignment = 1;
+            // Set the row align only when mipmapsNum == 1 and the data is uncompressed
+            if ((this._numberOfMipmaps == 0 || this._numberOfMipmaps == 1) && !this._compressed) {
+                const bytesPerRow = this.width * this._bpp / 8;
+                if (bytesPerRow % 8 == 0) this._alignment = 8;else if (bytesPerRow % 4 == 0) this._alignment = 4;else if (bytesPerRow % 2 == 0) this._alignment = 2;
+            }
 
-                _this2._alignment = 1;
-                // Set the row align only when mipmapsNum == 1 and the data is uncompressed
-                if ((_this2._numberOfMipmaps == 0 || _this2._numberOfMipmaps == 1) && !_this2._compressed) {
-                    var bytesPerRow = _this2.width * _this2._bpp / 8;
-                    if (bytesPerRow % 8 == 0) _this2._alignment = 8;else if (bytesPerRow % 4 == 0) _this2._alignment = 4;else if (bytesPerRow % 2 == 0) _this2._alignment = 2;
-                }
+            this.complete = true;
 
-                _this2.complete = true;
+            var event = new Event('load');
+            this.dispatchEvent(event);
+        });
+    }
 
-                var event = new Event('load');
-                _this2.dispatchEvent(event);
-            });
-        },
-        get: function get() {
-            return this._src;
-        }
-    }, {
-        key: 'clientWidth',
-        get: function get() {
-            return this.width;
-        }
-    }, {
-        key: 'clientHeight',
-        get: function get() {
-            return this.height;
-        }
-    }]);
+    get src() {
+        return this._src;
+    }
 
-    return HTMLImageElement;
-}(HTMLElement);
+    get clientWidth() {
+        return this.width;
+    }
+
+    get clientHeight() {
+        return this.height;
+    }
+
+    getBoundingClientRect() {
+        return new DOMRect(0, 0, this.width, this.height);
+    }
+}
 
 module.exports = HTMLImageElement;
 
 },{"./Event":9,"./HTMLElement":16}],18:[function(require,module,exports){
-'use strict';
+const HTMLElement = require('./HTMLElement');
+const MediaError = require('./MediaError');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+const HAVE_NOTHING = 0;
+const HAVE_METADATA = 1;
+const HAVE_CURRENT_DATA = 2;
+const HAVE_FUTURE_DATA = 3;
+const HAVE_ENOUGH_DATA = 4;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var HTMLElement = require('./HTMLElement');
-var MediaError = require('./MediaError');
-
-var HAVE_NOTHING = 0;
-var HAVE_METADATA = 1;
-var HAVE_CURRENT_DATA = 2;
-var HAVE_FUTURE_DATA = 3;
-var HAVE_ENOUGH_DATA = 4;
-
-var HTMLMediaElement = function (_HTMLElement) {
-    _inherits(HTMLMediaElement, _HTMLElement);
-
-    function HTMLMediaElement(type) {
-        _classCallCheck(this, HTMLMediaElement);
-
-        var _this = _possibleConstructorReturn(this, (HTMLMediaElement.__proto__ || Object.getPrototypeOf(HTMLMediaElement)).call(this, type));
-
-        _this._volume = 1.0;
-        _this._duration = 0;
-        _this._isEnded = false;
-        _this._isMute = false;
-        _this._readyState = HAVE_NOTHING;
-        _this._error = new MediaError();
-        return _this;
+class HTMLMediaElement extends HTMLElement {
+    constructor(type) {
+        super(type);
+        this._volume = 1.0;
+        this._duration = 0;
+        this._isEnded = false;
+        this._isMute = false;
+        this._readyState = HAVE_NOTHING;
+        this._error = new MediaError();
     }
 
-    _createClass(HTMLMediaElement, [{
-        key: 'addTextTrack',
-        value: function addTextTrack() {}
-    }, {
-        key: 'captureStream',
-        value: function captureStream() {}
-    }, {
-        key: 'fastSeek',
-        value: function fastSeek() {}
-    }, {
-        key: 'load',
-        value: function load() {}
-    }, {
-        key: 'pause',
-        value: function pause() {}
-    }, {
-        key: 'play',
-        value: function play() {}
-    }, {
-        key: 'canPlayType',
-        value: function canPlayType(mediaType) {
-            return '';
-        }
-    }, {
-        key: 'volume',
-        set: function set(volume) {
-            this._volume = volume;
-        },
-        get: function get() {
-            return this._volume;
-        }
-    }, {
-        key: 'duration',
-        get: function get() {
-            return this._duration;
-        }
-    }, {
-        key: 'ended',
-        get: function get() {
-            return this._isEnded;
-        }
-    }, {
-        key: 'muted',
-        get: function get() {
-            return this._isMute;
-        }
-    }, {
-        key: 'readyState',
-        get: function get() {
-            return this._readyState;
-        }
-    }, {
-        key: 'error',
-        get: function get() {
-            return this._error;
-        }
-    }, {
-        key: 'currentTime',
-        get: function get() {
-            return 0;
-        }
-    }]);
+    addTextTrack() {}
 
-    return HTMLMediaElement;
-}(HTMLElement);
+    captureStream() {}
+
+    fastSeek() {}
+
+    load() {}
+
+    pause() {}
+
+    play() {}
+
+    canPlayType(mediaType) {
+        return '';
+    }
+
+    set volume(volume) {
+        this._volume = volume;
+    }
+
+    get volume() {
+        return this._volume;
+    }
+
+    get duration() {
+        return this._duration;
+    }
+
+    get ended() {
+        return this._isEnded;
+    }
+
+    get muted() {
+        return this._isMute;
+    }
+
+    get readyState() {
+        return this._readyState;
+    }
+
+    get error() {
+        return this._error;
+    }
+
+    get currentTime() {
+        return 0;
+    }
+}
 
 module.exports = HTMLMediaElement;
 
 },{"./HTMLElement":16,"./MediaError":24}],19:[function(require,module,exports){
-'use strict';
+const HTMLElement = require('./HTMLElement');
+const Event = require('./Event');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var HTMLElement = require('./HTMLElement');
-var Event = require('./Event');
-
-var HTMLScriptElement = function (_HTMLElement) {
-    _inherits(HTMLScriptElement, _HTMLElement);
-
-    function HTMLScriptElement(width, height) {
-        _classCallCheck(this, HTMLScriptElement);
-
-        return _possibleConstructorReturn(this, (HTMLScriptElement.__proto__ || Object.getPrototypeOf(HTMLScriptElement)).call(this, 'script'));
+class HTMLScriptElement extends HTMLElement {
+    constructor(width, height) {
+        super('script');
     }
 
-    _createClass(HTMLScriptElement, [{
-        key: 'src',
-        set: function set(url) {
-            var _this2 = this;
-
-            setTimeout(function () {
-                require(url);
-                _this2.dispatchEvent(new Event('load'));
-            }, 0);
-        }
-    }]);
-
-    return HTMLScriptElement;
-}(HTMLElement);
+    set src(url) {
+        setTimeout(() => {
+            require(url);
+            this.dispatchEvent(new Event('load'));
+        }, 0);
+    }
+}
 
 module.exports = HTMLScriptElement;
 
 },{"./Event":9,"./HTMLElement":16}],20:[function(require,module,exports){
-'use strict';
+const HTMLMediaElement = require('./HTMLMediaElement');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var HTMLMediaElement = require('./HTMLMediaElement');
-
-var HTMLVideoElement = function (_HTMLMediaElement) {
-  _inherits(HTMLVideoElement, _HTMLMediaElement);
-
-  function HTMLVideoElement() {
-    _classCallCheck(this, HTMLVideoElement);
-
-    return _possibleConstructorReturn(this, (HTMLVideoElement.__proto__ || Object.getPrototypeOf(HTMLVideoElement)).call(this, 'video'));
+class HTMLVideoElement extends HTMLMediaElement {
+  constructor() {
+    super('video');
   }
 
-  _createClass(HTMLVideoElement, [{
-    key: 'canPlayType',
-    value: function canPlayType(type) {
-      if (type === 'video/mp4') return true;
-      return false;
-    }
-  }]);
-
-  return HTMLVideoElement;
-}(HTMLMediaElement);
+  canPlayType(type) {
+    if (type === 'video/mp4') return true;
+    return false;
+  }
+}
 
 module.exports = HTMLVideoElement;
 
 },{"./HTMLMediaElement":18}],21:[function(require,module,exports){
-'use strict';
+let HTMLImageElement = require('./HTMLImageElement');
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var HTMLImageElement = require('./HTMLImageElement');
-
-var Image = function (_HTMLImageElement) {
-    _inherits(Image, _HTMLImageElement);
-
-    function Image(width, height) {
-        _classCallCheck(this, Image);
-
-        return _possibleConstructorReturn(this, (Image.__proto__ || Object.getPrototypeOf(Image)).call(this, width, height, true));
+class Image extends HTMLImageElement {
+    constructor(width, height) {
+        super(width, height, true);
     }
-
-    return Image;
-}(HTMLImageElement);
+}
 
 module.exports = Image;
 
 },{"./HTMLImageElement":17}],22:[function(require,module,exports){
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ImageData = function () {
+class ImageData {
 
     // var imageData = new ImageData(array, width, height);
     // var imageData = new ImageData(width, height);
-    function ImageData(array, width, height) {
-        _classCallCheck(this, ImageData);
-
+    constructor(array, width, height) {
         if (typeof array === 'number' && typeof width == 'number') {
             height = width;
             width = array;
@@ -3779,44 +3325,26 @@ var ImageData = function () {
         this._height = height;
     }
 
-    _createClass(ImageData, [{
-        key: 'data',
-        get: function get() {
-            return this._data;
-        }
-    }, {
-        key: 'width',
-        get: function get() {
-            return this._width;
-        }
-    }, {
-        key: 'height',
-        get: function get() {
-            return this._height;
-        }
-    }]);
+    get data() {
+        return this._data;
+    }
 
-    return ImageData;
-}();
+    get width() {
+        return this._width;
+    }
+
+    get height() {
+        return this._height;
+    }
+
+}
 
 module.exports = ImageData;
 
 },{}],23:[function(require,module,exports){
-'use strict';
+const Event = require('./Event');
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Event = require('./Event');
-
-var __numberShiftMap = {
+const __numberShiftMap = {
     '48': ')', // 0
     '49': '!', // 1
     '50': '@', // 2
@@ -3831,674 +3359,511 @@ var __numberShiftMap = {
 
 var __capsLockActive = false;
 
-var KeyboardEvent = function (_Event) {
-    _inherits(KeyboardEvent, _Event);
-
-    function KeyboardEvent(type, KeyboardEventInit) {
-        _classCallCheck(this, KeyboardEvent);
-
-        var _this = _possibleConstructorReturn(this, (KeyboardEvent.__proto__ || Object.getPrototypeOf(KeyboardEvent)).call(this, type));
-
-        if ((typeof KeyboardEventInit === 'undefined' ? 'undefined' : _typeof(KeyboardEventInit)) === 'object') {
-            _this._altKeyActive = KeyboardEventInit.altKey ? KeyboardEventInit.altKey : false;
-            _this._ctrlKeyActive = KeyboardEventInit.ctrlKey ? KeyboardEventInit.ctrlKey : false;
-            _this._metaKeyActive = KeyboardEventInit.metaKey ? KeyboardEventInit.metaKey : false;
-            _this._shiftKeyActive = KeyboardEventInit.shiftKey ? KeyboardEventInit.shiftKey : false;
-            _this._keyCode = KeyboardEventInit.keyCode ? KeyboardEventInit.keyCode : -1;
-            _this._repeat = KeyboardEventInit.repeat ? KeyboardEventInit.repeat : false;
+class KeyboardEvent extends Event {
+    constructor(type, KeyboardEventInit) {
+        super(type);
+        if (typeof KeyboardEventInit === 'object') {
+            this._altKeyActive = KeyboardEventInit.altKey ? KeyboardEventInit.altKey : false;
+            this._ctrlKeyActive = KeyboardEventInit.ctrlKey ? KeyboardEventInit.ctrlKey : false;
+            this._metaKeyActive = KeyboardEventInit.metaKey ? KeyboardEventInit.metaKey : false;
+            this._shiftKeyActive = KeyboardEventInit.shiftKey ? KeyboardEventInit.shiftKey : false;
+            this._keyCode = KeyboardEventInit.keyCode ? KeyboardEventInit.keyCode : -1;
+            this._repeat = KeyboardEventInit.repeat ? KeyboardEventInit.repeat : false;
         } else {
-            _this._altKeyActive = false;
-            _this._ctrlKeyActive = false;
-            _this._metaKeyActive = false;
-            _this._shiftKeyActive = false;
-            _this._keyCode = -1;
-            _this._repeat = false;
+            this._altKeyActive = false;
+            this._ctrlKeyActive = false;
+            this._metaKeyActive = false;
+            this._shiftKeyActive = false;
+            this._keyCode = -1;
+            this._repeat = false;
         }
 
-        var keyCode = _this._keyCode;
+        var keyCode = this._keyCode;
         if (keyCode >= 48 && keyCode <= 57) {
             // 0 ~ 9
             var number = keyCode - 48;
-            _this._code = 'Digit' + number;
-            _this._key = _this._shiftKeyActive ? __numberShiftMap[keyCode] : '' + number;
+            this._code = 'Digit' + number;
+            this._key = this._shiftKeyActive ? __numberShiftMap[keyCode] : '' + number;
         } else if (keyCode >= 10048 && keyCode <= 10057) {
             // Numberpad 0 ~ 9
             // reset to web keyCode since it's a hack in C++ for distinguish numbers in Numberpad.
-            keyCode = _this._keyCode = keyCode - 10000;
+            keyCode = this._keyCode = keyCode - 10000;
             var number = keyCode - 48;
-            _this._code = 'Numpad' + number;
-            _this._key = '' + number;
+            this._code = 'Numpad' + number;
+            this._key = '' + number;
         } else if (keyCode >= 65 && keyCode <= 90) {
             // A ~ Z
             var charCode = String.fromCharCode(keyCode);
-            _this._code = 'Key' + charCode;
-            _this._key = _this._shiftKeyActive || __capsLockActive ? charCode : charCode.toLowerCase();
+            this._code = 'Key' + charCode;
+            this._key = this._shiftKeyActive || __capsLockActive ? charCode : charCode.toLowerCase();
         } else if (keyCode >= 112 && keyCode <= 123) {
             // F1 ~ F12
-            _this._code = _this._key = 'F' + (keyCode - 111);
+            this._code = this._key = 'F' + (keyCode - 111);
         } else if (keyCode === 27) {
-            _this._code = _this._key = 'Escape';
+            this._code = this._key = 'Escape';
         } else if (keyCode === 189) {
-            _this._code = 'Minus';
-            _this._key = _this._shiftKeyActive ? '_' : '-';
+            this._code = 'Minus';
+            this._key = this._shiftKeyActive ? '_' : '-';
         } else if (keyCode === 187) {
-            _this._code = 'Equal';
-            _this._key = _this._shiftKeyActive ? '+' : '=';
+            this._code = 'Equal';
+            this._key = this._shiftKeyActive ? '+' : '=';
         } else if (keyCode === 220) {
-            _this._code = 'Backslash';
-            _this._key = _this._shiftKeyActive ? '|' : '\\';
+            this._code = 'Backslash';
+            this._key = this._shiftKeyActive ? '|' : '\\';
         } else if (keyCode === 192) {
-            _this._code = 'Backquote';
-            _this._key = _this._shiftKeyActive ? '~' : '`';
+            this._code = 'Backquote';
+            this._key = this._shiftKeyActive ? '~' : '`';
         } else if (keyCode === 8) {
-            _this._code = _this._key = 'Backspace';
+            this._code = this._key = 'Backspace';
         } else if (keyCode === 13) {
-            _this._code = _this._key = 'Enter';
+            this._code = this._key = 'Enter';
         } else if (keyCode === 219) {
-            _this._code = 'BracketLeft';
-            _this._key = _this._shiftKeyActive ? '{' : '[';
+            this._code = 'BracketLeft';
+            this._key = this._shiftKeyActive ? '{' : '[';
         } else if (keyCode === 221) {
-            _this._code = 'BracketRight';
-            _this._key = _this._shiftKeyActive ? '}' : ']';
+            this._code = 'BracketRight';
+            this._key = this._shiftKeyActive ? '}' : ']';
         } else if (keyCode === 186) {
-            _this._code = 'Semicolon';
-            _this._key = _this._shiftKeyActive ? ':' : ';';
+            this._code = 'Semicolon';
+            this._key = this._shiftKeyActive ? ':' : ';';
         } else if (keyCode === 222) {
-            _this._code = 'Quote';
-            _this._key = _this._shiftKeyActive ? '"' : "'";
+            this._code = 'Quote';
+            this._key = this._shiftKeyActive ? '"' : "'";
         } else if (keyCode === 9) {
-            _this._code = _this._key = 'Tab';
+            this._code = this._key = 'Tab';
         } else if (keyCode === 17) {
-            _this._code = 'ControlLeft';
-            _this._key = 'Control';
+            this._code = 'ControlLeft';
+            this._key = 'Control';
         } else if (keyCode === 20017) {
-            _this._keyCode = 17; // Reset to the real value.
-            _this._code = 'ControlRight';
-            _this._key = 'Control';
+            this._keyCode = 17; // Reset to the real value.
+            this._code = 'ControlRight';
+            this._key = 'Control';
         } else if (keyCode === 16) {
-            _this._code = 'ShiftLeft';
-            _this._key = 'Shift';
+            this._code = 'ShiftLeft';
+            this._key = 'Shift';
         } else if (keyCode === 20016) {
-            _this._keyCode = 16; // Reset to the real value.
-            _this._code = 'ShiftRight';
-            _this._key = 'Shift';
+            this._keyCode = 16; // Reset to the real value.
+            this._code = 'ShiftRight';
+            this._key = 'Shift';
         } else if (keyCode === 18) {
-            _this._code = 'AltLeft';
-            _this._key = 'Alt';
+            this._code = 'AltLeft';
+            this._key = 'Alt';
         } else if (keyCode === 20018) {
-            _this._keyCode = 18; // Reset to the real value.
-            _this._code = 'AltRight';
-            _this._key = 'Alt';
+            this._keyCode = 18; // Reset to the real value.
+            this._code = 'AltRight';
+            this._key = 'Alt';
         } else if (keyCode === 91) {
-            _this._code = 'MetaLeft';
-            _this._key = 'Meta';
+            this._code = 'MetaLeft';
+            this._key = 'Meta';
         } else if (keyCode === 93) {
-            _this._code = 'MetaRight';
-            _this._key = 'Meta';
+            this._code = 'MetaRight';
+            this._key = 'Meta';
         } else if (keyCode === 37) {
-            _this._code = _this._key = 'ArrowLeft';
+            this._code = this._key = 'ArrowLeft';
         } else if (keyCode === 38) {
-            _this._code = _this._key = 'ArrowUp';
+            this._code = this._key = 'ArrowUp';
         } else if (keyCode === 39) {
-            _this._code = _this._key = 'ArrowRight';
+            this._code = this._key = 'ArrowRight';
         } else if (keyCode === 40) {
-            _this._code = _this._key = 'ArrowDown';
+            this._code = this._key = 'ArrowDown';
         } else if (keyCode === 20093) {
-            _this._keyCode = 93; // Bug of brower since its keycode is the same as MetaRight.
-            _this._code = _this._key = 'ContextMenu';
+            this._keyCode = 93; // Bug of brower since its keycode is the same as MetaRight.
+            this._code = this._key = 'ContextMenu';
         } else if (keyCode === 20013) {
-            _this._keyCode = 13;
-            _this._code = 'NumpadEnter';
-            _this._key = 'Enter';
+            this._keyCode = 13;
+            this._code = 'NumpadEnter';
+            this._key = 'Enter';
         } else if (keyCode === 107) {
-            _this._code = 'NumpadAdd';
-            _this._key = '+';
+            this._code = 'NumpadAdd';
+            this._key = '+';
         } else if (keyCode === 109) {
-            _this._code = 'NumpadSubtract';
-            _this._key = '-';
+            this._code = 'NumpadSubtract';
+            this._key = '-';
         } else if (keyCode === 106) {
-            _this._code = 'NumpadMultiply';
-            _this._key = '*';
+            this._code = 'NumpadMultiply';
+            this._key = '*';
         } else if (keyCode === 111) {
-            _this._code = 'NumpadDivide';
-            _this._key = '/';
+            this._code = 'NumpadDivide';
+            this._key = '/';
         } else if (keyCode === 12) {
-            _this._code = 'NumLock';
-            _this._key = 'Clear';
+            this._code = 'NumLock';
+            this._key = 'Clear';
         } else if (keyCode === 124) {
-            _this._code = _this._key = 'F13';
+            this._code = this._key = 'F13';
         } else if (keyCode === 36) {
-            _this._code = _this._key = 'Home';
+            this._code = this._key = 'Home';
         } else if (keyCode === 33) {
-            _this._code = _this._key = 'PageUp';
+            this._code = this._key = 'PageUp';
         } else if (keyCode === 34) {
-            _this._code = _this._key = 'PageDown';
+            this._code = this._key = 'PageDown';
         } else if (keyCode === 35) {
-            _this._code = _this._key = 'End';
+            this._code = this._key = 'End';
         } else if (keyCode === 188) {
-            _this._code = 'Comma';
-            _this._key = _this._shiftKeyActive ? '<' : ',';
+            this._code = 'Comma';
+            this._key = this._shiftKeyActive ? '<' : ',';
         } else if (keyCode === 190) {
-            _this._code = 'Period';
-            _this._key = _this._shiftKeyActive ? '>' : '.';
+            this._code = 'Period';
+            this._key = this._shiftKeyActive ? '>' : '.';
         } else if (keyCode === 191) {
-            _this._code = 'Slash';
-            _this._key = _this._shiftKeyActive ? '?' : '/';
+            this._code = 'Slash';
+            this._key = this._shiftKeyActive ? '?' : '/';
         } else if (keyCode === 32) {
-            _this._code = 'Space';
-            _this._key = ' ';
+            this._code = 'Space';
+            this._key = ' ';
         } else if (keyCode === 46) {
-            _this._code = _this._key = 'Delete';
+            this._code = this._key = 'Delete';
         } else if (keyCode === 110) {
-            _this._code = 'NumpadDecimal';
-            _this._key = '.';
+            this._code = 'NumpadDecimal';
+            this._key = '.';
         } else if (keyCode === 20) {
-            _this._code = _this._key = 'CapsLock';
+            this._code = this._key = 'CapsLock';
             if (type === 'keyup') {
                 __capsLockActive = !__capsLockActive;
             }
         } else {
-            console.log("Unknown keyCode: " + _this._keyCode);
+            console.log("Unknown keyCode: " + this._keyCode);
         }
-        return _this;
     }
 
     // Returns a Boolean indicating if the modifier key, like Alt, Shift, Ctrl, or Meta, was pressed when the event was created.
+    getModifierState() {
+        return false;
+    }
 
+    // Returns a Boolean that is true if the Alt ( Option or ⌥ on OS X) key was active when the key event was generated.
+    get altKey() {
+        return this._altKeyActive;
+    }
 
-    _createClass(KeyboardEvent, [{
-        key: 'getModifierState',
-        value: function getModifierState() {
-            return false;
-        }
+    // Returns a DOMString with the code value of the key represented by the event.
+    get code() {
+        return this._code;
+    }
 
-        // Returns a Boolean that is true if the Alt ( Option or ⌥ on OS X) key was active when the key event was generated.
+    // Returns a Boolean that is true if the Ctrl key was active when the key event was generated.
+    get ctrlKey() {
+        return this._ctrlKeyActive;
+    }
 
-    }, {
-        key: 'altKey',
-        get: function get() {
-            return this._altKeyActive;
-        }
+    // Returns a Boolean that is true if the event is fired between after compositionstart and before compositionend.
+    get isComposing() {
+        return false;
+    }
 
-        // Returns a DOMString with the code value of the key represented by the event.
+    // Returns a DOMString representing the key value of the key represented by the event.
+    get key() {
+        return this._key;
+    }
 
-    }, {
-        key: 'code',
-        get: function get() {
-            return this._code;
-        }
+    get keyCode() {
+        return this._keyCode;
+    }
 
-        // Returns a Boolean that is true if the Ctrl key was active when the key event was generated.
+    // Returns a Number representing the location of the key on the keyboard or other input device.
+    get location() {
+        return 0;
+    }
 
-    }, {
-        key: 'ctrlKey',
-        get: function get() {
-            return this._ctrlKeyActive;
-        }
+    // Returns a Boolean that is true if the Meta key (on Mac keyboards, the ⌘ Command key; on Windows keyboards, the Windows key (⊞)) was active when the key event was generated.
+    get metaKey() {
+        return this._metaKeyActive;
+    }
 
-        // Returns a Boolean that is true if the event is fired between after compositionstart and before compositionend.
+    // Returns a Boolean that is true if the key is being held down such that it is automatically repeating.
+    get repeat() {
+        return this._repeat;
+    }
 
-    }, {
-        key: 'isComposing',
-        get: function get() {
-            return false;
-        }
-
-        // Returns a DOMString representing the key value of the key represented by the event.
-
-    }, {
-        key: 'key',
-        get: function get() {
-            return this._key;
-        }
-    }, {
-        key: 'keyCode',
-        get: function get() {
-            return this._keyCode;
-        }
-
-        // Returns a Number representing the location of the key on the keyboard or other input device.
-
-    }, {
-        key: 'location',
-        get: function get() {
-            return 0;
-        }
-
-        // Returns a Boolean that is true if the Meta key (on Mac keyboards, the ⌘ Command key; on Windows keyboards, the Windows key (⊞)) was active when the key event was generated.
-
-    }, {
-        key: 'metaKey',
-        get: function get() {
-            return this._metaKeyActive;
-        }
-
-        // Returns a Boolean that is true if the key is being held down such that it is automatically repeating.
-
-    }, {
-        key: 'repeat',
-        get: function get() {
-            return this._repeat;
-        }
-
-        // Returns a Boolean that is true if the Shift key was active when the key event was generated.
-
-    }, {
-        key: 'shiftKey',
-        get: function get() {
-            return this._shiftKeyActive;
-        }
-    }]);
-
-    return KeyboardEvent;
-}(Event);
+    // Returns a Boolean that is true if the Shift key was active when the key event was generated.
+    get shiftKey() {
+        return this._shiftKeyActive;
+    }
+}
 
 module.exports = KeyboardEvent;
 
 },{"./Event":9}],24:[function(require,module,exports){
-"use strict";
+const MEDIA_ERR_ABORTED = 1;
+const MEDIA_ERR_NETWORK = 2;
+const MEDIA_ERR_DECODE = 3;
+const MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+class MediaError {
+	constructor() {}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var MEDIA_ERR_ABORTED = 1;
-var MEDIA_ERR_NETWORK = 2;
-var MEDIA_ERR_DECODE = 3;
-var MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
-
-var MediaError = function () {
-	function MediaError() {
-		_classCallCheck(this, MediaError);
+	get code() {
+		return MEDIA_ERR_ABORTED;
 	}
 
-	_createClass(MediaError, [{
-		key: "code",
-		get: function get() {
-			return MEDIA_ERR_ABORTED;
-		}
-	}, {
-		key: "message",
-		get: function get() {
-			return "";
-		}
-	}]);
-
-	return MediaError;
-}();
+	get message() {
+		return "";
+	}
+}
 
 module.exports = MediaError;
 
 },{}],25:[function(require,module,exports){
-'use strict';
+const Event = require('./Event');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Event = require('./Event');
-
-var MouseEvent = function (_Event) {
-    _inherits(MouseEvent, _Event);
-
-    function MouseEvent(type, initArgs) {
-        _classCallCheck(this, MouseEvent);
-
-        var _this = _possibleConstructorReturn(this, (MouseEvent.__proto__ || Object.getPrototypeOf(MouseEvent)).call(this, type));
-
-        _this._button = initArgs.button;
-        _this._which = initArgs.which;
-        _this._wheelDelta = initArgs.wheelDelta;
-        _this._clientX = initArgs.clientX;
-        _this._clientY = initArgs.clientY;
-        _this._screenX = initArgs.screenX;
-        _this._screenY = initArgs.screenY;
-        _this._pageX = initArgs.pageX;
-        _this._pageY = initArgs.pageY;
-        return _this;
+class MouseEvent extends Event {
+    constructor(type, initArgs) {
+        super(type);
+        this._button = initArgs.button;
+        this._which = initArgs.which;
+        this._wheelDelta = initArgs.wheelDelta;
+        this._clientX = initArgs.clientX;
+        this._clientY = initArgs.clientY;
+        this._screenX = initArgs.screenX;
+        this._screenY = initArgs.screenY;
+        this._pageX = initArgs.pageX;
+        this._pageY = initArgs.pageY;
     }
 
-    _createClass(MouseEvent, [{
-        key: 'button',
-        get: function get() {
-            return this._button;
-        }
-    }, {
-        key: 'which',
-        get: function get() {
-            return this._which;
-        }
-    }, {
-        key: 'wheelDelta',
-        get: function get() {
-            return this._wheelDelta;
-        }
-    }, {
-        key: 'clientX',
-        get: function get() {
-            return this._clientX;
-        }
-    }, {
-        key: 'clientY',
-        get: function get() {
-            return this._clientY;
-        }
-    }, {
-        key: 'screenX',
-        get: function get() {
-            return this._screenX;
-        }
-    }, {
-        key: 'screenY',
-        get: function get() {
-            return this._screenY;
-        }
-    }, {
-        key: 'pageX',
-        get: function get() {
-            return this._pageX;
-        }
-    }, {
-        key: 'pageY',
-        get: function get() {
-            return this._pageY;
-        }
-    }]);
+    get button() {
+        return this._button;
+    }
 
-    return MouseEvent;
-}(Event);
+    get which() {
+        return this._which;
+    }
+
+    get wheelDelta() {
+        return this._wheelDelta;
+    }
+
+    get clientX() {
+        return this._clientX;
+    }
+
+    get clientY() {
+        return this._clientY;
+    }
+
+    get screenX() {
+        return this._screenX;
+    }
+
+    get screenY() {
+        return this._screenY;
+    }
+
+    get pageX() {
+        return this._pageX;
+    }
+
+    get pageY() {
+        return this._pageY;
+    }
+}
 
 module.exports = MouseEvent;
 
 },{"./Event":9}],26:[function(require,module,exports){
-'use strict';
+const EventTarget = require('./EventTarget');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var EventTarget = require('./EventTarget');
-
-var Node = function (_EventTarget) {
-  _inherits(Node, _EventTarget);
-
-  function Node() {
-    _classCallCheck(this, Node);
-
-    var _this = _possibleConstructorReturn(this, (Node.__proto__ || Object.getPrototypeOf(Node)).call(this));
-
-    _this.childNodes = [];
-    _this.parentNode = window.__canvas;
-    return _this;
+class Node extends EventTarget {
+  constructor() {
+    super();
+    this.childNodes = [];
+    this.parentNode = window.__canvas;
   }
 
-  _createClass(Node, [{
-    key: 'appendChild',
-    value: function appendChild(node) {
-      if (node instanceof Node) {
-        this.childNodes.push(node);
-      } else {
-        throw new TypeError('Failed to executed \'appendChild\' on \'Node\': parameter 1 is not of type \'Node\'.');
-      }
+  appendChild(node) {
+    if (node instanceof Node) {
+      this.childNodes.push(node);
+    } else {
+      throw new TypeError('Failed to executed \'appendChild\' on \'Node\': parameter 1 is not of type \'Node\'.');
     }
-  }, {
-    key: 'insertBefore',
-    value: function insertBefore(newNode, referenceNode) {
-      //TODO:
-      return newNode;
-    }
-  }, {
-    key: 'replaceChild',
-    value: function replaceChild(newChild, oldChild) {
-      //TODO:
-      return oldChild;
-    }
-  }, {
-    key: 'cloneNode',
-    value: function cloneNode() {
-      var copyNode = Object.create(this);
+  }
 
-      Object.assign(copyNode, this);
-      return copyNode;
-    }
-  }, {
-    key: 'removeChild',
-    value: function removeChild(node) {
-      var index = this.childNodes.findIndex(function (child) {
-        return child === node;
-      });
+  insertBefore(newNode, referenceNode) {
+    //TODO:
+    return newNode;
+  }
 
-      if (index > -1) {
-        return this.childNodes.splice(index, 1);
-      }
-      return null;
-    }
-  }, {
-    key: 'contains',
-    value: function contains(node) {
-      return this.childNodes.indexOf(node) > -1;
-    }
-  }]);
+  replaceChild(newChild, oldChild) {
+    //TODO:
+    return oldChild;
+  }
 
-  return Node;
-}(EventTarget);
+  cloneNode() {
+    const copyNode = Object.create(this);
+
+    Object.assign(copyNode, this);
+    return copyNode;
+  }
+
+  removeChild(node) {
+    const index = this.childNodes.findIndex(child => child === node);
+
+    if (index > -1) {
+      return this.childNodes.splice(index, 1);
+    }
+    return null;
+  }
+
+  contains(node) {
+    return this.childNodes.indexOf(node) > -1;
+  }
+}
 
 module.exports = Node;
 
 },{"./EventTarget":10}],27:[function(require,module,exports){
-'use strict';
+const Event = require('./Event');
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Event = require('./Event');
-
-var TouchEvent = function (_Event) {
-    _inherits(TouchEvent, _Event);
-
-    function TouchEvent(type, touchEventInit) {
-        _classCallCheck(this, TouchEvent);
-
-        var _this = _possibleConstructorReturn(this, (TouchEvent.__proto__ || Object.getPrototypeOf(TouchEvent)).call(this, type));
-
-        _this.touches = [];
-        _this.targetTouches = [];
-        _this.changedTouches = [];
-        return _this;
+class TouchEvent extends Event {
+    constructor(type, touchEventInit) {
+        super(type);
+        this.touches = [];
+        this.targetTouches = [];
+        this.changedTouches = [];
     }
-
-    return TouchEvent;
-}(Event);
+}
 
 module.exports = TouchEvent;
 
 },{"./Event":9}],28:[function(require,module,exports){
-'use strict';
+const HTMLElement = require('./HTMLElement');
+const Image = require('./Image');
+const Audio = require('./Audio');
+const HTMLCanvasElement = require('./HTMLCanvasElement');
+const HTMLVideoElement = require('./HTMLVideoElement');
+const HTMLScriptElement = require('./HTMLScriptElement');
+const Node = require('./Node');
+const FontFaceSet = require('./FontFaceSet');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+class Document extends Node {
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+  constructor() {
+    super();
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+    this.readyState = 'complete';
+    this.visibilityState = 'visible';
+    this.documentElement = window;
+    this.hidden = false;
+    this.style = {};
+    this.location = require('./location');
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+    this.head = new HTMLElement('head');
+    this.body = new HTMLElement('body');
 
-var HTMLElement = require('./HTMLElement');
-var Image = require('./Image');
-var Audio = require('./Audio');
-var HTMLCanvasElement = require('./HTMLCanvasElement');
-var HTMLVideoElement = require('./HTMLVideoElement');
-var HTMLScriptElement = require('./HTMLScriptElement');
-var Node = require('./Node');
-var FontFaceSet = require('./FontFaceSet');
+    this.fonts = new FontFaceSet();
 
-var Document = function (_Node) {
-  _inherits(Document, _Node);
-
-  function Document() {
-    _classCallCheck(this, Document);
-
-    var _this = _possibleConstructorReturn(this, (Document.__proto__ || Object.getPrototypeOf(Document)).call(this));
-
-    _this.readyState = 'complete';
-    _this.visibilityState = 'visible';
-    _this.documentElement = window;
-    _this.hidden = false;
-    _this.style = {};
-    _this.location = require('./location');
-
-    _this.head = new HTMLElement('head');
-    _this.body = new HTMLElement('body');
-
-    _this.fonts = new FontFaceSet();
-
-    _this.scripts = [];
-    return _this;
+    this.scripts = [];
   }
 
-  _createClass(Document, [{
-    key: 'createElementNS',
-    value: function createElementNS(namespaceURI, qualifiedName, options) {
-      return this.createElement(qualifiedName);
-    }
-  }, {
-    key: 'createElement',
-    value: function createElement(tagName) {
-      if (tagName === 'canvas') {
-        return new HTMLCanvasElement();
-      } else if (tagName === 'audio') {
-        return new Audio();
-      } else if (tagName === 'img') {
-        return new Image();
-      } else if (tagName === 'video') {
-        return new HTMLVideoElement();
-      } else if (tagName === 'script') {
-        return new HTMLScriptElement();
-      }
+  createElementNS(namespaceURI, qualifiedName, options) {
+    return this.createElement(qualifiedName);
+  }
 
-      return new HTMLElement(tagName);
+  createElement(tagName) {
+    if (tagName === 'canvas') {
+      return new HTMLCanvasElement();
+    } else if (tagName === 'audio') {
+      return new Audio();
+    } else if (tagName === 'img') {
+      return new Image();
+    } else if (tagName === 'video') {
+      return new HTMLVideoElement();
+    } else if (tagName === 'script') {
+      return new HTMLScriptElement();
     }
-  }, {
-    key: 'getElementById',
-    value: function getElementById(id) {
-      if (id === window.__canvas.id || id === 'canvas') {
-        return window.__canvas;
-      }
-      return new HTMLElement(id);
-    }
-  }, {
-    key: 'getElementsByTagName',
-    value: function getElementsByTagName(tagName) {
-      if (tagName === 'head') {
-        return [document.head];
-      } else if (tagName === 'body') {
-        return [document.body];
-      } else if (tagName === 'canvas') {
-        return [window.__canvas];
-      }
-      return [new HTMLElement(tagName)];
-    }
-  }, {
-    key: 'getElementsByName',
-    value: function getElementsByName(tagName) {
-      if (tagName === 'head') {
-        return [document.head];
-      } else if (tagName === 'body') {
-        return [document.body];
-      } else if (tagName === 'canvas') {
-        return [window.__canvas];
-      }
-      return [new HTMLElement(tagName)];
-    }
-  }, {
-    key: 'querySelector',
-    value: function querySelector(query) {
-      if (query === 'head') {
-        return document.head;
-      } else if (query === 'body') {
-        return document.body;
-      } else if (query === 'canvas') {
-        return window.__canvas;
-      } else if (query === '#' + window.__canvas.id) {
-        return window.__canvas;
-      }
-      return new HTMLElement(query);
-    }
-  }, {
-    key: 'querySelectorAll',
-    value: function querySelectorAll(query) {
-      if (query === 'head') {
-        return [document.head];
-      } else if (query === 'body') {
-        return [document.body];
-      } else if (query === 'canvas') {
-        return [window.__canvas];
-      }
-      return [new HTMLElement(query)];
-    }
-  }, {
-    key: 'createTextNode',
-    value: function createTextNode() {
-      return new HTMLElement('text');
-    }
-  }, {
-    key: 'elementFromPoint',
-    value: function elementFromPoint() {
-      return window.canvas;
-    }
-  }, {
-    key: 'createEvent',
-    value: function createEvent(type) {
-      if (window[type]) {
-        return new window[type]();
-      }
-      return null;
-    }
-  }]);
 
-  return Document;
-}(Node);
+    return new HTMLElement(tagName);
+  }
 
-var document = new Document();
+  getElementById(id) {
+    if (id === window.__canvas.id || id === 'canvas') {
+      return window.__canvas;
+    }
+    return new HTMLElement(id);
+  }
+
+  getElementsByTagName(tagName) {
+    if (tagName === 'head') {
+      return [document.head];
+    } else if (tagName === 'body') {
+      return [document.body];
+    } else if (tagName === 'canvas') {
+      return [window.__canvas];
+    }
+    return [new HTMLElement(tagName)];
+  }
+
+  getElementsByName(tagName) {
+    if (tagName === 'head') {
+      return [document.head];
+    } else if (tagName === 'body') {
+      return [document.body];
+    } else if (tagName === 'canvas') {
+      return [window.__canvas];
+    }
+    return [new HTMLElement(tagName)];
+  }
+
+  querySelector(query) {
+    if (query === 'head') {
+      return document.head;
+    } else if (query === 'body') {
+      return document.body;
+    } else if (query === 'canvas') {
+      return window.__canvas;
+    } else if (query === `#${window.__canvas.id}`) {
+      return window.__canvas;
+    }
+    return new HTMLElement(query);
+  }
+
+  querySelectorAll(query) {
+    if (query === 'head') {
+      return [document.head];
+    } else if (query === 'body') {
+      return [document.body];
+    } else if (query === 'canvas') {
+      return [window.__canvas];
+    }
+    return [new HTMLElement(query)];
+  }
+
+  createTextNode() {
+    return new HTMLElement('text');
+  }
+
+  elementFromPoint() {
+    return window.canvas;
+  }
+
+  createEvent(type) {
+    if (window[type]) {
+      return new window[type]();
+    }
+    return null;
+  }
+}
+
+let document = new Document();
 
 module.exports = document;
 
 },{"./Audio":5,"./FontFaceSet":13,"./HTMLCanvasElement":15,"./HTMLElement":16,"./HTMLScriptElement":19,"./HTMLVideoElement":20,"./Image":21,"./Node":26,"./location":30}],29:[function(require,module,exports){
-'use strict';
-
 require('./window');
 
 },{"./window":33}],30:[function(require,module,exports){
-'use strict';
-
-var location = {
+const location = {
     href: 'game.js',
     pathname: 'game.js',
     search: '',
     hash: '',
-    reload: function reload() {}
+    reload() {}
 };
 
 module.exports = location;
 
 },{}],31:[function(require,module,exports){
-'use strict';
+let { noop } = require('./util');
 
-var _require = require('./util'),
-    noop = _require.noop;
-
-var navigator = {
+const navigator = {
   platform: __getOS(),
   language: __getCurrentLanguage(),
   appVersion: '5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1',
@@ -4517,15 +3882,11 @@ var navigator = {
 module.exports = navigator;
 
 },{"./util":32}],32:[function(require,module,exports){
-"use strict";
-
 function noop() {}
 
 module.exports = noop;
 
 },{}],33:[function(require,module,exports){
-'use strict';
-
 function inject() {
     window.top = window.parent = window;
 
@@ -4565,10 +3926,10 @@ function inject() {
     window.KeyboardEvent = require('./KeyboardEvent');
     window.DeviceMotionEvent = require('./DeviceMotionEvent');
 
-    var ROTATION_0 = 0;
-    var ROTATION_90 = 1;
-    var ROTATION_180 = 2;
-    var ROTATION_270 = 3;
+    const ROTATION_0 = 0;
+    const ROTATION_90 = 1;
+    const ROTATION_180 = 2;
+    const ROTATION_270 = 3;
     var orientation = 0;
     var rotation = jsb.device.getDeviceRotation();
     switch (rotation) {
@@ -4603,7 +3964,7 @@ function inject() {
         orientation: { //FIXME:cjh
             type: 'portrait-primary' // portrait-primary, portrait-secondary, landscape-primary, landscape-secondary
         },
-        onorientationchange: function onorientationchange(event) {}
+        onorientationchange: function (event) {}
     };
 
     window.addEventListener = function (eventName, listener, options) {
@@ -4653,8 +4014,6 @@ if (!window._isInjected) {
 window.localStorage = sys.localStorage;
 
 },{"./Audio":5,"./DeviceMotionEvent":7,"./Element":8,"./Event":9,"./EventTarget":10,"./FileReader":11,"./FontFace":12,"./FontFaceSet":13,"./HTMLAudioElement":14,"./HTMLCanvasElement":15,"./HTMLElement":16,"./HTMLImageElement":17,"./HTMLMediaElement":18,"./HTMLScriptElement":19,"./HTMLVideoElement":20,"./Image":21,"./KeyboardEvent":23,"./MouseEvent":25,"./TouchEvent":27,"./document":28,"./location":30,"./navigator":31}],34:[function(require,module,exports){
-"use strict";
-
 (function (jsb) {
 
     if (!jsb || !jsb.AudioEngine) return;
@@ -4672,20 +4031,18 @@ window.localStorage = sys.localStorage;
 })(jsb);
 
 },{}],35:[function(require,module,exports){
-'use strict';
-
-var EventTarget = require('./jsb-adapter/EventTarget');
-var Event = require('./jsb-adapter/Event');
+const EventTarget = require('./jsb-adapter/EventTarget');
+const Event = require('./jsb-adapter/Event');
 
 var eventTarget = new EventTarget();
 
 var callbackWrappers = {};
 var callbacks = {};
 var index = 1;
-var callbackWrapper = function callbackWrapper(cb) {
+var callbackWrapper = function (cb) {
 	if (!cb) return null;
 
-	var func = function func(event) {
+	var func = function (event) {
 		cb({ value: event.text });
 	};
 	cb.___index = index++;
@@ -4693,25 +4050,25 @@ var callbackWrapper = function callbackWrapper(cb) {
 
 	return func;
 };
-var getCallbackWrapper = function getCallbackWrapper(cb) {
+var getCallbackWrapper = function (cb) {
 	if (cb && cb.___index) {
 		var ret = callbackWrappers[cb.___index];
 		delete callbackWrappers[cb.___index];
 		return ret;
 	} else return null;
 };
-var removeListener = function removeListener(name, cb) {
+var removeListener = function (name, cb) {
 	if (cb) eventTarget.removeEventListener(name, getCallbackWrapper(cb));else {
 		// remove all listeners of name
 		var cbs = callbacks[name];
 		if (!cbs) return;
 
-		for (var i = 0, len = cbs.length; i < len; ++i) {
-			eventTarget.removeEventListener(name, cbs[i]);
-		}delete callbacks[name];
+		for (var i = 0, len = cbs.length; i < len; ++i) eventTarget.removeEventListener(name, cbs[i]);
+
+		delete callbacks[name];
 	}
 };
-var recordCallback = function recordCallback(name, cb) {
+var recordCallback = function (name, cb) {
 	if (!cb || !name || name === '') return;
 
 	if (!callbacks[name]) callbacks[name] = [];
@@ -4720,30 +4077,30 @@ var recordCallback = function recordCallback(name, cb) {
 };
 
 jsb.inputBox = {
-	onConfirm: function onConfirm(cb) {
+	onConfirm: function (cb) {
 		var newCb = callbackWrapper(cb);
 		eventTarget.addEventListener('confirm', newCb);
 		recordCallback('confirm', newCb);
 	},
-	offConfirm: function offConfirm(cb) {
+	offConfirm: function (cb) {
 		removeListener('confirm', cb);
 	},
 
-	onComplete: function onComplete(cb) {
+	onComplete: function (cb) {
 		var newCb = callbackWrapper(cb);
 		eventTarget.addEventListener('complete', newCb);
 		recordCallback('complete', newCb);
 	},
-	offComplete: function offComplete(cb) {
+	offComplete: function (cb) {
 		removeListener('complete', cb);
 	},
 
-	onInput: function onInput(cb) {
+	onInput: function (cb) {
 		var newCb = callbackWrapper(cb);
 		eventTarget.addEventListener('input', newCb);
 		recordCallback('input', newCb);
 	},
-	offInput: function offInput(cb) {
+	offInput: function (cb) {
 		removeListener('input', cb);
 	},
 
@@ -4758,10 +4115,10 @@ jsb.inputBox = {
   * Values of options.confirmType can be [done|next|search|go|send].
   * Values of options.inputType can be [text|email|number|phone|password].
   */
-	show: function show(options) {
+	show: function (options) {
 		jsb.showInputBox(options);
 	},
-	hide: function hide() {
+	hide: function () {
 		jsb.hideInputBox();
 	}
 };
@@ -4773,8 +4130,6 @@ jsb.onTextInput = function (eventName, text) {
 };
 
 },{"./jsb-adapter/Event":9,"./jsb-adapter/EventTarget":10}],36:[function(require,module,exports){
-'use strict';
-
 require('./jsb_opengl_constants');
 
 var gl = __gl;
@@ -4786,18 +4141,18 @@ gl.drawingBufferHeight = window.innerHeight;
 // Extensions
 //
 
-var WebGLCompressedTextureS3TC = {
+const WebGLCompressedTextureS3TC = {
     COMPRESSED_RGB_S3TC_DXT1_EXT: 0x83F0, // A DXT1-compressed image in an RGB image format.
     COMPRESSED_RGBA_S3TC_DXT1_EXT: 0x83F1, // A DXT1-compressed image in an RGB image format with a simple on/off alpha value.
     COMPRESSED_RGBA_S3TC_DXT3_EXT: 0x83F2, // A DXT3-compressed image in an RGBA image format. Compared to a 32-bit RGBA texture, it offers 4:1 compression.
     COMPRESSED_RGBA_S3TC_DXT5_EXT: 0x83F3 // A DXT5-compressed image in an RGBA image format. It also provides a 4:1 compression, but differs to the DXT3 compression in how the alpha compression is done.
 };
 
-var WebGLCompressedTextureETC1 = {
+const WebGLCompressedTextureETC1 = {
     COMPRESSED_RGB_ETC1_WEBGL: 0x8D64 // Compresses 24-bit RGB data with no alpha channel.
 };
 
-var WebGLCompressedTexturePVRTC = {
+const WebGLCompressedTexturePVRTC = {
     COMPRESSED_RGB_PVRTC_4BPPV1_IMG: 0x8C00, //  RGB compression in 4-bit mode. One block for each 4×4 pixels.
     COMPRESSED_RGBA_PVRTC_4BPPV1_IMG: 0x8C02, //  RGBA compression in 4-bit mode. One block for each 4×4 pixels.
     COMPRESSED_RGB_PVRTC_2BPPV1_IMG: 0x8C01, //  RGB compression in 2-bit mode. One block for each 8×4 pixels.
@@ -4841,11 +4196,11 @@ gl.getExtension = function (extension) {
     return null;
 };
 
-var HTMLCanvasElement = require('./jsb-adapter/HTMLCanvasElement');
-var HTMLImageElement = require('./jsb-adapter/HTMLImageElement');
-var ImageData = require('./jsb-adapter/ImageData');
+const HTMLCanvasElement = require('./jsb-adapter/HTMLCanvasElement');
+const HTMLImageElement = require('./jsb-adapter/HTMLImageElement');
+const ImageData = require('./jsb-adapter/ImageData');
 
-var _glTexImage2D = gl.texImage2D;
+const _glTexImage2D = gl.texImage2D;
 
 /*
 // WebGL1:
@@ -4857,7 +4212,7 @@ void gl.texImage2D(target, level, internalformat, format, type, HTMLVideoElement
 void gl.texImage2D(target, level, internalformat, format, type, ImageBitmap? pixels);
 */
 gl.texImage2D = function (target, level, internalformat, width, height, border, format, type, pixels) {
-    var argCount = arguments.length;
+    let argCount = arguments.length;
     if (argCount == 6) {
 
         var image = border;
@@ -4884,7 +4239,7 @@ gl.texImage2D = function (target, level, internalformat, width, height, border, 
     }
 };
 
-var _glTexSubImage2D = gl.texSubImage2D;
+const _glTexSubImage2D = gl.texSubImage2D;
 /*
  // WebGL 1:
  void gl.texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, ArrayBufferView? pixels);
@@ -4895,7 +4250,7 @@ var _glTexSubImage2D = gl.texSubImage2D;
  void gl.texSubImage2D(target, level, xoffset, yoffset, format, type, ImageBitmap? pixels);
  */
 gl.texSubImage2D = function (target, level, xoffset, yoffset, width, height, format, type, pixels) {
-    var argCount = arguments.length;
+    let argCount = arguments.length;
     if (argCount == 7) {
         var image = format;
         type = height;
@@ -4939,9 +4294,7 @@ gl.isContextLost = function () {
 };
 
 },{"./jsb-adapter/HTMLCanvasElement":15,"./jsb-adapter/HTMLImageElement":17,"./jsb-adapter/ImageData":22,"./jsb_opengl_constants":37}],37:[function(require,module,exports){
-"use strict";
-
-var gl = __gl;
+const gl = __gl;
 
 gl.GCCSO_SHADER_BINARY_FJ = 0x9260;
 gl._3DC_XY_AMD = 0x87fa;
@@ -5777,16 +5130,14 @@ gl.UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
 gl.BROWSER_DEFAULT_WEBGL = 0x9244;
 
 },{}],38:[function(require,module,exports){
-"use strict";
-
 jsb.__obj_ref_id = 0;
 
 jsb.registerNativeRef = function (owner, target) {
     if (owner && target && owner !== target) {
-        var targetID = target.__jsb_ref_id;
+        let targetID = target.__jsb_ref_id;
         if (targetID === undefined) targetID = target.__jsb_ref_id = jsb.__obj_ref_id++;
 
-        var refs = owner.__nativeRefs;
+        let refs = owner.__nativeRefs;
         if (!refs) {
             refs = owner.__nativeRefs = {};
         }
@@ -5797,10 +5148,10 @@ jsb.registerNativeRef = function (owner, target) {
 
 jsb.unregisterNativeRef = function (owner, target) {
     if (owner && target && owner !== target) {
-        var targetID = target.__jsb_ref_id;
+        let targetID = target.__jsb_ref_id;
         if (targetID === undefined) return;
 
-        var refs = owner.__nativeRefs;
+        let refs = owner.__nativeRefs;
         if (!refs) {
             return;
         }
@@ -5816,10 +5167,10 @@ jsb.unregisterAllNativeRefs = function (owner) {
 
 jsb.unregisterChildRefsForNode = function (node, recursive) {
     recursive = !!recursive;
-    var children = node.getChildren(),
-        i = void 0,
-        l = void 0,
-        child = void 0;
+    let children = node.getChildren(),
+        i,
+        l,
+        child;
     for (i = 0, l = children.length; i < l; ++i) {
         child = children[i];
         jsb.unregisterNativeRef(node, child);
@@ -5830,8 +5181,6 @@ jsb.unregisterChildRefsForNode = function (node, recursive) {
 };
 
 },{}],39:[function(require,module,exports){
-'use strict';
-
 function DOMParser(options) {
 	this.options = options || { locator: {} };
 }
@@ -5911,13 +5260,13 @@ function position(locator, node) {
  * @link http://www.saxproject.org/apidoc/org/xml/sax/ContentHandler.html
  */
 DOMHandler.prototype = {
-	startDocument: function startDocument() {
+	startDocument: function () {
 		this.doc = new DOMImplementation().createDocument(null, null, null);
 		if (this.locator) {
 			this.doc.documentURI = this.locator.systemId;
 		}
 	},
-	startElement: function startElement(namespaceURI, localName, qName, attrs) {
+	startElement: function (namespaceURI, localName, qName, attrs) {
 		var doc = this.doc;
 		var el = doc.createElementNS(namespaceURI, qName || localName);
 		var len = attrs.length;
@@ -5935,20 +5284,20 @@ DOMHandler.prototype = {
 			el.setAttributeNode(attr);
 		}
 	},
-	endElement: function endElement(namespaceURI, localName, qName) {
+	endElement: function (namespaceURI, localName, qName) {
 		var current = this.currentElement;
 		var tagName = current.tagName;
 		this.currentElement = current.parentNode;
 	},
-	startPrefixMapping: function startPrefixMapping(prefix, uri) {},
-	endPrefixMapping: function endPrefixMapping(prefix) {},
-	processingInstruction: function processingInstruction(target, data) {
+	startPrefixMapping: function (prefix, uri) {},
+	endPrefixMapping: function (prefix) {},
+	processingInstruction: function (target, data) {
 		var ins = this.doc.createProcessingInstruction(target, data);
 		this.locator && position(this.locator, ins);
 		appendElement(this, ins);
 	},
-	ignorableWhitespace: function ignorableWhitespace(ch, start, length) {},
-	characters: function characters(chars, start, length) {
+	ignorableWhitespace: function (ch, start, length) {},
+	characters: function (chars, start, length) {
 		chars = _toString.apply(this, arguments);
 		//console.log(chars)
 		if (chars) {
@@ -5966,33 +5315,33 @@ DOMHandler.prototype = {
 			this.locator && position(this.locator, charNode);
 		}
 	},
-	skippedEntity: function skippedEntity(name) {},
-	endDocument: function endDocument() {
+	skippedEntity: function (name) {},
+	endDocument: function () {
 		this.doc.normalize();
 	},
-	setDocumentLocator: function setDocumentLocator(locator) {
+	setDocumentLocator: function (locator) {
 		if (this.locator = locator) {
 			// && !('lineNumber' in locator)){
 			locator.lineNumber = 0;
 		}
 	},
 	//LexicalHandler
-	comment: function comment(chars, start, length) {
+	comment: function (chars, start, length) {
 		chars = _toString.apply(this, arguments);
 		var comm = this.doc.createComment(chars);
 		this.locator && position(this.locator, comm);
 		appendElement(this, comm);
 	},
 
-	startCDATA: function startCDATA() {
+	startCDATA: function () {
 		//used in characters() methods
 		this.cdata = true;
 	},
-	endCDATA: function endCDATA() {
+	endCDATA: function () {
 		this.cdata = false;
 	},
 
-	startDTD: function startDTD(name, publicId, systemId) {
+	startDTD: function (name, publicId, systemId) {
 		var impl = this.doc.implementation;
 		if (impl && impl.createDocumentType) {
 			var dt = impl.createDocumentType(name, publicId, systemId);
@@ -6004,13 +5353,13 @@ DOMHandler.prototype = {
   * @see org.xml.sax.ErrorHandler
   * @link http://www.saxproject.org/apidoc/org/xml/sax/ErrorHandler.html
   */
-	warning: function warning(error) {
+	warning: function (error) {
 		console.warn('[xmldom warning]\t' + error, _locator(this.locator));
 	},
-	error: function error(_error) {
-		console.error('[xmldom error]\t' + _error, _locator(this.locator));
+	error: function (error) {
+		console.error('[xmldom error]\t' + error, _locator(this.locator));
 	},
-	fatalError: function fatalError(error) {
+	fatalError: function (error) {
 		console.error('[xmldom fatalError]\t' + error, _locator(this.locator));
 		throw error;
 	}
@@ -6087,10 +5436,6 @@ exports.DOMParser = DOMParser;
 //}
 
 },{"./dom":40,"./entities":41,"./sax":42}],40:[function(require,module,exports){
-'use strict';
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 /*
  * DOM Level 2
  * Object DOMException
@@ -6110,9 +5455,7 @@ function copy(src, dest) {
 function _extends(Class, Super) {
 	var pt = Class.prototype;
 	if (!(pt instanceof Super)) {
-		var t = function t() {};
-
-		;
+		function t() {};
 		t.prototype = Super.prototype;
 		t = new t();
 		copy(pt, t);
@@ -6196,10 +5539,10 @@ NodeList.prototype = {
   * @return Node
   * 	The node at the indexth position in the NodeList, or null if that is not a valid index. 
   */
-	item: function item(index) {
+	item: function (index) {
 		return this[index] || null;
 	},
-	toString: function toString(isHTML, nodeFilter) {
+	toString: function (isHTML, nodeFilter) {
 		for (var buf = [], i = 0; i < this.length; i++) {
 			serializeToString(this[i], buf, isHTML, nodeFilter);
 		}
@@ -6282,7 +5625,7 @@ function _removeNamedNode(el, list, attr) {
 NamedNodeMap.prototype = {
 	length: 0,
 	item: NodeList.prototype.item,
-	getNamedItem: function getNamedItem(key) {
+	getNamedItem: function (key) {
 		//		if(key.indexOf(':')>0 || key == 'xmlns'){
 		//			return null;
 		//		}
@@ -6296,7 +5639,7 @@ NamedNodeMap.prototype = {
 			}
 		}
 	},
-	setNamedItem: function setNamedItem(attr) {
+	setNamedItem: function (attr) {
 		var el = attr.ownerElement;
 		if (el && el != this._ownerElement) {
 			throw new DOMException(INUSE_ATTRIBUTE_ERR);
@@ -6306,7 +5649,7 @@ NamedNodeMap.prototype = {
 		return oldAttr;
 	},
 	/* returns Node */
-	setNamedItemNS: function setNamedItemNS(attr) {
+	setNamedItemNS: function (attr) {
 		// raises: WRONG_DOCUMENT_ERR,NO_MODIFICATION_ALLOWED_ERR,INUSE_ATTRIBUTE_ERR
 		var el = attr.ownerElement,
 		    oldAttr;
@@ -6319,19 +5662,19 @@ NamedNodeMap.prototype = {
 	},
 
 	/* returns Node */
-	removeNamedItem: function removeNamedItem(key) {
+	removeNamedItem: function (key) {
 		var attr = this.getNamedItem(key);
 		_removeNamedNode(this._ownerElement, this, attr);
 		return attr;
 	}, // raises: NOT_FOUND_ERR,NO_MODIFICATION_ALLOWED_ERR
 
 	//for level2
-	removeNamedItemNS: function removeNamedItemNS(namespaceURI, localName) {
+	removeNamedItemNS: function (namespaceURI, localName) {
 		var attr = this.getNamedItemNS(namespaceURI, localName);
 		_removeNamedNode(this._ownerElement, this, attr);
 		return attr;
 	},
-	getNamedItemNS: function getNamedItemNS(namespaceURI, localName) {
+	getNamedItemNS: function (namespaceURI, localName) {
 		var i = this.length;
 		while (i--) {
 			var node = this[i];
@@ -6355,7 +5698,7 @@ function DOMImplementation( /* Object */features) {
 };
 
 DOMImplementation.prototype = {
-	hasFeature: function hasFeature( /* string */feature, /* string */version) {
+	hasFeature: function ( /* string */feature, /* string */version) {
 		var versions = this._features[feature.toLowerCase()];
 		if (versions && (!version || version in versions)) {
 			return true;
@@ -6364,7 +5707,7 @@ DOMImplementation.prototype = {
 		}
 	},
 	// Introduced in DOM Level 2:
-	createDocument: function createDocument(namespaceURI, qualifiedName, doctype) {
+	createDocument: function (namespaceURI, qualifiedName, doctype) {
 		// raises:INVALID_CHARACTER_ERR,NAMESPACE_ERR,WRONG_DOCUMENT_ERR
 		var doc = new Document();
 		doc.implementation = this;
@@ -6380,7 +5723,7 @@ DOMImplementation.prototype = {
 		return doc;
 	},
 	// Introduced in DOM Level 2:
-	createDocumentType: function createDocumentType(qualifiedName, publicId, systemId) {
+	createDocumentType: function (qualifiedName, publicId, systemId) {
 		// raises:INVALID_CHARACTER_ERR,NAMESPACE_ERR
 		var node = new DocumentType();
 		node.name = qualifiedName;
@@ -6417,31 +5760,31 @@ Node.prototype = {
 	prefix: null,
 	localName: null,
 	// Modified in DOM Level 2:
-	insertBefore: function insertBefore(newChild, refChild) {
+	insertBefore: function (newChild, refChild) {
 		//raises 
 		return _insertBefore(this, newChild, refChild);
 	},
-	replaceChild: function replaceChild(newChild, oldChild) {
+	replaceChild: function (newChild, oldChild) {
 		//raises 
 		this.insertBefore(newChild, oldChild);
 		if (oldChild) {
 			this.removeChild(oldChild);
 		}
 	},
-	removeChild: function removeChild(oldChild) {
+	removeChild: function (oldChild) {
 		return _removeChild(this, oldChild);
 	},
-	appendChild: function appendChild(newChild) {
+	appendChild: function (newChild) {
 		return this.insertBefore(newChild, null);
 	},
-	hasChildNodes: function hasChildNodes() {
+	hasChildNodes: function () {
 		return this.firstChild != null;
 	},
-	cloneNode: function cloneNode(deep) {
-		return _cloneNode(this.ownerDocument || this, this, deep);
+	cloneNode: function (deep) {
+		return cloneNode(this.ownerDocument || this, this, deep);
 	},
 	// Modified in DOM Level 2:
-	normalize: function normalize() {
+	normalize: function () {
 		var child = this.firstChild;
 		while (child) {
 			var next = child.nextSibling;
@@ -6455,14 +5798,14 @@ Node.prototype = {
 		}
 	},
 	// Introduced in DOM Level 2:
-	isSupported: function isSupported(feature, version) {
+	isSupported: function (feature, version) {
 		return this.ownerDocument.implementation.hasFeature(feature, version);
 	},
 	// Introduced in DOM Level 2:
-	hasAttributes: function hasAttributes() {
+	hasAttributes: function () {
 		return this.attributes.length > 0;
 	},
-	lookupPrefix: function lookupPrefix(namespaceURI) {
+	lookupPrefix: function (namespaceURI) {
 		var el = this;
 		while (el) {
 			var map = el._nsMap;
@@ -6479,7 +5822,7 @@ Node.prototype = {
 		return null;
 	},
 	// Introduced in DOM Level 3:
-	lookupNamespaceURI: function lookupNamespaceURI(prefix) {
+	lookupNamespaceURI: function (prefix) {
 		var el = this;
 		while (el) {
 			var map = el._nsMap;
@@ -6494,7 +5837,7 @@ Node.prototype = {
 		return null;
 	},
 	// Introduced in DOM Level 3:
-	isDefaultNamespace: function isDefaultNamespace(namespaceURI) {
+	isDefaultNamespace: function (namespaceURI) {
 		var prefix = this.lookupPrefix(namespaceURI);
 		return prefix == null;
 	}
@@ -6656,7 +5999,7 @@ Document.prototype = {
 	documentElement: null,
 	_inc: 1,
 
-	insertBefore: function insertBefore(newChild, refChild) {
+	insertBefore: function (newChild, refChild) {
 		//raises 
 		if (newChild.nodeType == DOCUMENT_FRAGMENT_NODE) {
 			var child = newChild.firstChild;
@@ -6673,18 +6016,18 @@ Document.prototype = {
 
 		return _insertBefore(this, newChild, refChild), newChild.ownerDocument = this, newChild;
 	},
-	removeChild: function removeChild(oldChild) {
+	removeChild: function (oldChild) {
 		if (this.documentElement == oldChild) {
 			this.documentElement = null;
 		}
 		return _removeChild(this, oldChild);
 	},
 	// Introduced in DOM Level 2:
-	importNode: function importNode(importedNode, deep) {
-		return _importNode(this, importedNode, deep);
+	importNode: function (importedNode, deep) {
+		return importNode(this, importedNode, deep);
 	},
 	// Introduced in DOM Level 2:
-	getElementById: function getElementById(id) {
+	getElementById: function (id) {
 		var rtv = null;
 		_visitNode(this.documentElement, function (node) {
 			if (node.nodeType == ELEMENT_NODE) {
@@ -6698,7 +6041,7 @@ Document.prototype = {
 	},
 
 	//document factory method:
-	createElement: function createElement(tagName) {
+	createElement: function (tagName) {
 		var node = new Element();
 		node.ownerDocument = this;
 		node.nodeName = tagName;
@@ -6708,38 +6051,38 @@ Document.prototype = {
 		attrs._ownerElement = node;
 		return node;
 	},
-	createDocumentFragment: function createDocumentFragment() {
+	createDocumentFragment: function () {
 		var node = new DocumentFragment();
 		node.ownerDocument = this;
 		node.childNodes = new NodeList();
 		return node;
 	},
-	createTextNode: function createTextNode(data) {
+	createTextNode: function (data) {
 		var node = new Text();
 		node.ownerDocument = this;
 		node.appendData(data);
 		return node;
 	},
-	createComment: function createComment(data) {
+	createComment: function (data) {
 		var node = new Comment();
 		node.ownerDocument = this;
 		node.appendData(data);
 		return node;
 	},
-	createCDATASection: function createCDATASection(data) {
+	createCDATASection: function (data) {
 		var node = new CDATASection();
 		node.ownerDocument = this;
 		node.appendData(data);
 		return node;
 	},
-	createProcessingInstruction: function createProcessingInstruction(target, data) {
+	createProcessingInstruction: function (target, data) {
 		var node = new ProcessingInstruction();
 		node.ownerDocument = this;
 		node.tagName = node.target = target;
 		node.nodeValue = node.data = data;
 		return node;
 	},
-	createAttribute: function createAttribute(name) {
+	createAttribute: function (name) {
 		var node = new Attr();
 		node.ownerDocument = this;
 		node.name = name;
@@ -6748,14 +6091,14 @@ Document.prototype = {
 		node.specified = true;
 		return node;
 	},
-	createEntityReference: function createEntityReference(name) {
+	createEntityReference: function (name) {
 		var node = new EntityReference();
 		node.ownerDocument = this;
 		node.nodeName = name;
 		return node;
 	},
 	// Introduced in DOM Level 2:
-	createElementNS: function createElementNS(namespaceURI, qualifiedName) {
+	createElementNS: function (namespaceURI, qualifiedName) {
 		var node = new Element();
 		var pl = qualifiedName.split(':');
 		var attrs = node.attributes = new NamedNodeMap();
@@ -6775,7 +6118,7 @@ Document.prototype = {
 		return node;
 	},
 	// Introduced in DOM Level 2:
-	createAttributeNS: function createAttributeNS(namespaceURI, qualifiedName) {
+	createAttributeNS: function (namespaceURI, qualifiedName) {
 		var node = new Attr();
 		var pl = qualifiedName.split(':');
 		node.ownerDocument = this;
@@ -6800,67 +6143,67 @@ function Element() {
 };
 Element.prototype = {
 	nodeType: ELEMENT_NODE,
-	hasAttribute: function hasAttribute(name) {
+	hasAttribute: function (name) {
 		return this.getAttributeNode(name) != null;
 	},
-	getAttribute: function getAttribute(name) {
+	getAttribute: function (name) {
 		var attr = this.getAttributeNode(name);
 		return attr && attr.value || '';
 	},
-	getAttributeNode: function getAttributeNode(name) {
+	getAttributeNode: function (name) {
 		return this.attributes.getNamedItem(name);
 	},
-	setAttribute: function setAttribute(name, value) {
+	setAttribute: function (name, value) {
 		var attr = this.ownerDocument.createAttribute(name);
 		attr.value = attr.nodeValue = "" + value;
 		this.setAttributeNode(attr);
 	},
-	removeAttribute: function removeAttribute(name) {
+	removeAttribute: function (name) {
 		var attr = this.getAttributeNode(name);
 		attr && this.removeAttributeNode(attr);
 	},
 
 	//four real opeartion method
-	appendChild: function appendChild(newChild) {
+	appendChild: function (newChild) {
 		if (newChild.nodeType === DOCUMENT_FRAGMENT_NODE) {
 			return this.insertBefore(newChild, null);
 		} else {
 			return _appendSingleChild(this, newChild);
 		}
 	},
-	setAttributeNode: function setAttributeNode(newAttr) {
+	setAttributeNode: function (newAttr) {
 		return this.attributes.setNamedItem(newAttr);
 	},
-	setAttributeNodeNS: function setAttributeNodeNS(newAttr) {
+	setAttributeNodeNS: function (newAttr) {
 		return this.attributes.setNamedItemNS(newAttr);
 	},
-	removeAttributeNode: function removeAttributeNode(oldAttr) {
+	removeAttributeNode: function (oldAttr) {
 		//console.log(this == oldAttr.ownerElement)
 		return this.attributes.removeNamedItem(oldAttr.nodeName);
 	},
 	//get real attribute name,and remove it by removeAttributeNode
-	removeAttributeNS: function removeAttributeNS(namespaceURI, localName) {
+	removeAttributeNS: function (namespaceURI, localName) {
 		var old = this.getAttributeNodeNS(namespaceURI, localName);
 		old && this.removeAttributeNode(old);
 	},
 
-	hasAttributeNS: function hasAttributeNS(namespaceURI, localName) {
+	hasAttributeNS: function (namespaceURI, localName) {
 		return this.getAttributeNodeNS(namespaceURI, localName) != null;
 	},
-	getAttributeNS: function getAttributeNS(namespaceURI, localName) {
+	getAttributeNS: function (namespaceURI, localName) {
 		var attr = this.getAttributeNodeNS(namespaceURI, localName);
 		return attr && attr.value || '';
 	},
-	setAttributeNS: function setAttributeNS(namespaceURI, qualifiedName, value) {
+	setAttributeNS: function (namespaceURI, qualifiedName, value) {
 		var attr = this.ownerDocument.createAttributeNS(namespaceURI, qualifiedName);
 		attr.value = attr.nodeValue = "" + value;
 		this.setAttributeNode(attr);
 	},
-	getAttributeNodeNS: function getAttributeNodeNS(namespaceURI, localName) {
+	getAttributeNodeNS: function (namespaceURI, localName) {
 		return this.attributes.getNamedItemNS(namespaceURI, localName);
 	},
 
-	getElementsByTagName: function getElementsByTagName(tagName) {
+	getElementsByTagName: function (tagName) {
 		return new LiveNodeList(this, function (base) {
 			var ls = [];
 			_visitNode(base, function (node) {
@@ -6871,7 +6214,7 @@ Element.prototype = {
 			return ls;
 		});
 	},
-	getElementsByTagNameNS: function getElementsByTagNameNS(namespaceURI, localName) {
+	getElementsByTagNameNS: function (namespaceURI, localName) {
 		return new LiveNodeList(this, function (base) {
 			var ls = [];
 			_visitNode(base, function (node) {
@@ -6894,24 +6237,24 @@ _extends(Attr, Node);
 function CharacterData() {};
 CharacterData.prototype = {
 	data: '',
-	substringData: function substringData(offset, count) {
+	substringData: function (offset, count) {
 		return this.data.substring(offset, offset + count);
 	},
-	appendData: function appendData(text) {
+	appendData: function (text) {
 		text = this.data + text;
 		this.nodeValue = this.data = text;
 		this.length = text.length;
 	},
-	insertData: function insertData(offset, text) {
+	insertData: function (offset, text) {
 		this.replaceData(offset, 0, text);
 	},
-	appendChild: function appendChild(newChild) {
+	appendChild: function (newChild) {
 		throw new Error(ExceptionMessage[HIERARCHY_REQUEST_ERR]);
 	},
-	deleteData: function deleteData(offset, count) {
+	deleteData: function (offset, count) {
 		this.replaceData(offset, count, "");
 	},
-	replaceData: function replaceData(offset, count, text) {
+	replaceData: function (offset, count, text) {
 		var start = this.data.substring(0, offset);
 		var end = this.data.substring(offset + count);
 		text = start + text + end;
@@ -6924,7 +6267,7 @@ function Text() {};
 Text.prototype = {
 	nodeName: "#text",
 	nodeType: TEXT_NODE,
-	splitText: function splitText(offset) {
+	splitText: function (offset) {
 		var text = this.data;
 		var newText = text.substring(offset);
 		text = text.substring(0, offset);
@@ -7154,7 +6497,7 @@ function serializeToString(node, buf, isHTML, nodeFilter, visibleNamespaces) {
 			buf.push('??', node.nodeName);
 	}
 }
-function _importNode(doc, node, deep) {
+function importNode(doc, node, deep) {
 	var node2;
 	switch (node.nodeType) {
 		case ELEMENT_NODE:
@@ -7193,7 +6536,7 @@ function _importNode(doc, node, deep) {
 	if (deep) {
 		var child = node.firstChild;
 		while (child) {
-			node2.appendChild(_importNode(doc, child, deep));
+			node2.appendChild(importNode(doc, child, deep));
 			child = child.nextSibling;
 		}
 	}
@@ -7202,11 +6545,11 @@ function _importNode(doc, node, deep) {
 //
 //var _relationMap = {firstChild:1,lastChild:1,previousSibling:1,nextSibling:1,
 //					attributes:1,childNodes:1,parentNode:1,documentElement:1,doctype,};
-function _cloneNode(doc, node, deep) {
+function cloneNode(doc, node, deep) {
 	var node2 = new node.constructor();
 	for (var n in node) {
 		var v = node[n];
-		if ((typeof v === 'undefined' ? 'undefined' : _typeof(v)) != 'object') {
+		if (typeof v != 'object') {
 			if (v != node2[n]) {
 				node2[n] = v;
 			}
@@ -7223,7 +6566,7 @@ function _cloneNode(doc, node, deep) {
 			var len = attrs.length;
 			attrs2._ownerElement = node2;
 			for (var i = 0; i < len; i++) {
-				node2.setAttributeNode(_cloneNode(doc, attrs.item(i), true));
+				node2.setAttributeNode(cloneNode(doc, attrs.item(i), true));
 			}
 			break;;
 		case ATTRIBUTE_NODE:
@@ -7232,7 +6575,7 @@ function _cloneNode(doc, node, deep) {
 	if (deep) {
 		var child = node.firstChild;
 		while (child) {
-			node2.appendChild(_cloneNode(doc, child, deep));
+			node2.appendChild(cloneNode(doc, child, deep));
 			child = child.nextSibling;
 		}
 	}
@@ -7245,35 +6588,17 @@ function __set__(object, key, value) {
 //do dynamic
 try {
 	if (Object.defineProperty) {
-		var getTextContent = function getTextContent(node) {
-			switch (node.nodeType) {
-				case ELEMENT_NODE:
-				case DOCUMENT_FRAGMENT_NODE:
-					var buf = [];
-					node = node.firstChild;
-					while (node) {
-						if (node.nodeType !== 7 && node.nodeType !== 8) {
-							buf.push(getTextContent(node));
-						}
-						node = node.nextSibling;
-					}
-					return buf.join('');
-				default:
-					return node.nodeValue;
-			}
-		};
-
 		Object.defineProperty(LiveNodeList.prototype, 'length', {
-			get: function get() {
+			get: function () {
 				_updateLiveList(this);
 				return this.$$length;
 			}
 		});
 		Object.defineProperty(Node.prototype, 'textContent', {
-			get: function get() {
+			get: function () {
 				return getTextContent(this);
 			},
-			set: function set(data) {
+			set: function (data) {
 				switch (this.nodeType) {
 					case ELEMENT_NODE:
 					case DOCUMENT_FRAGMENT_NODE:
@@ -7293,7 +6618,24 @@ try {
 			}
 		});
 
-		__set__ = function __set__(object, key, value) {
+		function getTextContent(node) {
+			switch (node.nodeType) {
+				case ELEMENT_NODE:
+				case DOCUMENT_FRAGMENT_NODE:
+					var buf = [];
+					node = node.firstChild;
+					while (node) {
+						if (node.nodeType !== 7 && node.nodeType !== 8) {
+							buf.push(getTextContent(node));
+						}
+						node = node.nextSibling;
+					}
+					return buf.join('');
+				default:
+					return node.nodeValue;
+			}
+		}
+		__set__ = function (object, key, value) {
 			//console.log(value)
 			object['$$' + key] = value;
 		};
@@ -7307,8 +6649,6 @@ exports.XMLSerializer = XMLSerializer;
 //}
 
 },{}],41:[function(require,module,exports){
-'use strict';
-
 exports.entityMap = {
        lt: '<',
        gt: '>',
@@ -7555,8 +6895,6 @@ exports.entityMap = {
 //for(var  n in exports.entityMap){console.log(exports.entityMap[n].charCodeAt())}
 
 },{}],42:[function(require,module,exports){
-"use strict";
-
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
 //[4a]   	NameChar	   ::=   	NameStartChar | "-" | "." | [0-9] | #xB7 | [#x0300-#x036F] | [#x203F-#x2040]
 //[5]   	Name	   ::=   	NameStartChar (NameChar)*
@@ -7580,15 +6918,15 @@ var S_TAG_CLOSE = 7; //closed el<el />
 function XMLReader() {}
 
 XMLReader.prototype = {
-	parse: function parse(source, defaultNSMap, entityMap) {
+	parse: function (source, defaultNSMap, entityMap) {
 		var domBuilder = this.domBuilder;
 		domBuilder.startDocument();
 		_copy(defaultNSMap, defaultNSMap = {});
-		_parse(source, defaultNSMap, entityMap, domBuilder, this.errorHandler);
+		parse(source, defaultNSMap, entityMap, domBuilder, this.errorHandler);
 		domBuilder.endDocument();
 	}
 };
-function _parse(source, defaultNSMapCopy, entityMap, domBuilder, errorHandler) {
+function parse(source, defaultNSMapCopy, entityMap, domBuilder, errorHandler) {
 	function fixedFromCharCode(code) {
 		// String.prototype.fromCharCode does not supports
 		// > 2 bytes unicode chars directly
@@ -7879,7 +7217,7 @@ function parseElementStartPart(source, start, el, currentNSMap, entityReplacer, 
 				//			console.log(tagName,tagNamePattern,tagNamePattern.test(tagName))
 				return p;
 			/*xml space '\x20' | #x9 | #xD | #xA; */
-			case "\x80":
+			case '\u0080':
 				c = ' ';
 			default:
 				if (c <= ' ') {
@@ -8130,32 +7468,32 @@ function parseInstruction(source, start, domBuilder) {
  */
 function ElementAttributes(source) {}
 ElementAttributes.prototype = {
-	setTagName: function setTagName(tagName) {
+	setTagName: function (tagName) {
 		if (!tagNamePattern.test(tagName)) {
 			throw new Error('invalid tagName:' + tagName);
 		}
 		this.tagName = tagName;
 	},
-	add: function add(qName, value, offset) {
+	add: function (qName, value, offset) {
 		if (!tagNamePattern.test(qName)) {
 			throw new Error('invalid attribute:' + qName);
 		}
 		this[this.length++] = { qName: qName, value: value, offset: offset };
 	},
 	length: 0,
-	getLocalName: function getLocalName(i) {
+	getLocalName: function (i) {
 		return this[i].localName;
 	},
-	getLocator: function getLocator(i) {
+	getLocator: function (i) {
 		return this[i].locator;
 	},
-	getQName: function getQName(i) {
+	getQName: function (i) {
 		return this[i].qName;
 	},
-	getURI: function getURI(i) {
+	getURI: function (i) {
 		return this[i].uri;
 	},
-	getValue: function getValue(i) {
+	getValue: function (i) {
 		return this[i].value;
 	}
 	//	,getIndex:function(uri, localName)){
