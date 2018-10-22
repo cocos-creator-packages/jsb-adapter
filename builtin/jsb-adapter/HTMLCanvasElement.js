@@ -106,12 +106,41 @@ class HTMLCanvasElement extends HTMLElement {
 }
 
 var ctx2DProto = CanvasRenderingContext2D.prototype;
-ctx2DProto.createImageData = function(width, height) {
-    return new ImageData(width, height);
+
+// ImageData ctx.createImageData(imagedata);
+// ImageData ctx.createImageData(width, height);
+ctx2DProto.createImageData = function(imagedata, width, height) {
+    if (typeof imagedata === 'number' && typeof width == 'number') {
+        return new ImageData(imagedata, width);
+    }
+    else if (imagedata instanceof ImageData) {
+        return new imageData(imagedata.data);
+    }
 }
 
-ctx2DProto.putImageData = function(imagedata, dx, dy) {
-    this._canvas._data = imagedata; //REFINE: consider dx, dy?
+// void ctx.putImageData(imagedata, dx, dy);
+// void ctx.putImageData(imagedata, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
+ctx2DProto.putImageData = function(imagedata, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight) {
+    var desData = this._canvas._data;
+    var imgData = imageData.data;
+    var height = imageData.height;
+    var width = imageData.width;
+    dirtyX = dirtyX || 0;
+    dirtyY = dirtyY || 0;
+    dirtyWidth = dirtyWidth !== undefined? dirtyWidth: width;
+    dirtyHeight = dirtyHeight !== undefined? dirtyHeight: height;
+    var limitBottom = dirtyY + dirtyHeight;
+    var limitRight = dirtyX + dirtyWidth;
+    for (var y = dirtyY; y < limitBottom; y++) {
+      for (var x = dirtyX; x < limitRight; x++) {
+        var imgPos = y * width + x;
+        var desPos = (y + dy) * this._canvas.width + (x + dx)
+        desData[desPos*4+0] = imgData[imgPos*4+0];
+        desData[desPos*4+1] = imgData[imgPos*4+1];
+        desData[desPos*4+2] = imgData[imgPos*4+2];
+        desData[desPos*4+3] = imgData[imgPos*4+3];
+      }
+    }
 }
 
 ctx2DProto.getImageData = function(sx, sy, sw, sh) {
