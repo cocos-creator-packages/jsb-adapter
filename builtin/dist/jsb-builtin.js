@@ -800,7 +800,7 @@ function depthRangeOpt(zNear, zFar) {
     }
     buffer_data[next_index] = GL_COMMAND_DEPTH_RANGE;
     buffer_data[next_index + 1] = zNear;
-    buffer_data[next_index + 1] = zFar;
+    buffer_data[next_index + 2] = zFar;
     next_index += 3;
     ++commandCount;
 }
@@ -812,7 +812,7 @@ function detachShaderOpt(program, shader) {
     }
     buffer_data[next_index] = GL_COMMAND_DETACH_SHADER;
     buffer_data[next_index + 1] = program ? program._id : 0;
-    buffer_data[next_index + 1] = shader ? shader._id : 0;
+    buffer_data[next_index + 2] = shader ? shader._id : 0;
     next_index += 3;
     ++commandCount;
 }
@@ -3253,17 +3253,59 @@ var HTMLCanvasElement = function (_HTMLElement) {
 }(HTMLElement);
 
 var ctx2DProto = CanvasRenderingContext2D.prototype;
-ctx2DProto.createImageData = function (width, height) {
-    return new ImageData(width, height);
+
+// ImageData ctx.createImageData(imagedata);
+// ImageData ctx.createImageData(width, height);
+ctx2DProto.createImageData = function (args1, args2) {
+    if (typeof args1 === 'number' && typeof args2 == 'number') {
+        return new ImageData(args1, args2);
+    } else if (args1 instanceof ImageData) {
+        return new imageData(args1.data);
+    }
 };
 
-ctx2DProto.putImageData = function (imagedata, dx, dy) {
-    this._canvas._data = imagedata; //REFINE: consider dx, dy?
+// void ctx.putImageData(imagedata, dx, dy);
+// void ctx.putImageData(imagedata, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
+ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight) {
+    var height = imageData.height;
+    var width = imageData.width;
+    var imgBuffer = imageData.data;
+    var canvasWidth = window.innerWidth;
+    var canvasBuffer = this._canvas._data.data;
+    dirtyX = dirtyX || 0;
+    dirtyY = dirtyY || 0;
+    dirtyWidth = dirtyWidth !== undefined ? dirtyWidth : width;
+    dirtyHeight = dirtyHeight !== undefined ? dirtyHeight : height;
+    var limitBottom = dirtyY + dirtyHeight;
+    var limitRight = dirtyX + dirtyWidth;
+    for (var y = dirtyY; y < limitBottom; y++) {
+        for (var x = dirtyX; x < limitRight; x++) {
+            var imgPos = y * width + x;
+            var canvasPos = (y + dy) * canvasWidth + (x + dx);
+            canvasBuffer[canvasPos * 4 + 0] = imgBuffer[imgPos * 4 + 0];
+            canvasBuffer[canvasPos * 4 + 1] = imgBuffer[imgPos * 4 + 1];
+            canvasBuffer[canvasPos * 4 + 2] = imgBuffer[imgPos * 4 + 2];
+            canvasBuffer[canvasPos * 4 + 3] = imgBuffer[imgPos * 4 + 3];
+        }
+    }
 };
 
+// ImageData ctx.getImageData(sx, sy, sw, sh);
 ctx2DProto.getImageData = function (sx, sy, sw, sh) {
-    //REFINE:cjh
-    return this._canvas._data;
+    var canvasWidth = window.innerWidth;
+    var canvasBuffer = this._canvas._data.data;
+    var imgBuffer = new Uint8ClampedArray(sw * sh * 4);
+    for (var y = 0; y < sh; y++) {
+        for (var x = 0; x < sw; x++) {
+            var canvasPos = (y + sy) * canvasWidth + (x + sx);
+            var imgPos = y * sw + x;
+            imgBuffer[imgPos * 4 + 0] = canvasBuffer[canvasPos * 4 + 0];
+            imgBuffer[imgPos * 4 + 1] = canvasBuffer[canvasPos * 4 + 1];
+            imgBuffer[imgPos * 4 + 2] = canvasBuffer[canvasPos * 4 + 2];
+            imgBuffer[imgPos * 4 + 3] = canvasBuffer[canvasPos * 4 + 3];
+        }
+    }
+    return new ImageData(imgBuffer);
 };
 
 module.exports = HTMLCanvasElement;
