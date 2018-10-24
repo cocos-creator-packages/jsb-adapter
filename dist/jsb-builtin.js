@@ -3191,10 +3191,12 @@ var HTMLCanvasElement = function (_HTMLElement) {
             } else if (name === '2d') {
                 if (!this._context2D) {
                     this._context2D = new CanvasRenderingContext2D(this._width, this._height);
+                    this._data = new ImageData(this._width, this._height);
                     this._context2D._canvas = this;
                     this._context2D._setCanvasBufferUpdatedCallback(function (data) {
                         // FIXME: Canvas's data will take 2x memory size, one in C++, another is obtained by Uint8Array here.
-                        self._data = new ImageData(data, self._width, self._height);
+                        var drawData = new ImageData(data, self._width, self._height);
+                        this._context2D.putImageData(imageData, 0, 0);
                         // If the width of canvas could be divided by 2, it means that the bytes per row could be divided by 8.
                         self._alignment = self._width % 2 === 0 ? 8 : 4;
                     });
@@ -3260,7 +3262,7 @@ ctx2DProto.createImageData = function (args1, args2) {
     if (typeof args1 === 'number' && typeof args2 == 'number') {
         return new ImageData(args1, args2);
     } else if (args1 instanceof ImageData) {
-        return new imageData(args1.data);
+        return new imageData(args1.data, args1.width, args1.height);
     }
 };
 
@@ -3270,7 +3272,8 @@ ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidt
     var height = imageData.height;
     var width = imageData.width;
     var imgBuffer = imageData.data;
-    var canvasWidth = window.innerWidth;
+    var canvasWidth = this._canvas._width;
+    var canvasHeight = this._canvas._height;
     var canvasBuffer = this._canvas._data.data;
     dirtyX = dirtyX || 0;
     dirtyY = dirtyY || 0;
@@ -3278,6 +3281,9 @@ ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidt
     dirtyHeight = dirtyHeight !== undefined ? dirtyHeight : height;
     var limitBottom = dirtyY + dirtyHeight;
     var limitRight = dirtyX + dirtyWidth;
+    // next image rect may bigger than canvas rect 
+    limitBottom = limitBottom < canvasHeight ? limitBottom : canvasHeight;
+    limitRight = limitRight < canvasWidth ? limitRight : canvasWidth;
     for (var y = dirtyY; y < limitBottom; y++) {
         for (var x = dirtyX; x < limitRight; x++) {
             var imgPos = y * width + x;
@@ -3292,11 +3298,15 @@ ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidt
 
 // ImageData ctx.getImageData(sx, sy, sw, sh);
 ctx2DProto.getImageData = function (sx, sy, sw, sh) {
-    var canvasWidth = window.innerWidth;
+    var canvasWidth = this._canvas._width;
+    var canvasHeight = this._canvas._height;
     var canvasBuffer = this._canvas._data.data;
+    // iamge rect may bigger that canvas rect
+    var maxValidSH = sh + sy < canvasHeight ? sh : canvasHeight - sy;
+    var maxValidSW = sw + sx < canvasWidth ? sw : canvasWidth - sx;
     var imgBuffer = new Uint8ClampedArray(sw * sh * 4);
-    for (var y = 0; y < sh; y++) {
-        for (var x = 0; x < sw; x++) {
+    for (var y = 0; y < maxValidSH; y++) {
+        for (var x = 0; x < maxValidSW; x++) {
             var canvasPos = (y + sy) * canvasWidth + (x + sx);
             var imgPos = y * sw + x;
             imgBuffer[imgPos * 4 + 0] = canvasBuffer[canvasPos * 4 + 0];
@@ -3305,7 +3315,7 @@ ctx2DProto.getImageData = function (sx, sy, sw, sh) {
             imgBuffer[imgPos * 4 + 3] = canvasBuffer[canvasPos * 4 + 3];
         }
     }
-    return new ImageData(imgBuffer);
+    return new ImageData(imgBuffer, sw, sh);
 };
 
 module.exports = HTMLCanvasElement;
