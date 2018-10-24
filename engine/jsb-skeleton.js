@@ -24,6 +24,8 @@
  THE SOFTWARE.
  ****************************************************************************/
 
+if(window.jsbspine !== undefined){
+
 var jsbSkeleton = sp.Skeleton.prototype;
 jsbSkeleton.setSkeletonData = function (skeletonData) {
     null != skeletonData.width && null != skeletonData.height && this.node.setContentSize(skeletonData.width, skeletonData.height);
@@ -281,4 +283,6 @@ jsbSkeleton.onDestroy = function(){
     _onDestroy.call(this);
     this._skeletonTextures = undefined;
     this._skeleton = undefined;
+}
+
 }

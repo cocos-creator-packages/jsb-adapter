@@ -22,6 +22,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
+if(window.jsbspine !== undefined){
+
 const StencilManager = cc.StencilManager.sharedManager;
 const Skeleton = sp.Skeleton;
 const renderer = cc.renderer;
@@ -101,7 +103,7 @@ Skeleton._assembler.fillBuffers = function (comp, renderer) {
         comp._skeleton.setDebugSlotsEnabled(comp.debugSlots);
         comp.__preDebugSlots__ = comp.debugSlots;
     }
-
+    
     if(comp.__prePremultipliedAlpha !== comp.premultipliedAlpha){
         comp._skeleton.setOpacityModifyRGB(comp.premultipliedAlpha);
         comp.__prePremultipliedAlpha = comp.premultipliedAlpha;
@@ -218,4 +220,6 @@ Skeleton._assembler.fillBuffers = function (comp, renderer) {
     }
 
     comp.node._renderFlag |= RenderFlow.FLAG_UPDATE_RENDER_DATA;
+}
+
 }
