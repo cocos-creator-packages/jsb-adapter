@@ -54,9 +54,7 @@ class HTMLCanvasElement extends HTMLElement {
                 this._context2D._canvas = this;
                 this._context2D._setCanvasBufferUpdatedCallback(function(data) {
                     // FIXME: Canvas's data will take 2x memory size, one in C++, another is obtained by Uint8Array here.
-                    // var drawData = new ImageData(data, self._width, self._height);
                     self._data = new ImageData(data, self._width, self._height);
-                    // self._context2D.putImageData(drawData, 0,0);
                     // If the width of canvas could be divided by 2, it means that the bytes per row could be divided by 8.
                     self._alignment = self._width % 2 === 0 ? 8 : 4;
                 });
