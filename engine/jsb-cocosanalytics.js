@@ -31,6 +31,7 @@ if (!jsb || !jsb.reflection) {
 
 var sys = cc.sys;
 var platform = sys.platform;
+var cocosAnalytics;
 
 // Only android and iOS support cocos analytics
 if (platform === sys.ANDROID) {
