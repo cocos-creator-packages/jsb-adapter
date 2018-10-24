@@ -58,7 +58,7 @@ jsbSkeleton.setSkeletonData = function (skeletonData) {
         textures[texKeys[i]] = spTex;
     }
 
-    var skeletonAni = new jsbspine.SkeletonAnimation();
+    var skeletonAni = new jsbspine.SpineAnimation();
     try {
         jsbspine._initSkeletonRenderer(skeletonAni, jsonFile, atlasText, textures, skeletonData.scale);
     } catch (e) {
