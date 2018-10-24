@@ -54,8 +54,9 @@ class HTMLCanvasElement extends HTMLElement {
                 this._context2D._canvas = this;
                 this._context2D._setCanvasBufferUpdatedCallback(function(data) {
                     // FIXME: Canvas's data will take 2x memory size, one in C++, another is obtained by Uint8Array here.
-                    var drawData = new ImageData(data, self._width, self._height);
-                    this._context2D.putImageData(imageData, 0,0);
+                    // var drawData = new ImageData(data, self._width, self._height);
+                    self._data = new ImageData(data, self._width, self._height);
+                    // self._context2D.putImageData(drawData, 0,0);
                     // If the width of canvas could be divided by 2, it means that the bytes per row could be divided by 8.
                     self._alignment = self._width % 2 === 0 ? 8 : 4;
                 });
@@ -140,7 +141,7 @@ ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidt
     for (var y = dirtyY; y < limitBottom; y++) {
         for (var x = dirtyX; x < limitRight; x++) {
             var imgPos = y * width + x;
-            var canvasPos = (y + dy) * canvasWidth + (x + dx)
+            var canvasPos = (y - dirtyY + dy) * canvasWidth + (x - dirtyX + dx)
             canvasBuffer[canvasPos * 4 + 0] = imgBuffer[imgPos * 4 + 0];
             canvasBuffer[canvasPos * 4 + 1] = imgBuffer[imgPos * 4 + 1];
             canvasBuffer[canvasPos * 4 + 2] = imgBuffer[imgPos * 4 + 2];
