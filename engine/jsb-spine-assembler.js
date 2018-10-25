@@ -88,28 +88,31 @@ Skeleton._assembler.updateRenderData = function (comp, batchData) {
 
 Skeleton._assembler.fillBuffers = function (comp, renderer) {
 
+    let jsbSkeleton = comp._skeleton;
+    if(!jsbSkeleton)return;
+    let node = comp.node;
+
     if(comp.__preColor__ === undefined || 
-       !comp.node.color.equals(comp.__preColor__)){
-        comp._skeleton.setColor(comp.node.color);
-        comp.__preColor__ = comp.node.color;
+       !node.color.equals(comp.__preColor__)){
+        jsbSkeleton.setColor(node.color);
+        comp.__preColor__ = node.color;
     }
 
     if(comp.__preDebugBones__!==comp.debugBones){
-        comp._skeleton.setDebugBonesEnabled(comp.debugBones);
+        jsbSkeleton.setDebugBonesEnabled(comp.debugBones);
         comp.__preDebugBones__ = comp.debugBones;
     }
 
     if(comp.__preDebugSlots__ !== comp.debugSlots){
-        comp._skeleton.setDebugSlotsEnabled(comp.debugSlots);
+        jsbSkeleton.setDebugSlotsEnabled(comp.debugSlots);
         comp.__preDebugSlots__ = comp.debugSlots;
     }
     
     if(comp.__prePremultipliedAlpha !== comp.premultipliedAlpha){
-        comp._skeleton.setOpacityModifyRGB(comp.premultipliedAlpha);
+        jsbSkeleton.setOpacityModifyRGB(comp.premultipliedAlpha);
         comp.__prePremultipliedAlpha = comp.premultipliedAlpha;
     }
 
-    let jsbSkeleton = comp._skeleton;
     let renderData = jsbSkeleton.getRenderData();
     let renderDataFloat = new Float32Array(renderData.buffer);
     let indiceData = jsbSkeleton.getIndiceData();
@@ -138,7 +141,7 @@ Skeleton._assembler.fillBuffers = function (comp, renderer) {
 
         if (material !== renderer.material) {
             renderer._flush();
-            renderer.node = comp.node;
+            renderer.node = node;
             renderer.material = material;
         }
 
@@ -219,7 +222,7 @@ Skeleton._assembler.fillBuffers = function (comp, renderer) {
         }
     }
 
-    comp.node._renderFlag |= RenderFlow.FLAG_UPDATE_RENDER_DATA;
+    node._renderFlag |= RenderFlow.FLAG_UPDATE_RENDER_DATA;
 }
 
 }

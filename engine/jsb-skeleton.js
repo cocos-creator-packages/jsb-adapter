@@ -214,7 +214,7 @@ jsbSkeleton.setDisposeListener = function (listener) {
 jsbSkeleton.setCompleteListener = function (listener) {
     this._completeListener = listener;
     if (this._skeleton) {
-        this._skeleton.setCompleteListener(listener);
+        this._skeleton.setCompleteListenerNative(listener);
     }
 }
 
@@ -251,7 +251,7 @@ jsbSkeleton.setTrackDisposeListener = function (entry, listener) {
 
 jsbSkeleton.setTrackCompleteListener = function (entry, listener) {
     if (this._skeleton) {
-        this._skeleton.setTrackCompleteListener(entry, listener);
+        this._skeleton.setTrackCompleteListenerNative(entry, listener);
     }
 }
 
@@ -275,6 +275,7 @@ jsbSkeleton._updateSkeletonData = function () {
     if (this.skeletonData) {
         this.setSkeletonData(this.skeletonData);
         this.defaultSkin && this._skeleton.setSkin(this.defaultSkin);
+        this.animation = this.defaultAnimation;
     }
 }
 
