@@ -3270,29 +3270,30 @@ ctx2DProto.createImageData = function (args1, args2) {
 ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight) {
     var height = imageData.height;
     var width = imageData.width;
-    var imgBuffer = imageData.data;
     var canvasWidth = this._canvas._width;
     var canvasHeight = this._canvas._height;
-    var canvasBuffer = this._canvas._data.data;
     dirtyX = dirtyX || 0;
     dirtyY = dirtyY || 0;
     dirtyWidth = dirtyWidth !== undefined ? dirtyWidth : width;
     dirtyHeight = dirtyHeight !== undefined ? dirtyHeight : height;
     var limitBottom = dirtyY + dirtyHeight;
     var limitRight = dirtyX + dirtyWidth;
-    // next image rect may bigger than canvas rect 
-    limitBottom = limitBottom < canvasHeight ? limitBottom : canvasHeight;
-    limitRight = limitRight < canvasWidth ? limitRight : canvasWidth;
+    // shrink dirty rect if next image rect bigger than canvas rect 
+    dirtyHeight = limitBottom < canvasHeight ? dirtyHeight : dirtyHeight - (limitBottom - canvasHeight);
+    dirtyWidth = limitRight < canvasWidth ? dirtyWidth : dirtyWidth - (limitRight - canvasWidth);
+    // collect data needed to put
+    var imageToFill = new ImageData(dirtyWidth, dirtyHeight);
     for (var y = dirtyY; y < limitBottom; y++) {
         for (var x = dirtyX; x < limitRight; x++) {
             var imgPos = y * width + x;
-            var canvasPos = (y - dirtyY + dy) * canvasWidth + (x - dirtyX + dx);
-            canvasBuffer[canvasPos * 4 + 0] = imgBuffer[imgPos * 4 + 0];
-            canvasBuffer[canvasPos * 4 + 1] = imgBuffer[imgPos * 4 + 1];
-            canvasBuffer[canvasPos * 4 + 2] = imgBuffer[imgPos * 4 + 2];
-            canvasBuffer[canvasPos * 4 + 3] = imgBuffer[imgPos * 4 + 3];
+            var toPos = (y - dirtyY) * dirtyX + (x - dirtyX);
+            imageToFill.data[toPos * 4 + 0] = imageData.data[imgPos * 4 + 0];
+            imageToFill.data[toPos * 4 + 1] = imageData.data[imgPos * 4 + 1];
+            imageToFill.data[toPos * 4 + 2] = imageData.data[imgPos * 4 + 2];
+            imageToFill.data[toPos * 4 + 3] = imageData.data[imgPos * 4 + 3];
         }
     }
+    this._fillImageData(imageToFill.data, dirtyWidth, dirtyHeight, dx, dy);
 };
 
 // ImageData ctx.getImageData(sx, sy, sw, sh);
