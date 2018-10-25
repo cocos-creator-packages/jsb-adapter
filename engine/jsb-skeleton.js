@@ -24,7 +24,7 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-if(window.jsbspine !== undefined){
+if (window.jsbspine !== undefined) {
 
 var jsbSkeleton = sp.Skeleton.prototype;
 jsbSkeleton.setSkeletonData = function (skeletonData) {
@@ -80,13 +80,13 @@ jsbSkeleton.setSkeletonData = function (skeletonData) {
 }
 
 jsbSkeleton.setAnimationStateData = function (stateData) {
-    if(this._skeleton){
+    if (this._skeleton) {
         return this._skeleton.setAnimationStateData(stateData);
     }
 }
 
 jsbSkeleton.update = function (dt) {
-    if(this.paused)return;
+    if (this.paused) return;
     var skeleton = this._skeleton;
     if (skeleton) {
         skeleton.update(dt*this.timeScale);

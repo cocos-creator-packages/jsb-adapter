@@ -22,7 +22,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-if(window.jsbspine !== undefined){
+if (window.jsbspine !== undefined) {
 
 const StencilManager = cc.StencilManager.sharedManager;
 const Skeleton = sp.Skeleton;
@@ -89,26 +89,26 @@ Skeleton._assembler.updateRenderData = function (comp, batchData) {
 Skeleton._assembler.fillBuffers = function (comp, renderer) {
 
     let jsbSkeleton = comp._skeleton;
-    if(!jsbSkeleton)return;
+    if (!jsbSkeleton) return;
     let node = comp.node;
 
-    if(comp.__preColor__ === undefined || 
-       !node.color.equals(comp.__preColor__)){
+    if (comp.__preColor__ === undefined || 
+       !node.color.equals(comp.__preColor__)) {
         jsbSkeleton.setColor(node.color);
         comp.__preColor__ = node.color;
     }
 
-    if(comp.__preDebugBones__!==comp.debugBones){
+    if (comp.__preDebugBones__ !== comp.debugBones) {
         jsbSkeleton.setDebugBonesEnabled(comp.debugBones);
         comp.__preDebugBones__ = comp.debugBones;
     }
 
-    if(comp.__preDebugSlots__ !== comp.debugSlots){
+    if (comp.__preDebugSlots__ !== comp.debugSlots) {
         jsbSkeleton.setDebugSlotsEnabled(comp.debugSlots);
         comp.__preDebugSlots__ = comp.debugSlots;
     }
     
-    if(comp.__prePremultipliedAlpha !== comp.premultipliedAlpha){
+    if (comp.__prePremultipliedAlpha !== comp.premultipliedAlpha) {
         jsbSkeleton.setOpacityModifyRGB(comp.premultipliedAlpha);
         comp.__prePremultipliedAlpha = comp.premultipliedAlpha;
     }
@@ -194,14 +194,14 @@ Skeleton._assembler.fillBuffers = function (comp, renderer) {
             }
         }
 
-        if(comp.debugBones){
+        if (comp.debugBones) {
 
             graphics.lineWidth = 5;
             graphics.strokeColor = _boneColor;
             graphics.fillColor = _slotColor; // Root bone color is same as slot color.
 
             let debugBonesLen = debugData[debugIdx++];
-            for (let i = 0; i < debugBonesLen; i+=4) {
+            for (let i = 0; i < debugBonesLen; i += 4) {
                 let bx = debugData[debugIdx++];
                 let by = debugData[debugIdx++];
                 let x = debugData[debugIdx++];
