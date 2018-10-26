@@ -135,6 +135,8 @@ ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidt
     dirtyHeight = limitBottom < canvasHeight ? dirtyHeight : (dirtyHeight - (limitBottom - canvasHeight))
     dirtyWidth = limitRight < canvasWidth ? dirtyWidth : (dirtyWidth - (limitRight - canvasWidth))
     // collect data needed to put
+    dirtyWidth = Math.floor(dirtyWidth);
+    dirtyHeight = Math.floor(dirtyHeight);
     var imageToFill = new ImageData(dirtyWidth, dirtyHeight);
     for (var y = dirtyY; y < limitBottom; y++) {
         for (var x = dirtyX; x < limitRight; x++) {
