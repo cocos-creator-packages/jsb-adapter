@@ -3261,7 +3261,7 @@ ctx2DProto.createImageData = function (args1, args2) {
     if (typeof args1 === 'number' && typeof args2 == 'number') {
         return new ImageData(args1, args2);
     } else if (args1 instanceof ImageData) {
-        return new imageData(args1.data, args1.width, args1.height);
+        return new ImageData(args1.data, args1.width, args1.height);
     }
 };
 
@@ -3295,7 +3295,7 @@ ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidt
             imageToFill.data[toPos * 4 + 3] = imageData.data[imgPos * 4 + 3];
         }
     }
-    // do image data write operation at Native
+    // do image data write operation at Native (only impl on Android)
     this._fillImageData(imageToFill.data, dirtyWidth, dirtyHeight, dx, dy);
 };
 

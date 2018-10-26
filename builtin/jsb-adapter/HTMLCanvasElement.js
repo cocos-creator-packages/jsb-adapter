@@ -114,7 +114,7 @@ ctx2DProto.createImageData = function (args1, args2) {
     if (typeof args1 === 'number' && typeof args2 == 'number') {
         return new ImageData(args1, args2);
     } else if (args1 instanceof ImageData) {
-        return new imageData(args1.data, args1.width, args1.height);
+        return new ImageData(args1.data, args1.width, args1.height);
     }
 }
 
