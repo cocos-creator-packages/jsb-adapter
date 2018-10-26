@@ -3295,6 +3295,7 @@ ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidt
             imageToFill.data[toPos * 4 + 3] = imageData.data[imgPos * 4 + 3];
         }
     }
+    // do image data write operation at Native
     this._fillImageData(imageToFill.data, dirtyWidth, dirtyHeight, dx, dy);
 };
 
@@ -3303,7 +3304,7 @@ ctx2DProto.getImageData = function (sx, sy, sw, sh) {
     var canvasWidth = this._canvas._width;
     var canvasHeight = this._canvas._height;
     var canvasBuffer = this._canvas._data.data;
-    // iamge rect may bigger that canvas rect
+    // image rect may bigger that canvas rect
     var maxValidSH = sh + sy < canvasHeight ? sh : canvasHeight - sy;
     var maxValidSW = sw + sx < canvasWidth ? sw : canvasWidth - sx;
     var imgBuffer = new Uint8ClampedArray(sw * sh * 4);
