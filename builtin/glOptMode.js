@@ -618,7 +618,7 @@ function drawArraysOpt(mode, first, count) {
     // next_index += 4;
     // ++commandCount;
     flushCommands();
-    __gl.drawArrays(mode, first, count);
+    _gl.drawArrays(mode, first, count);
 }
 
 function drawElementsOpt(mode, count, type, offset) {
@@ -634,7 +634,7 @@ function drawElementsOpt(mode, count, type, offset) {
     // next_index += 5;
     // ++commandCount;
     flushCommands();
-    __gl.drawElements(mode, count, type, offset ? offset : 0);
+    _gl.drawElements(mode, count, type, offset ? offset : 0);
 }
 
 function enableOpt(cap) {
