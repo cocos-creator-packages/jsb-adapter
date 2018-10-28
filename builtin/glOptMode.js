@@ -608,29 +608,33 @@ function disableVertexAttribArrayOpt(index) {
 
 function drawArraysOpt(mode, first, count) {
     // console.log('GLOpt: drawArrays');
-    if (next_index + 4 >= total_size) {
-        flushCommands();
-    }
-    buffer_data[next_index] = GL_COMMAND_DRAW_ARRAYS;
-    buffer_data[next_index + 1] = mode;
-    buffer_data[next_index + 2] = first;
-    buffer_data[next_index + 3] = count;
-    next_index += 4;
-    ++commandCount;
+    // if (next_index + 4 >= total_size) {
+    //     flushCommands();
+    // }
+    // buffer_data[next_index] = GL_COMMAND_DRAW_ARRAYS;
+    // buffer_data[next_index + 1] = mode;
+    // buffer_data[next_index + 2] = first;
+    // buffer_data[next_index + 3] = count;
+    // next_index += 4;
+    // ++commandCount;
+    flushCommands();
+    return __gl.drawArrays(mode, first, count);
 }
 
 function drawElementsOpt(mode, count, type, offset) {
     // console.log('GLOpt: drawElements');
-    if (next_index + 5 >= total_size) {
-        flushCommands();
-    }
-    buffer_data[next_index] = GL_COMMAND_DRAW_ELEMENTS;
-    buffer_data[next_index + 1] = mode;
-    buffer_data[next_index + 2] = count;
-    buffer_data[next_index + 3] = type;
-    buffer_data[next_index + 4] = offset ? offset : 0;
-    next_index += 5;
-    ++commandCount;
+    // if (next_index + 5 >= total_size) {
+    //     flushCommands();
+    // }
+    // buffer_data[next_index] = GL_COMMAND_DRAW_ELEMENTS;
+    // buffer_data[next_index + 1] = mode;
+    // buffer_data[next_index + 2] = count;
+    // buffer_data[next_index + 3] = type;
+    // buffer_data[next_index + 4] = offset ? offset : 0;
+    // next_index += 5;
+    // ++commandCount;
+    flushCommands();
+    return __gl.drawElements(mode, count, type, offset);
 }
 
 function enableOpt(cap) {
