@@ -634,7 +634,7 @@ function drawElementsOpt(mode, count, type, offset) {
     // next_index += 5;
     // ++commandCount;
     flushCommands();
-    return __gl.drawElements(mode, count, type, offset);
+    return __gl.drawElements(mode, count, type, offset ? offset : 0);
 }
 
 function enableOpt(cap) {
