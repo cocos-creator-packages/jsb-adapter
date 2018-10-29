@@ -105,10 +105,11 @@ for (var k in gl) {
     _gl[k] = gl[k];
 }
 
-var total_size = 100000;
+var total_size = 5000;
 var next_index = 0;
 var buffer_data;
 var commandCount = 0;
+var max_command_count = 200;
 
 // Batch GL commands is enabled by default.
 function batchGLCommandsToNative() {
@@ -608,7 +609,9 @@ function disableVertexAttribArrayOpt(index) {
 
 function drawArraysOpt(mode, first, count) {
     // console.log('GLOpt: drawArrays');
-    if (next_index + 4 >= total_size) {
+    if (next_index + 4 >= total_size ||
+        commandCount >= max_command_count)
+    {
         flushCommands();
     }
     buffer_data[next_index] = GL_COMMAND_DRAW_ARRAYS;
@@ -621,7 +624,9 @@ function drawArraysOpt(mode, first, count) {
 
 function drawElementsOpt(mode, count, type, offset) {
     // console.log('GLOpt: drawElements');
-    if (next_index + 5 >= total_size) {
+    if (next_index + 5 >= total_size ||
+        commandCount >= max_command_count)
+    {
         flushCommands();
     }
     buffer_data[next_index] = GL_COMMAND_DRAW_ELEMENTS;
