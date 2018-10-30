@@ -153,10 +153,10 @@ function flushCommands() {
 
 function activeTextureOpt(texture) {
     currentActiveTexture = texture - gl.TEXTURE0;
-    if (activedTextures[texture] === true)
+    if (activedTextures[currentActiveTexture] === true)
         return;
 
-    activedTextures[texture] = true;
+    activedTextures[currentActiveTexture] = true;
 
     // console.log('GLOpt: activeTexture');
     if (next_index + 2 > total_size) {
