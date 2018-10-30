@@ -110,6 +110,12 @@ var next_index = 0;
 var buffer_data;
 var commandCount = 0;
 
+//  Is 32 enough?
+var activedTextures = new Array(32);
+var currentActiveTexture = 0;
+var boundTextures = new Array(32);
+var currentUsedProgram = 0;
+
 // Batch GL commands is enabled by default.
 function batchGLCommandsToNative() {
     if (gl._flushCommands) {
@@ -146,6 +152,12 @@ function flushCommands() {
 }
 
 function activeTextureOpt(texture) {
+    currentActiveTexture = texture - gl.TEXTURE0;
+    if (activedTextures[texture] === true)
+        return;
+
+    activedTextures[texture] = true;
+
     // console.log('GLOpt: activeTexture');
     if (next_index + 2 > total_size) {
         flushCommands();
@@ -211,6 +223,16 @@ function bindRenderbufferOpt(target, renderbuffer) {
 }
 
 function bindTextureOpt(target, texture) {
+     var boundTexture = boundTextures[currentActiveTexture];
+     if (boundTexture &&
+         boundTexture.target === target &&
+         boundTexture.texture === texture)
+     {
+        return;
+     }
+
+     boundTextures[currentActiveTexture] = {'target': target, 'texture':texture};
+
     // console.log('GLOpt: bindTexture');
     if (next_index + 3 > total_size) {
         flushCommands();
@@ -1386,6 +1408,11 @@ function uniformMatrix4fvOpt(location, transpose, value) {
 }
 
 function useProgramOpt(program) {
+    if (currentUsedProgram === program)
+        return;
+
+    currentUsedProgram = program;
+
     // console.log('GLOpt: useProgram');
     if (next_index + 2 >= total_size) {
         flushCommands();
