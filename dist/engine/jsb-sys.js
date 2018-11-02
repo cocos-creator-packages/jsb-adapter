@@ -47,6 +47,11 @@ sys.getSafeAreaRect = function () {
     height: screenSize.height
   };
   cc.view.convertToLocationInView(leftBottom.x, leftBottom.y, relatedPos, leftBottom);
-  cc.view.convertToLocationInView(rightTop.x, rightTop.y, relatedPos, rightTop);
+  cc.view.convertToLocationInView(rightTop.x, rightTop.y, relatedPos, rightTop); // convert view point to design resolution size
+
+  cc.view._convertPointWithScale(leftBottom);
+
+  cc.view._convertPointWithScale(rightTop);
+
   return cc.rect(leftBottom.x, leftBottom.y, rightTop.x - leftBottom.x, rightTop.y - leftBottom.y);
 };
