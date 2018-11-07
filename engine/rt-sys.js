@@ -27,7 +27,7 @@
 
 const sys = cc.sys;
 
-if (typeof loadRuntime == 'function') {
+if (typeof loadRuntime === 'function') {
     var rt = loadRuntime();
     sys.getNetworkType = rt.getNetworkType;
     sys.getBatteryLevel = rt.getBatteryLevel;
@@ -37,7 +37,7 @@ if (typeof __restartVM !== 'undefined') {
     sys.restartVM = __restartVM;
 } else {
     sys.restartVM = function () {
-        console.error("The sys.restartVM is not define!");
+        console.error("The restartVM is not define!");
     }
 }
 if (typeof __isObjectValid !== 'undefined') {

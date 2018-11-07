@@ -81,9 +81,7 @@ if (typeof jsb.saveImageData === 'undefined') {
 
 if (typeof jsb.setPreferredFramesPerSecond === 'undefined'
     && typeof rt.setPreferredFramesPerSecond !== 'undefined') {
-    jsb.setPreferredFramesPerSecond = function (fps) {
-        rt.setPreferredFramesPerSecond(fps);
-    }
+    jsb.setPreferredFramesPerSecond = rt.setPreferredFramesPerSecond;
 } else {
     jsb.setPreferredFramesPerSecond = function () {
         console.error("The jsb.setPreferredFramesPerSecond is not define!");

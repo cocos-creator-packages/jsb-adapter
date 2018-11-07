@@ -1,9 +1,5 @@
 cc.game.restart = function () {
-    if (typeof __restartVM != 'undefined') {
-        __restartVM();
-    } else {
-        console.error("The restartVM is not define!");
-    }
+    cc.sys.restartVM();
 };
 
 loadRuntime().onHide(function () {
