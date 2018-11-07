@@ -55,28 +55,35 @@ jsb.fileUtils = {
     },
 };
 
-jsb.saveImageData = function (data, width, height, filePath) {
-    var index = filePath.lastIndexOf(".");
-    if (index === -1) {
+if (typeof jsb.saveImageData === 'undefined') {
+    jsb.saveImageData = function (data, width, height, filePath) {
+        var index = filePath.lastIndexOf(".");
+        if (index === -1) {
+            return false;
+        }
+        var fileType = filePath.substr(index + 1);
+        var tempFilePath = rt.saveImageTempSync({
+            'data': data,
+            'width': width,
+            'height': height,
+            'fileType': fileType,
+        });
+        if (tempFilePath === '') {
+            return false;
+        }
+        var savedFilePath = rt.getFileSystemManager().saveFileSync(tempFilePath, filePath);
+        if (savedFilePath === filePath) {
+            return true;
+        }
         return false;
     }
-    var fileType = filePath.substr(index + 1);
-    var tempFilePath = rt.saveImageTempSync({
-        'data': data,
-        'width': width,
-        'height': height,
-        'fileType': fileType,
-    });
-    if (tempFilePath === '') {
-        return false;
-    }
-    var savedFilePath = rt.getFileSystemManager().saveFileSync(tempFilePath, filePath);
-    if (savedFilePath === filePath) {
-        return true;
-    }
-    return false;
 }
 
-jsb.setPreferredFramesPerSecond = function (fps) {
-    rt.setPreferredFramesPerSecond(fps);
+if (typeof jsb.setPreferredFramesPerSecond === 'undefined'
+    && typeof rt.setPreferredFramesPerSecond !== 'undefined') {
+    jsb.setPreferredFramesPerSecond = rt.setPreferredFramesPerSecond;
+} else {
+    jsb.setPreferredFramesPerSecond = function () {
+        console.error("The jsb.setPreferredFramesPerSecond is not define!");
+    }
 }

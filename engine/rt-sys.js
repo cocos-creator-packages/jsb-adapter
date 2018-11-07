@@ -27,8 +27,23 @@
 
 const sys = cc.sys;
 
-sys.getNetworkType = loadRuntime().getNetworkType;
-sys.getBatteryLevel = loadRuntime().getBatteryLevel;
-sys.garbageCollect = loadRuntime().triggerGC;
-sys.restartVM = __restartVM;
-sys.isObjectValid = __isObjectValid;
+if (typeof loadRuntime === 'function') {
+    var rt = loadRuntime();
+    sys.getNetworkType = rt.getNetworkType;
+    sys.getBatteryLevel = rt.getBatteryLevel;
+    sys.garbageCollect = rt.triggerGC;
+}
+if (typeof __restartVM !== 'undefined') {
+    sys.restartVM = __restartVM;
+} else {
+    sys.restartVM = function () {
+        console.error("The restartVM is not define!");
+    }
+}
+if (typeof __isObjectValid !== 'undefined') {
+    sys.isObjectValid = __isObjectValid;
+} else {
+    sys.isObjectValid = function () {
+        console.error("The sys.isObjectValid is not define!");
+    }
+}
