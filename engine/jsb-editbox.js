@@ -68,13 +68,15 @@
 		return 'done';
 	}
 
-	function updateLabelsInvisible (editBox) {
-		let placeholderLabel = editBox._placeholderLabel;
-		let textLabel = editBox._textLabel;
+	function updateLabelsVisibility (editBox) {
 		let displayText = editBox._impl._text;
 		
-		placeholderLabel.node.active = displayText === '';
-		textLabel.node.active = displayText !== '';
+		if (editBox.textLabel) {
+			editBox.textLabel.node.active = displayText !== '';
+		}
+		if (editBox.placeholderLabel) {
+			editBox.placeholderLabel.node.active = displayText === '';
+		}
 	}
 
 	cc.EditBox.prototype.editBoxEditingDidBegan = function () {
@@ -118,7 +120,7 @@
 			let editBox = this._delegate;
 			cc.Component.EventHandler.emitEvents(editBox.editingDidBegan, editBox);
 			editBox.node.emit('editing-did-began', editBox);
-			updateLabelsInvisible(editBox);
+			updateLabelsVisibility(editBox);
 		}
 
 		function onConfirm(res) {
@@ -216,7 +218,7 @@
 	_p.setString = function (text) {
 		this._text = text;
 		this._updateInput();
-		updateLabelsInvisible(this._delegate);
+		updateLabelsVisibility(this._delegate);
 	};
 
 	_p._updateInput = function () {
@@ -224,17 +226,26 @@
 		if (this._inputFlag === InputFlag.PASSWORD) {
 			tmpText = tmpText.replace(/./g, '*');
 		}
-		this._delegate._textLabel.string = tmpText;
+		let textLabel = this._delegate.textLabel;
+		if (textLabel) {
+			textLabel.string = tmpText;
+		}
 	};
 
 	_p.setFontSize = function (fontSize) {
 		this._edFontSize = fontSize || this._edFontSize;
-		this._delegate._textLabel.fontSize = this._edFontSize;
+		let textLabel = this._delegate.textLabel;
+		if (textLabel) {
+			textLabel.fontSize = this._edFontSize;
+		}
 	};
 
 	_p.setFontColor = function (color) {
 		this._textColor = color;
-		this._delegate._textLabel.fontColor = this._textColor;
+		let textLabel = this._delegate.textLabel;
+		if (textLabel) {
+			textLabel.node.color = this._textColor;
+		}
 	};
 
 	_p.setInputMode = function (inputMode) {

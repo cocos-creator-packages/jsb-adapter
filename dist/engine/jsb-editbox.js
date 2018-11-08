@@ -78,12 +78,16 @@
     return 'done';
   }
 
-  function updateLabelsInvisible(editBox) {
-    var placeholderLabel = editBox._placeholderLabel;
-    var textLabel = editBox._textLabel;
+  function updateLabelsVisibility(editBox) {
     var displayText = editBox._impl._text;
-    placeholderLabel.node.active = displayText === '';
-    textLabel.node.active = displayText !== '';
+
+    if (editBox.textLabel) {
+      editBox.textLabel.node.active = displayText !== '';
+    }
+
+    if (editBox.placeholderLabel) {
+      editBox.placeholderLabel.node.active = displayText === '';
+    }
   }
 
   cc.EditBox.prototype.editBoxEditingDidBegan = function () {
@@ -125,7 +129,7 @@
       var editBox = this._delegate;
       cc.Component.EventHandler.emitEvents(editBox.editingDidBegan, editBox);
       editBox.node.emit('editing-did-began', editBox);
-      updateLabelsInvisible(editBox);
+      updateLabelsVisibility(editBox);
     }
 
     function onConfirm(res) {
@@ -221,7 +225,7 @@
 
     this._updateInput();
 
-    updateLabelsInvisible(this._delegate);
+    updateLabelsVisibility(this._delegate);
   };
 
   _p._updateInput = function () {
@@ -231,17 +235,29 @@
       tmpText = tmpText.replace(/./g, '*');
     }
 
-    this._delegate._textLabel.string = tmpText;
+    var textLabel = this._delegate.textLabel;
+
+    if (textLabel) {
+      textLabel.string = tmpText;
+    }
   };
 
   _p.setFontSize = function (fontSize) {
     this._edFontSize = fontSize || this._edFontSize;
-    this._delegate._textLabel.fontSize = this._edFontSize;
+    var textLabel = this._delegate.textLabel;
+
+    if (textLabel) {
+      textLabel.fontSize = this._edFontSize;
+    }
   };
 
   _p.setFontColor = function (color) {
     this._textColor = color;
-    this._delegate._textLabel.fontColor = this._textColor;
+    var textLabel = this._delegate.textLabel;
+
+    if (textLabel) {
+      textLabel.node.color = this._textColor;
+    }
   };
 
   _p.setInputMode = function (inputMode) {
