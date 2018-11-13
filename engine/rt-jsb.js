@@ -28,7 +28,7 @@
 var rt = loadRuntime();
 jsb.fileUtils = {
     getStringFromFile: function (url) {
-        var result = "";
+        var result;
         try {
             result = rt.getFileSystemManager().readFileSync(url, "utf8");
         } catch (error) { }
@@ -36,7 +36,7 @@ jsb.fileUtils = {
     },
 
     getDataFromFile: function (url) {
-        var result = "";
+        var result;
         try {
             result = rt.getFileSystemManager().readFileSync(url);
         } catch (error) { }
@@ -59,7 +59,7 @@ jsb.fileUtils = {
 
     getValueMapFromFile: function (url) {
         var map_object = {};
-        var read = "";
+        var read;
         try {
             read = rt.getFileSystemManager().readFileSync(url, "utf8");
         } catch (error) { }
