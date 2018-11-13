@@ -80,7 +80,10 @@ if (CC_RUNTIME) {
     downloadText = function (item) {
         var url = item.url;
     
-        var result = loadRuntime().getFileSystemManager().readFileSync(url, "utf8");
+        var result = "";
+        try {
+            result = loadRuntime().getFileSystemManager().readFileSync(url, "utf8")
+        } catch (error) { }
         if (typeof result === 'string' && result) {
             return result;
         }
@@ -92,7 +95,10 @@ if (CC_RUNTIME) {
     downloadBinary = function (item) {
         var url = item.url;
     
-        var result = loadRuntime().getFileSystemManager().readFileSync(url);
+        var result = "";
+        try {
+            result = loadRuntime().getFileSystemManager().readFileSync(url);
+        } catch (error) { }
         if (result) {
             return result;
         }
