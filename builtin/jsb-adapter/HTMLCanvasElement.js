@@ -121,7 +121,7 @@ ctx2DProto.createImageData = function (args1, args2) {
 // void ctx.putImageData(imagedata, dx, dy);
 // void ctx.putImageData(imagedata, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
 ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight) {
-    if (CC_RUNTIME) {
+    if (typeof loadRuntime === "function") {
         var height = imageData.height;
         var width = imageData.width;
         var canvasWidth = this._canvas._width;

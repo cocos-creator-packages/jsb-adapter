@@ -28,11 +28,19 @@
 var rt = loadRuntime();
 jsb.fileUtils = {
     getStringFromFile: function (url) {
-        return rt.getFileSystemManager().readFileSync(url, "utf8");
+        var result;
+        try {
+            result = rt.getFileSystemManager().readFileSync(url, "utf8");
+        } catch (error) { }
+        return result;
     },
 
     getDataFromFile: function (url) {
-        return rt.getFileSystemManager().readFileSync(url);
+        var result;
+        try {
+            result = rt.getFileSystemManager().readFileSync(url);
+        } catch (error) { }
+        return result;
     },
 
     getWritablePath: function () {
@@ -41,12 +49,20 @@ jsb.fileUtils = {
 
     writeToFile: function (map, url) {
         var str = JSON.stringify(map);
-        return rt.getFileSystemManager().writeFileSync(url, str, "utf8")
+        var result = false;
+        try {
+            rt.getFileSystemManager().writeFileSync(url, str, "utf8");
+            result = true;
+        } catch (error) { }
+        return result;
     },
 
     getValueMapFromFile: function (url) {
         var map_object = {};
-        var read = rt.getFileSystemManager().readFileSync(url, "utf8");
+        var read;
+        try {
+            read = rt.getFileSystemManager().readFileSync(url, "utf8");
+        } catch (error) { }
         if (!read) {
             return map_object;
         }
