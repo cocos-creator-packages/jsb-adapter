@@ -32,6 +32,17 @@ cc.Audio = function (src) {
   this.id = -1;
 };
 
+var handleVolume = function handleVolume(volume) {
+  if (!volume) {
+    // set default volume as 1
+    volume = 1;
+  } else if (typeof volume === 'string') {
+    volume = Number.parseFloat(volume);
+  }
+
+  return volume;
+};
+
 if (CC_RUNTIME) {
   var rt = loadRuntime();
   jsb.AudioEngine = rt.AudioEngine;
@@ -95,6 +106,7 @@ if (CC_RUNTIME) {
   };
 
   proto.setVolume = function (volume) {
+    volume = handleVolume(volume);
     this.volume = volume;
     return audioEngine.setVolume(this.id, volume);
   };
@@ -202,7 +214,7 @@ if (CC_RUNTIME) {
   };
 
   audioEngine.setMusicVolume = function (volume) {
-    _music.volume = volume;
+    _music.volume = handleVolume(volume);
     audioEngine.setVolume(_music.id, _music.volume);
     return volume;
   };
@@ -216,7 +228,7 @@ if (CC_RUNTIME) {
   };
 
   audioEngine.setEffectsVolume = function (volume) {
-    _effect.volume = volume;
+    _effect.volume = handleVolume(volume);
   };
 
   audioEngine.getEffectsVolume = function () {
