@@ -41,3 +41,7 @@ require('jsb-adapter/engine/jsb-editbox.js');
 require('jsb-adapter/engine/jsb-reflection.js');
 require('jsb-adapter/engine/jsb-cocosanalytics.js');
 require('jsb-adapter/engine/jsb-assets-manager.js');
+require('jsb-adapter/engine/jsb-editor-support.js');
+require('jsb-adapter/engine/jsb-dragonbones.js');
+require('jsb-adapter/engine/jsb-skeleton.js');
+require('jsb-adapter/engine/jsb-spine-assembler.js');
