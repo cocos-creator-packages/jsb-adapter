@@ -76,31 +76,31 @@ function _getFontFamily (fontHandle) {
 }
 
 let downloadBinary, downloadText, loadFont;
-if (CC_RUNTIME) {
-    downloadText = function (item) {
-        var url = item.url;
-    
-        var result = loadRuntime().getFileSystemManager().readFileSync(url, "utf8");
-        if (typeof result === 'string' && result) {
-            return result;
-        }
-        else {
-            return new Error('Download text failed: ' + url);
-        }
-    };
-    
-    downloadBinary = function (item) {
-        var url = item.url;
-    
-        var result = loadRuntime().getFileSystemManager().readFileSync(url);
-        if (result) {
-            return result;
-        }
-        else {
-            return new Error('Download binary file failed: ' + url);
-        }
-    };
+downloadText = function (item) {
+    var url = item.url;
 
+    var result = jsb.fileUtils.getStringFromFile(url);
+    if (typeof result === 'string' && result) {
+        return result;
+    }
+    else {
+        return new Error('Download text failed: ' + url);
+    }
+};
+
+downloadBinary = function (item) {
+    var url = item.url;
+
+    var result = jsb.fileUtils.getDataFromFile(url);
+    if (result) {
+        return result;
+    }
+    else {
+        return new Error('Download binary file failed: ' + url);
+    }
+};
+
+if (CC_RUNTIME) {
     loadFont = function (item) {
         let url = item.url;
         let fontFamilyName = _getFontFamily(url);
@@ -112,30 +112,6 @@ if (CC_RUNTIME) {
     };
 }
 else {
-    downloadText = function (item) {
-        var url = item.url;
-
-        var result = jsb.fileUtils.getStringFromFile(url);
-        if (typeof result === 'string' && result) {
-            return result;
-        }
-        else {
-            return new Error('Download text failed: ' + url);
-        }
-    };
-
-    downloadBinary = function (item) {
-        var url = item.url;
-
-        var result = jsb.fileUtils.getDataFromFile(url);
-        if (result) {
-            return result;
-        }
-        else {
-            return new Error('Download binary file failed: ' + url);
-        }
-    };
-
     loadFont = function (item, callback) {
         let url = item.url;
         let fontFamilyName = _getFontFamily(url);

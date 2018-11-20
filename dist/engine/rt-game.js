@@ -1,11 +1,12 @@
+"use strict";
+
 cc.game.restart = function () {
-    cc.sys.restartVM();
+  __restartVM();
 };
 
 loadRuntime().onHide(function () {
-    cc.game.emit(cc.game.EVENT_HIDE);
+  cc.game.emit(cc.game.EVENT_HIDE);
 });
-
 loadRuntime().onShow(function () {
-    cc.game.emit(cc.game.EVENT_SHOW);
+  cc.game.emit(cc.game.EVENT_SHOW);
 });

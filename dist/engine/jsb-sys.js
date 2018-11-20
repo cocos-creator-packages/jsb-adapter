@@ -25,25 +25,33 @@
  ****************************************************************************/
 'use strict';
 
-const sys = cc.sys;
+var sys = cc.sys;
+sys.getNetworkType = jsb.Device.getNetworkType;
+sys.getBatteryLevel = jsb.Device.getBatteryLevel;
+sys.garbageCollect = jsb.garbageCollect;
+sys.restartVM = __restartVM;
+sys.isObjectValid = __isObjectValid;
 
-if (typeof loadRuntime === 'function') {
-    var rt = loadRuntime();
-    sys.getNetworkType = rt.getNetworkType;
-    sys.getBatteryLevel = rt.getBatteryLevel;
-    sys.garbageCollect = rt.triggerGC;
-}
-if (typeof __restartVM !== 'undefined') {
-    sys.restartVM = __restartVM;
-} else {
-    sys.restartVM = function () {
-        console.error("The restartVM is not define!");
-    }
-}
-if (typeof __isObjectValid !== 'undefined') {
-    sys.isObjectValid = __isObjectValid;
-} else {
-    sys.isObjectValid = function () {
-        console.error("The sys.isObjectValid is not define!");
-    }
-}
+sys.getSafeAreaRect = function () {
+  // x(top), y(left), z(bottom), w(right)
+  var edge = jsb.Device.getSafeAreaEdge();
+  var screenSize = cc.view.getFrameSize(); // Get leftBottom and rightTop point in UI coordinates
+
+  var leftBottom = new cc.Vec2(edge.y, screenSize.height - edge.z);
+  var rightTop = new cc.Vec2(screenSize.width - edge.w, edge.x); // Returns the real location in view.
+
+  var relatedPos = {
+    left: 0,
+    top: 0,
+    width: screenSize.width,
+    height: screenSize.height
+  };
+  cc.view.convertToLocationInView(leftBottom.x, leftBottom.y, relatedPos, leftBottom);
+  cc.view.convertToLocationInView(rightTop.x, rightTop.y, relatedPos, rightTop); // convert view point to design resolution size
+
+  cc.view._convertPointWithScale(leftBottom);
+
+  cc.view._convertPointWithScale(rightTop);
+
+  return cc.rect(leftBottom.x, leftBottom.y, rightTop.x - leftBottom.x, rightTop.y - leftBottom.y);
+};

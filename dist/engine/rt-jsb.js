@@ -25,25 +25,62 @@
  ****************************************************************************/
 'use strict';
 
-const sys = cc.sys;
+var rt = loadRuntime();
+jsb.fileUtils = {
+  getStringFromFile: function getStringFromFile(url) {
+    return rt.getFileSystemManager().readFileSync(url, "utf8");
+  },
+  getDataFromFile: function getDataFromFile(url) {
+    return rt.getFileSystemManager().readFileSync(url);
+  },
+  getWritablePath: function getWritablePath() {
+    return "".concat(rt.env.USER_DATA_PATH, "/");
+  },
+  writeToFile: function writeToFile(map, url) {
+    var str = JSON.stringify(map);
+    return rt.getFileSystemManager().writeFileSync(url, str, "utf8");
+  },
+  getValueMapFromFile: function getValueMapFromFile(url) {
+    var map_object = {};
+    var read = rt.getFileSystemManager().readFileSync(url, "utf8");
 
-if (typeof loadRuntime === 'function') {
-    var rt = loadRuntime();
-    sys.getNetworkType = rt.getNetworkType;
-    sys.getBatteryLevel = rt.getBatteryLevel;
-    sys.garbageCollect = rt.triggerGC;
-}
-if (typeof __restartVM !== 'undefined') {
-    sys.restartVM = __restartVM;
-} else {
-    sys.restartVM = function () {
-        console.error("The restartVM is not define!");
+    if (!read) {
+      return map_object;
     }
-}
-if (typeof __isObjectValid !== 'undefined') {
-    sys.isObjectValid = __isObjectValid;
-} else {
-    sys.isObjectValid = function () {
-        console.error("The sys.isObjectValid is not define!");
-    }
-}
+
+    map_object = JSON.parse(read);
+    return map_object;
+  }
+};
+
+jsb.saveImageData = function (data, width, height, filePath) {
+  var index = filePath.lastIndexOf(".");
+
+  if (index === -1) {
+    return false;
+  }
+
+  var fileType = filePath.substr(index + 1);
+  var tempFilePath = rt.saveImageTempSync({
+    'data': data,
+    'width': width,
+    'height': height,
+    'fileType': fileType
+  });
+
+  if (tempFilePath === '') {
+    return false;
+  }
+
+  var savedFilePath = rt.getFileSystemManager().saveFileSync(tempFilePath, filePath);
+
+  if (savedFilePath === filePath) {
+    return true;
+  }
+
+  return false;
+};
+
+jsb.setPreferredFramesPerSecond = function (fps) {
+  rt.setPreferredFramesPerSecond(fps);
+};

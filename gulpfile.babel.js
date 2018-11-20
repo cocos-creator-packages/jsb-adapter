@@ -1,12 +1,11 @@
 /****************************************************************************
- Copyright (c) 2013-2016 Chukong Technologies Inc.
- Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos.com
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and  non-exclusive license
+  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
  to use Cocos Creator solely to develop games on your target platforms. You shall
   not use Cocos Creator software for developing other software or tools that's
   used for developing games. You are not granted to publish, distribute,
@@ -23,27 +22,31 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-'use strict';
+const gulp = require('gulp');
+const sourcemaps = require("gulp-sourcemaps");
+const babelify = require("babelify");
+const browserify = require('browserify');
+const source = require("vinyl-source-stream");
+const uglify = require('gulp-uglify');
+const buffer = require('vinyl-buffer');
+const babel = require('gulp-babel');
 
-const sys = cc.sys;
+gulp.task("default", ['build-jsb-builtin', 'build-engine-es5']);
 
-if (typeof loadRuntime === 'function') {
-    var rt = loadRuntime();
-    sys.getNetworkType = rt.getNetworkType;
-    sys.getBatteryLevel = rt.getBatteryLevel;
-    sys.garbageCollect = rt.triggerGC;
-}
-if (typeof __restartVM !== 'undefined') {
-    sys.restartVM = __restartVM;
-} else {
-    sys.restartVM = function () {
-        console.error("The restartVM is not define!");
-    }
-}
-if (typeof __isObjectValid !== 'undefined') {
-    sys.isObjectValid = __isObjectValid;
-} else {
-    sys.isObjectValid = function () {
-        console.error("The sys.isObjectValid is not define!");
-    }
-}
+gulp.task('build-jsb-builtin', () => {
+  return browserify('./builtin/index.js')
+         .transform(babelify, {presets: ['env']} )
+         .bundle()
+         .pipe(source('jsb-builtin.js'))
+         .pipe(buffer())
+         // .pipe(sourcemaps.init({ loadMaps: true }))
+         // .pipe(uglify()) // Use any gulp plugins you want now
+         // .pipe(sourcemaps.write('./'))
+         .pipe(gulp.dest('./dist'));
+});
+
+gulp.task('build-engine-es5', () => {
+  return gulp.src('./engine/**/*.js')
+         .pipe(babel( {presets: ['@babel/preset-env']} ))
+         .pipe(gulp.dest('./dist/engine'));
+});

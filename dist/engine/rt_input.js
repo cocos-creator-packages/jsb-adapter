@@ -1,12 +1,13 @@
+"use strict";
+
 /****************************************************************************
- Copyright (c) 2013-2016 Chukong Technologies Inc.
- Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos.com
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and  non-exclusive license
+  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
  to use Cocos Creator solely to develop games on your target platforms. You shall
   not use Cocos Creator software for developing other software or tools that's
   used for developing games. You are not granted to publish, distribute,
@@ -23,27 +24,42 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-'use strict';
+var rt = loadRuntime();
+jsb.inputBox = {
+  onConfirm: function onConfirm(cb) {
+    rt.onKeyboardConfirm(cb);
+  },
+  offConfirm: function offConfirm(cb) {
+    rt.offKeyboardConfirm(cb);
+  },
+  onComplete: function onComplete(cb) {
+    rt.onKeyboardComplete(cb);
+  },
+  offComplete: function offComplete(cb) {
+    rt.offKeyboardComplete(cb);
+  },
+  onInput: function onInput(cb) {
+    rt.onKeyboardInput(cb);
+  },
+  offInput: function offInput(cb) {
+    rt.offKeyboardInput(cb);
+  },
 
-const sys = cc.sys;
-
-if (typeof loadRuntime === 'function') {
-    var rt = loadRuntime();
-    sys.getNetworkType = rt.getNetworkType;
-    sys.getBatteryLevel = rt.getBatteryLevel;
-    sys.garbageCollect = rt.triggerGC;
-}
-if (typeof __restartVM !== 'undefined') {
-    sys.restartVM = __restartVM;
-} else {
-    sys.restartVM = function () {
-        console.error("The restartVM is not define!");
-    }
-}
-if (typeof __isObjectValid !== 'undefined') {
-    sys.isObjectValid = __isObjectValid;
-} else {
-    sys.isObjectValid = function () {
-        console.error("The sys.isObjectValid is not define!");
-    }
-}
+  /**
+   * @param {string}		options.defaultValue
+   * @param {number}		options.maxLength
+   * @param {bool}        options.multiple
+   * @param {bool}        options.confirmHold
+   * @param {string}      options.confirmType
+   * @param {string}      options.inputType
+   * 
+   * Values of options.confirmType can be [done|next|search|go|send].
+   * Values of options.inputType can be [text|email|number|phone|password].
+   */
+  show: function show(options) {
+    rt.showKeyboard(options);
+  },
+  hide: function hide() {
+    rt.hideKeyboard();
+  }
+};

@@ -1,12 +1,13 @@
+"use strict";
+
 /****************************************************************************
- Copyright (c) 2013-2016 Chukong Technologies Inc.
- Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos.com
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated engine source code (the "Software"), a limited,
-  worldwide, royalty-free, non-assignable, revocable and  non-exclusive license
+  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
  to use Cocos Creator solely to develop games on your target platforms. You shall
   not use Cocos Creator software for developing other software or tools that's
   used for developing games. You are not granted to publish, distribute,
@@ -23,27 +24,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-'use strict';
-
-const sys = cc.sys;
-
-if (typeof loadRuntime === 'function') {
-    var rt = loadRuntime();
-    sys.getNetworkType = rt.getNetworkType;
-    sys.getBatteryLevel = rt.getBatteryLevel;
-    sys.garbageCollect = rt.triggerGC;
-}
-if (typeof __restartVM !== 'undefined') {
-    sys.restartVM = __restartVM;
-} else {
-    sys.restartVM = function () {
-        console.error("The restartVM is not define!");
-    }
-}
-if (typeof __isObjectValid !== 'undefined') {
-    sys.isObjectValid = __isObjectValid;
-} else {
-    sys.isObjectValid = function () {
-        console.error("The sys.isObjectValid is not define!");
-    }
+// JS to Native bridges
+if (window.JavascriptJavaBridge && cc.sys.os == cc.sys.OS_ANDROID) {
+  jsb.reflection = new JavascriptJavaBridge();
+  cc.sys.capabilities["keyboard"] = true;
+} else if (window.JavaScriptObjCBridge && (cc.sys.os == cc.sys.OS_IOS || cc.sys.os == cc.sys.OS_OSX)) {
+  jsb.reflection = new JavaScriptObjCBridge();
 }
