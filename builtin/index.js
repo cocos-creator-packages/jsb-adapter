@@ -210,3 +210,5 @@ if (window.SocketIO) {
 
 window.gameTick = tick;
 
+// promise polyfill relies on setTimeout implementation
+require('./promise.min');
