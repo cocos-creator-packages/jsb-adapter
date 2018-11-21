@@ -31,7 +31,9 @@ jsb.fileUtils = {
         var result;
         try {
             result = rt.getFileSystemManager().readFileSync(url, "utf8");
-        } catch (error) { }
+        } catch (error) {
+            cc.error(error);
+        }
         return result;
     },
 
@@ -39,7 +41,9 @@ jsb.fileUtils = {
         var result;
         try {
             result = rt.getFileSystemManager().readFileSync(url);
-        } catch (error) { }
+        } catch (error) {
+            cc.error(error);
+        }
         return result;
     },
 
@@ -53,7 +57,9 @@ jsb.fileUtils = {
         try {
             rt.getFileSystemManager().writeFileSync(url, str, "utf8");
             result = true;
-        } catch (error) { }
+        } catch (error) {
+            cc.error(error);
+        }
         return result;
     },
 
@@ -62,7 +68,9 @@ jsb.fileUtils = {
         var read;
         try {
             read = rt.getFileSystemManager().readFileSync(url, "utf8");
-        } catch (error) { }
+        } catch (error) {
+            cc.error(error);
+        }
         if (!read) {
             return map_object;
         }
