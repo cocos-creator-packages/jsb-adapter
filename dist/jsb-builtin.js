@@ -2152,7 +2152,10 @@ if (window.SocketIO) {
 
 window.gameTick = tick;
 
-},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":27,"./jsb_audioengine":32,"./jsb_input":33,"./jsb_opengl":34,"./jsb_prepare":36,"./xmldom/dom-parser":37}],5:[function(require,module,exports){
+// promise polyfill relies on setTimeout implementation
+require('./promise.min');
+
+},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":27,"./jsb_audioengine":32,"./jsb_input":33,"./jsb_opengl":34,"./jsb_prepare":36,"./promise.min":37,"./xmldom/dom-parser":38}],5:[function(require,module,exports){
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3268,7 +3271,7 @@ ctx2DProto.createImageData = function (args1, args2) {
 // void ctx.putImageData(imagedata, dx, dy);
 // void ctx.putImageData(imagedata, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
 ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight) {
-    if (CC_RUNTIME) {
+    if (typeof loadRuntime === "function") {
         var height = imageData.height;
         var width = imageData.width;
         var canvasWidth = this._canvas._width;
@@ -3296,11 +3299,9 @@ ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidt
                 imageToFill.data[toPos * 4 + 3] = imageData.data[imgPos * 4 + 3];
             }
         }
-
         // do image data write operation at Native (only impl on Android)
         this._fillImageData(imageToFill.data, dirtyWidth, dirtyHeight, dx, dy);
-    }
-    else {
+    } else {
         this._canvas._data = imageData;
     }
 };
@@ -5769,6 +5770,128 @@ jsb.unregisterChildRefsForNode = function (node, recursive) {
 };
 
 },{}],37:[function(require,module,exports){
+(function (global,setImmediate){
+"use strict";
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/* promise.min.js
+ * A Promise polyfill implementation.
+ * 2018-11-16
+ *
+ * By taylorhakes, https://github.com/taylorhakes
+ * License: MIT
+ *   See https://github.com/taylorhakes/promise-polyfill/blob/master/LICENSE
+ */
+
+/*! @source https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js */
+!function (e, n) {
+  "object" == (typeof exports === "undefined" ? "undefined" : _typeof(exports)) && "undefined" != typeof module ? n() : "function" == typeof define && define.amd ? define(n) : n();
+}(0, function () {
+  "use strict";
+  function e(e) {
+    var n = this.constructor;return this.then(function (t) {
+      return n.resolve(e()).then(function () {
+        return t;
+      });
+    }, function (t) {
+      return n.resolve(e()).then(function () {
+        return n.reject(t);
+      });
+    });
+  }function n() {}function t(e) {
+    if (!(this instanceof t)) throw new TypeError("Promises must be constructed via new");if ("function" != typeof e) throw new TypeError("not a function");this._state = 0, this._handled = !1, this._value = undefined, this._deferreds = [], u(e, this);
+  }function o(e, n) {
+    for (; 3 === e._state;) {
+      e = e._value;
+    }0 !== e._state ? (e._handled = !0, t._immediateFn(function () {
+      var t = 1 === e._state ? n.onFulfilled : n.onRejected;if (null !== t) {
+        var o;try {
+          o = t(e._value);
+        } catch (f) {
+          return void i(n.promise, f);
+        }r(n.promise, o);
+      } else (1 === e._state ? r : i)(n.promise, e._value);
+    })) : e._deferreds.push(n);
+  }function r(e, n) {
+    try {
+      if (n === e) throw new TypeError("A promise cannot be resolved with itself.");if (n && ("object" == (typeof n === "undefined" ? "undefined" : _typeof(n)) || "function" == typeof n)) {
+        var o = n.then;if (n instanceof t) return e._state = 3, e._value = n, void f(e);if ("function" == typeof o) return void u(function (e, n) {
+          return function () {
+            e.apply(n, arguments);
+          };
+        }(o, n), e);
+      }e._state = 1, e._value = n, f(e);
+    } catch (r) {
+      i(e, r);
+    }
+  }function i(e, n) {
+    e._state = 2, e._value = n, f(e);
+  }function f(e) {
+    2 === e._state && 0 === e._deferreds.length && t._immediateFn(function () {
+      e._handled || t._unhandledRejectionFn(e._value);
+    });for (var n = 0, r = e._deferreds.length; r > n; n++) {
+      o(e, e._deferreds[n]);
+    }e._deferreds = null;
+  }function u(e, n) {
+    var t = !1;try {
+      e(function (e) {
+        t || (t = !0, r(n, e));
+      }, function (e) {
+        t || (t = !0, i(n, e));
+      });
+    } catch (o) {
+      if (t) return;t = !0, i(n, o);
+    }
+  }var c = setTimeout;t.prototype["catch"] = function (e) {
+    return this.then(null, e);
+  }, t.prototype.then = function (e, t) {
+    var r = new this.constructor(n);return o(this, new function (e, n, t) {
+      this.onFulfilled = "function" == typeof e ? e : null, this.onRejected = "function" == typeof n ? n : null, this.promise = t;
+    }(e, t, r)), r;
+  }, t.prototype["finally"] = e, t.all = function (e) {
+    return new t(function (n, t) {
+      function o(e, f) {
+        try {
+          if (f && ("object" == (typeof f === "undefined" ? "undefined" : _typeof(f)) || "function" == typeof f)) {
+            var u = f.then;if ("function" == typeof u) return void u.call(f, function (n) {
+              o(e, n);
+            }, t);
+          }r[e] = f, 0 == --i && n(r);
+        } catch (c) {
+          t(c);
+        }
+      }if (!e || "undefined" == typeof e.length) throw new TypeError("Promise.all accepts an array");var r = Array.prototype.slice.call(e);if (0 === r.length) return n([]);for (var i = r.length, f = 0; r.length > f; f++) {
+        o(f, r[f]);
+      }
+    });
+  }, t.resolve = function (e) {
+    return e && "object" == (typeof e === "undefined" ? "undefined" : _typeof(e)) && e.constructor === t ? e : new t(function (n) {
+      n(e);
+    });
+  }, t.reject = function (e) {
+    return new t(function (n, t) {
+      t(e);
+    });
+  }, t.race = function (e) {
+    return new t(function (n, t) {
+      for (var o = 0, r = e.length; r > o; o++) {
+        e[o].then(n, t);
+      }
+    });
+  }, t._immediateFn = "function" == typeof setImmediate && function (e) {
+    setImmediate(e);
+  } || function (e) {
+    c(e, 0);
+  }, t._unhandledRejectionFn = function (e) {
+    void 0 !== console && console && console.warn("Possible Unhandled Promise Rejection:", e);
+  };var l = function () {
+    if ("undefined" != typeof self) return self;if ("undefined" != typeof window) return window;if ("undefined" != typeof global) return global;throw Error("unable to locate global object");
+  }();"Promise" in l ? l.Promise.prototype["finally"] || (l.Promise.prototype["finally"] = e) : l.Promise = t;
+});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("timers").setImmediate)
+},{"timers":43}],38:[function(require,module,exports){
 'use strict';
 
 function DOMParser(options) {
@@ -6025,7 +6148,7 @@ exports.XMLSerializer = require('./dom').XMLSerializer;
 exports.DOMParser = DOMParser;
 //}
 
-},{"./dom":38,"./entities":39,"./sax":40}],38:[function(require,module,exports){
+},{"./dom":39,"./entities":40,"./sax":41}],39:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -7245,7 +7368,7 @@ exports.DOMImplementation = DOMImplementation;
 exports.XMLSerializer = XMLSerializer;
 //}
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 'use strict';
 
 exports.entityMap = {
@@ -7493,7 +7616,7 @@ exports.entityMap = {
 };
 //for(var  n in exports.entityMap){console.log(exports.entityMap[n].charCodeAt())}
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
@@ -8123,4 +8246,269 @@ function split(source, start) {
 
 exports.XMLReader = XMLReader;
 
-},{}]},{},[4]);
+},{}],42:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],43:[function(require,module,exports){
+(function (setImmediate,clearImmediate){
+var nextTick = require('process/browser.js').nextTick;
+var apply = Function.prototype.apply;
+var slice = Array.prototype.slice;
+var immediateIds = {};
+var nextImmediateId = 0;
+
+// DOM APIs, for completeness
+
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) { timeout.close(); };
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
+}
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(window, this._id);
+};
+
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// That's not how node.js implements it but the exposed api is the same.
+exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
+  var id = nextImmediateId++;
+  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
+
+  immediateIds[id] = true;
+
+  nextTick(function onNextTick() {
+    if (immediateIds[id]) {
+      // fn.call() is faster so we optimize for the common use-case
+      // @see http://jsperf.com/call-apply-segu
+      if (args) {
+        fn.apply(null, args);
+      } else {
+        fn.call(null);
+      }
+      // Prevent ids from leaking
+      exports.clearImmediate(id);
+    }
+  });
+
+  return id;
+};
+
+exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
+  delete immediateIds[id];
+};
+}).call(this,require("timers").setImmediate,require("timers").clearImmediate)
+},{"process/browser.js":42,"timers":43}]},{},[4]);
