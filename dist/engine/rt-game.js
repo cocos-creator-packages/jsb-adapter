@@ -1,7 +1,7 @@
 "use strict";
 
 cc.game.restart = function () {
-  __restartVM();
+  cc.sys.restartVM();
 };
 
 loadRuntime().onHide(function () {

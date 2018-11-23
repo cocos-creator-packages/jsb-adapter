@@ -28,21 +28,52 @@
 var rt = loadRuntime();
 jsb.fileUtils = {
   getStringFromFile: function getStringFromFile(url) {
-    return rt.getFileSystemManager().readFileSync(url, "utf8");
+    var result;
+
+    try {
+      result = rt.getFileSystemManager().readFileSync(url, "utf8");
+    } catch (error) {
+      cc.error(error);
+    }
+
+    return result;
   },
   getDataFromFile: function getDataFromFile(url) {
-    return rt.getFileSystemManager().readFileSync(url);
+    var result;
+
+    try {
+      result = rt.getFileSystemManager().readFileSync(url);
+    } catch (error) {
+      cc.error(error);
+    }
+
+    return result;
   },
   getWritablePath: function getWritablePath() {
     return "".concat(rt.env.USER_DATA_PATH, "/");
   },
   writeToFile: function writeToFile(map, url) {
     var str = JSON.stringify(map);
-    return rt.getFileSystemManager().writeFileSync(url, str, "utf8");
+    var result = false;
+
+    try {
+      rt.getFileSystemManager().writeFileSync(url, str, "utf8");
+      result = true;
+    } catch (error) {
+      cc.error(error);
+    }
+
+    return result;
   },
   getValueMapFromFile: function getValueMapFromFile(url) {
     var map_object = {};
-    var read = rt.getFileSystemManager().readFileSync(url, "utf8");
+    var read;
+
+    try {
+      read = rt.getFileSystemManager().readFileSync(url, "utf8");
+    } catch (error) {
+      cc.error(error);
+    }
 
     if (!read) {
       return map_object;
@@ -53,34 +84,40 @@ jsb.fileUtils = {
   }
 };
 
-jsb.saveImageData = function (data, width, height, filePath) {
-  var index = filePath.lastIndexOf(".");
+if (typeof jsb.saveImageData === 'undefined') {
+  jsb.saveImageData = function (data, width, height, filePath) {
+    var index = filePath.lastIndexOf(".");
 
-  if (index === -1) {
+    if (index === -1) {
+      return false;
+    }
+
+    var fileType = filePath.substr(index + 1);
+    var tempFilePath = rt.saveImageTempSync({
+      'data': data,
+      'width': width,
+      'height': height,
+      'fileType': fileType
+    });
+
+    if (tempFilePath === '') {
+      return false;
+    }
+
+    var savedFilePath = rt.getFileSystemManager().saveFileSync(tempFilePath, filePath);
+
+    if (savedFilePath === filePath) {
+      return true;
+    }
+
     return false;
-  }
+  };
+}
 
-  var fileType = filePath.substr(index + 1);
-  var tempFilePath = rt.saveImageTempSync({
-    'data': data,
-    'width': width,
-    'height': height,
-    'fileType': fileType
-  });
-
-  if (tempFilePath === '') {
-    return false;
-  }
-
-  var savedFilePath = rt.getFileSystemManager().saveFileSync(tempFilePath, filePath);
-
-  if (savedFilePath === filePath) {
-    return true;
-  }
-
-  return false;
-};
-
-jsb.setPreferredFramesPerSecond = function (fps) {
-  rt.setPreferredFramesPerSecond(fps);
-};
+if (typeof jsb.setPreferredFramesPerSecond === 'undefined' && typeof rt.setPreferredFramesPerSecond !== 'undefined') {
+  jsb.setPreferredFramesPerSecond = rt.setPreferredFramesPerSecond;
+} else {
+  jsb.setPreferredFramesPerSecond = function () {
+    console.error("The jsb.setPreferredFramesPerSecond is not define!");
+  };
+}

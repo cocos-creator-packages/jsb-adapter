@@ -82,29 +82,29 @@ function _getFontFamily(fontHandle) {
 
 var downloadBinary, downloadText, loadFont;
 
+downloadText = function downloadText(item) {
+  var url = item.url;
+  var result = jsb.fileUtils.getStringFromFile(url);
+
+  if (typeof result === 'string' && result) {
+    return result;
+  } else {
+    return new Error('Download text failed: ' + url);
+  }
+};
+
+downloadBinary = function downloadBinary(item) {
+  var url = item.url;
+  var result = jsb.fileUtils.getDataFromFile(url);
+
+  if (result) {
+    return result;
+  } else {
+    return new Error('Download binary file failed: ' + url);
+  }
+};
+
 if (CC_RUNTIME) {
-  downloadText = function downloadText(item) {
-    var url = item.url;
-    var result = loadRuntime().getFileSystemManager().readFileSync(url, "utf8");
-
-    if (typeof result === 'string' && result) {
-      return result;
-    } else {
-      return new Error('Download text failed: ' + url);
-    }
-  };
-
-  downloadBinary = function downloadBinary(item) {
-    var url = item.url;
-    var result = loadRuntime().getFileSystemManager().readFileSync(url);
-
-    if (result) {
-      return result;
-    } else {
-      return new Error('Download binary file failed: ' + url);
-    }
-  };
-
   loadFont = function loadFont(item) {
     var url = item.url;
 
@@ -116,28 +116,6 @@ if (CC_RUNTIME) {
     return fontFamilyName;
   };
 } else {
-  downloadText = function downloadText(item) {
-    var url = item.url;
-    var result = jsb.fileUtils.getStringFromFile(url);
-
-    if (typeof result === 'string' && result) {
-      return result;
-    } else {
-      return new Error('Download text failed: ' + url);
-    }
-  };
-
-  downloadBinary = function downloadBinary(item) {
-    var url = item.url;
-    var result = jsb.fileUtils.getDataFromFile(url);
-
-    if (result) {
-      return result;
-    } else {
-      return new Error('Download binary file failed: ' + url);
-    }
-  };
-
   loadFont = function loadFont(item, callback) {
     var url = item.url;
 
