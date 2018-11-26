@@ -34,16 +34,17 @@
 
   _p._bindEvent = function () {
     var video = this._video,
-        self = this; //binding event
+        self = this;
+
+    if (!video) {
+      return;
+    } //binding event
+
 
     var cbs = this.__eventListeners;
 
     cbs.loadedmetadata = function () {
       self._loadedmeta = true;
-
-      if (sys.os === sys.OS_IOS && sys.isBrowser) {
-        triggerFullScene(video, self._fullScreenEnabled);
-      }
 
       self._dispatchEvent(_impl.EventType.META_LOADED);
     };
@@ -120,6 +121,11 @@
   _p._updateSize = function (width, height) {};
 
   _p.createDomElementIfNeeded = function () {
+    if (!jsb.VideoPlayer) {
+      cc.warn('VideoPlayer only supports mobile platform.');
+      return null;
+    }
+
     if (!this._video) {
       this._video = new jsb.VideoPlayer();
     }
@@ -160,6 +166,11 @@
     this._bindEvent();
 
     var video = this._video;
+
+    if (!video) {
+      return;
+    }
+
     video.setVisible(this._visible);
     this._loaded = false;
     this._played = false;
@@ -219,10 +230,18 @@
   };
 
   _p.setKeepAspectRatioEnabled = function (isEnabled) {
+    if (!this._video) {
+      return false;
+    }
+
     return this._video.setKeepAspectRatioEnabled(isEnabled);
   };
 
   _p.isKeepAspectRatioEnabled = function () {
+    if (!this._video) {
+      return false;
+    }
+
     return this._video.isKeepAspectRatioEnabled();
   };
 

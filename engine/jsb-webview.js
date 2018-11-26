@@ -64,6 +64,10 @@
         }
     };
     _p.createDomElementIfNeeded = function (w, h) {
+        if (!jsb.WebView) {
+            cc.warn('WebView only supports mobile platform.');
+            return;
+        }
         if (!this._iframe){
             this._iframe = jsb.WebView.create();
             this._initEvent();
