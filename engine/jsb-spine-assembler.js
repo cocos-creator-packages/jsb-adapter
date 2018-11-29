@@ -49,13 +49,13 @@
 
         comp._material = comp._material || new SpriteMaterial();
         let baseMaterial = comp._material;
-        let materials = comp._materials;
-        let material = materials[key];
+        let materialCache = comp._materialCache;
+        let material = materialCache[key];
 
         if (!material) {
 
             var baseKey = baseMaterial._hash;
-            if (!materials[baseKey]) {
+            if (!materialCache[baseKey]) {
                 material = baseMaterial;
             } else {
                 material = baseMaterial.clone();
@@ -74,7 +74,7 @@
                 gfx.BLEND_FUNC_ADD,
                 src, dst
             );
-            materials[key] = material;
+            materialCache[key] = material;
             material.updateHash(key);
         }
         else if (material.texture !== tex) {
@@ -98,7 +98,7 @@
         var poolIdx = 0;
 
         var materialData = comp._materialData;
-        var materials = comp._materials;
+        var materialCache = comp._materialCache;
 
         var materialIdx = 0,realTextureIndex,realTexture;
         var matLen = materialData[materialIdx++];
@@ -119,10 +119,10 @@
             var key = material._hash;
             var newKey = _updateKeyWithStencilRef(key, StencilManager.getStencilRef());
             if (key !== newKey) {
-                material = materials[newKey] || material.clone();
+                material = materialCache[newKey] || material.clone();
                 material.updateHash(newKey);
-                if (!materials[newKey]) {
-                    materials[newKey] = material;
+                if (!materialCache[newKey]) {
+                    materialCache[newKey] = material;
                 }
             }
 

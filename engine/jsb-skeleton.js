@@ -449,7 +449,7 @@
             this._skeleton._comp = undefined;
             this._skeleton = undefined;
         }
-        this._materials = undefined;
+        this._materialCache = undefined;
     }
 
 })();
