@@ -25,23 +25,13 @@
  ****************************************************************************/
 
 (function(){
-    if (window.jsbSpine === undefined) return;
+    if (window.spine === undefined) return;
 
     var RenderFlow = cc.RenderFlow;
     var renderer = cc.renderer;
     var renderEngine = renderer.renderEngine;
-    var RecyclePool = renderEngine.RecyclePool;
 
-    sp.ANIMATION_EVENT_TYPE = {
-        START: 0,
-        INTERRUPT: 1,
-        END: 2,
-        DISPOSE: 3,
-        COMPLETE: 4,
-        EVENT: 5
-    };
-
-    var animation = jsbSpine.SpineAnimation.prototype;
+    var animation = spine.SpineAnimation.prototype;
     // The methods are added to be compatibility with old versions.
     animation.setCompleteListener = function (listener) {
         this._compeleteListener = listener;
@@ -58,37 +48,37 @@
 
         this.setStartListener(function (trackEntry) {
             if (this._target && this._callback) {
-                this._callback.call(this._target, this, trackEntry, sp.ANIMATION_EVENT_TYPE.START, null, 0);
+                this._callback.call(this._target, this, trackEntry, sp.AnimationEventType.START, null, 0);
             }
         });
 
         this.setInterruptListener(function (trackEntry) {
             if (this._target && this._callback) {
-                this._callback.call(this._target, this, trackEntry, sp.ANIMATION_EVENT_TYPE.INTERRUPT, null, 0);
+                this._callback.call(this._target, this, trackEntry, sp.AnimationEventType.INTERRUPT, null, 0);
             }
         });
 
         this.setEndListener(function (trackEntry) {
             if (this._target && this._callback) {
-                this._callback.call(this._target, this, trackEntry, sp.ANIMATION_EVENT_TYPE.END, null, 0);
+                this._callback.call(this._target, this, trackEntry, sp.AnimationEventType.END, null, 0);
             }
         });
 
         this.setDisposeListener(function (trackEntry) {
             if (this._target && this._callback) {
-                this._callback.call(this._target, this, trackEntry, sp.ANIMATION_EVENT_TYPE.DISPOSE, null, 0);
+                this._callback.call(this._target, this, trackEntry, sp.AnimationEventType.DISPOSE, null, 0);
             }
         });
 
         this.setCompleteListener(function (trackEntry, loopCount) {
             if (this._target && this._callback) {
-                this._callback.call(this._target, this, trackEntry, sp.ANIMATION_EVENT_TYPE.COMPLETE, null, loopCount);
+                this._callback.call(this._target, this, trackEntry, sp.AnimationEventType.COMPLETE, null, loopCount);
             }
         });
 
         this.setEventListener(function (trackEntry, event) {
             if (this._target && this._callback) {
-                this._callback.call(this._target, this, trackEntry, sp.ANIMATION_EVENT_TYPE.EVENT, event, 0);
+                this._callback.call(this._target, this, trackEntry, sp.AnimationEventType.EVENT, event, 0);
             }
         });
     }
@@ -166,7 +156,7 @@
         }
 
         this._iaPool = [];
-        this._iaPool.push(new jsbEditor.EditorIA());
+        this._iaPool.push(new middleware.MiddlewareIA());
 
         this._iaRenderData = new renderEngine.IARenderData();
     }
@@ -193,7 +183,7 @@
         }
         var textures = {};
         for (var i = 0; i < texValues.length; ++i) {
-            var spTex = new jsbEditor.Texture2D();
+            var spTex = new middleware.Texture2D();
             spTex.setRealTextureIndex(i);
             spTex.setPixelsWide(texValues[i].width);
             spTex.setPixelsHigh(texValues[i].height);
@@ -204,9 +194,9 @@
             textures[texKeys[i]] = spTex;
         }
 
-        var skeletonAni = new jsbSpine.SpineAnimation();
+        var skeletonAni = new spine.SpineAnimation();
         try {
-            jsbSpine._initSkeletonRenderer(skeletonAni, jsonFile, atlasText, textures, skeletonData.scale);
+            spine._initSkeletonRenderer(skeletonAni, jsonFile, atlasText, textures, skeletonData.scale);
         } catch (e) {
             cc._throw(e);
             return;

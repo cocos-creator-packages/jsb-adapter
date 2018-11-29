@@ -24,16 +24,16 @@
  THE SOFTWARE.
  ****************************************************************************/
 (function(){
-    if (window.jsbEditor === undefined) return;
+    if (window.middleware === undefined) return;
 
     var renderEngine = cc.renderer.renderEngine;
     var gfx = renderEngine.gfx;
 
-    var editorMgr = jsbEditor.EditorManager.getInstance();
+    var editorMgr = middleware.MiddlewareManager.getInstance();
     var vbid = editorMgr.getGLVBID();
     var ibid = editorMgr.getGLIBID();
 
-    var EditorIA = cc.Class({
+    var MiddlewareIA = cc.Class({
         ctor () {
             this._vertexBuffer = {
                 _format : gfx.VertexFormat.XY_UV_Color,
@@ -60,5 +60,5 @@
         }
     });
 
-    jsbEditor.EditorIA = EditorIA;
+    middleware.MiddlewareIA = MiddlewareIA;
 })();

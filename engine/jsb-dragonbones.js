@@ -24,7 +24,7 @@
  THE SOFTWARE.
  ****************************************************************************/
 (function(){
-    if (window.jsbDragonBones === undefined || window.jsbEditor === undefined) return;
+    if (window.dragonBones === undefined || window.middleware === undefined) return;
 
     ////////////////////////////////////////////////////////////
     // override dragonBones library by native dragonBones
@@ -32,9 +32,8 @@
     //-------------------
     // native factory
     //-------------------
-    dragonBones.CCFactory = jsbDragonBones.CCFactory;
 
-    var factoryProto = jsbDragonBones.CCFactory.prototype;
+    var factoryProto = dragonBones.CCFactory.prototype;
     factoryProto.createArmatureNode = function (comp, armatureName, node) {
         node = node || new cc.Node();
         var display = node.getComponent(dragonBones.ArmatureDisplay);
@@ -55,7 +54,7 @@
     //-------------------
     // native armature
     //-------------------
-    var armatureProto = jsbDragonBones.Armature.prototype;
+    var armatureProto = dragonBones.Armature.prototype;
     Object.defineProperty(armatureProto, 'animation', {
         get () {
             return this.getAnimation();
@@ -91,7 +90,7 @@
     //--------------------------
     // native CCArmatureDisplay
     //--------------------------
-    var nativeArmatureDisplayProto = jsbDragonBones.CCArmatureDisplay.prototype;
+    var nativeArmatureDisplayProto = dragonBones.CCArmatureDisplay.prototype;
 
     Object.defineProperty(nativeArmatureDisplayProto,"node",{
         get : function () {
@@ -137,7 +136,7 @@
     //-------------------
     // native slot
     //-------------------
-    var slotProto = jsbDragonBones.Slot.prototype;
+    var slotProto = dragonBones.Slot.prototype;
     Object.defineProperty(slotProto, 'childArmature', {
         get () {
             return this.getChildArmature();
@@ -162,7 +161,7 @@
     //------------------------
     // native TransformObject
     //------------------------
-    var transformObjectProto = jsbDragonBones.TransformObject.prototype;
+    var transformObjectProto = dragonBones.TransformObject.prototype;
     Object.defineProperty(transformObjectProto, 'global', {
         get () {
             return this.getGlobal();
@@ -236,7 +235,7 @@
         }
 
         index = this._texture.__textureIndex__;
-        this.jsbTexture = new jsbEditor.Texture2D();
+        this.jsbTexture = new middleware.Texture2D();
         this.jsbTexture.setRealTextureIndex(index);
         this.jsbTexture.setPixelsWide(this._texture.width);
         this.jsbTexture.setPixelsHigh(this._texture.height);
@@ -406,7 +405,7 @@
         }
 
         this._iaPool = [];
-        this._iaPool.push(new jsbEditor.EditorIA());
+        this._iaPool.push(new middleware.MiddlewareIA());
         
         this._iaRenderData = new renderEngine.IARenderData();
     }
@@ -545,7 +544,7 @@
             var segmentCount = materialData[materialIdx++];
             var ia = iaPool[poolIdx];
             if (!ia) {
-                ia = new jsbEditor.EditorIA();
+                ia = new middleware.MiddlewareIA();
                 iaPool[poolIdx] = ia;
             }
             ia._start = indiceOffset;

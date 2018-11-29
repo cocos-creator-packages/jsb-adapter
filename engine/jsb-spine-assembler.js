@@ -23,7 +23,7 @@
  THE SOFTWARE.
  ****************************************************************************/
 (function(){
-    if (window.jsbSpine === undefined || window.jsbEditor === undefined) return;
+    if (window.spine === undefined || window.middleware === undefined) return;
 
     var StencilManager = cc.StencilManager.sharedManager;
     var Skeleton = sp.Skeleton;
@@ -129,7 +129,7 @@
             var segmentCount = materialData[materialIdx++];
             var ia = iaPool[poolIdx];
             if (!ia) {
-                ia = new jsbEditor.EditorIA();
+                ia = new middleware.MiddlewareIA();
                 iaPool[poolIdx] = ia;
             }
             ia._start = indiceOffset;
