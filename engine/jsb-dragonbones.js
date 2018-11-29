@@ -29,6 +29,24 @@
     ////////////////////////////////////////////////////////////
     // override dragonBones library by native dragonBones
     ////////////////////////////////////////////////////////////
+    //--------------------
+    // adapt event name
+    //--------------------
+    dragonBones.EventObject.START = "start";
+    dragonBones.EventObject.LOOP_COMPLETE = "loopComplete";
+    dragonBones.EventObject.COMPLETE = "complete";
+    dragonBones.EventObject.FADE_IN = "fadeIn";
+    dragonBones.EventObject.FADE_IN_COMPLETE = "fadeInComplete";
+    dragonBones.EventObject.FADE_OUT = "fadeOut";
+    dragonBones.EventObject.FADE_OUT_COMPLETE = "fadeOutComplete";
+    dragonBones.EventObject.FRAME_EVENT = "frameEvent";
+    dragonBones.EventObject.SOUND_EVENT = "soundEvent";
+
+    dragonBones.DragonBones = {
+        ANGLE_TO_RADIAN : Math.PI / 180,
+        RADIAN_TO_ANGLE : 180 / Math.PI
+    };
+
     //-------------------
     // native factory
     //-------------------
