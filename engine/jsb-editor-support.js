@@ -29,9 +29,14 @@
     var renderEngine = cc.renderer.renderEngine;
     var gfx = renderEngine.gfx;
 
-    var editorMgr = middleware.MiddlewareManager.getInstance();
-    var vbid = editorMgr.getGLVBID();
-    var ibid = editorMgr.getGLIBID();
+    var middlewareMgr = middleware.MiddlewareManager.getInstance();
+    var director = cc.director;
+    var vbid = middlewareMgr.getGLVBID();
+    var ibid = middlewareMgr.getGLIBID();
+
+    director.on(cc.Director.EVENT_BEFORE_DRAW,function(){
+        middlewareMgr.update(director._deltaTime);
+    })
 
     var MiddlewareIA = cc.Class({
         ctor () {

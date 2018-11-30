@@ -357,7 +357,7 @@
     Object.defineProperty(armatureDisplayProto, "premultipliedAlpha", {
         get () {
             if (this._premultipliedAlpha === undefined){
-                return true;
+                return false;
             }
             return this._premultipliedAlpha;
         },
@@ -388,6 +388,9 @@
 
         this._nativeDisplay._ccNode = this.node;
         this._nativeDisplay._comp = this;
+
+        this._nativeDisplay.setOpacityModifyRGB(this.premultipliedAlpha);
+        this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
 
         this._armature = this._nativeDisplay.armature();
         this._armature.animation.timeScale = this.timeScale;

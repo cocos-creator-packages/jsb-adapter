@@ -205,6 +205,10 @@
         this._skeletonTextures = textures;
         this._skeleton._comp = this;
 
+        this._skeleton.setOpacityModifyRGB(this.premultipliedAlpha);
+        this._skeleton.setDebugSlotsEnabled(this.debugSlots);
+        this._skeleton.setDebugBonesEnabled(this.debugBones);
+
         this._materialData = this._skeleton.getMaterialData();
 
         // init skeleton listener
