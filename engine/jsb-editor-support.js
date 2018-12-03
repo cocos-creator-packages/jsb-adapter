@@ -22,27 +22,47 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
+(function(){
+    if (window.middleware === undefined) return;
 
-if (CC_RUNTIME) {
-    require('jsb-adapter/engine/rt-sys.js');
-    require('jsb-adapter/engine/rt_input.js');
-    require('jsb-adapter/engine/rt-loadSubpackage.js');
-    require('jsb-adapter/engine/rt-game.js');
-    require('jsb-adapter/engine/rt-jsb.js');
-} else {
-    require('jsb-adapter/engine/jsb-sys.js');
-    require('jsb-adapter/engine/jsb-game.js');
-    require('jsb-adapter/engine/jsb-videoplayer.js');
-    require('jsb-adapter/engine/jsb-webview.js');
-}
-require('jsb-adapter/engine/jsb-node.js');
-require('jsb-adapter/engine/jsb-audio.js');
-require('jsb-adapter/engine/jsb-loader.js');
-require('jsb-adapter/engine/jsb-editbox.js');
-require('jsb-adapter/engine/jsb-reflection.js');
-require('jsb-adapter/engine/jsb-cocosanalytics.js');
-require('jsb-adapter/engine/jsb-assets-manager.js');
-require('jsb-adapter/engine/jsb-editor-support.js');
-require('jsb-adapter/engine/jsb-dragonbones.js');
-require('jsb-adapter/engine/jsb-spine-skeleton.js');
-require('jsb-adapter/engine/jsb-spine-assembler.js');
+    var renderEngine = cc.renderer.renderEngine;
+    var gfx = renderEngine.gfx;
+
+    var middlewareMgr = middleware.MiddlewareManager.getInstance();
+    var director = cc.director;
+    var vbid = middlewareMgr.getGLVBID();
+    var ibid = middlewareMgr.getGLIBID();
+
+    director.on(cc.Director.EVENT_BEFORE_DRAW,function(){
+        middlewareMgr.update(director._deltaTime);
+    })
+
+    var MiddlewareIA = cc.Class({
+        ctor () {
+            this._vertexBuffer = {
+                _format : gfx.VertexFormat.XY_UV_Color,
+                _usage : gfx.USAGE_DYNAMIC,
+                _glID : {
+                    _id : vbid,
+                }
+            };
+            this._indexBuffer = {
+                _format : gfx.INDEX_FMT_UINT16,
+                _usage : gfx.USAGE_STATIC,
+                _glID : {
+                    _id : ibid,
+                },
+                _bytesPerIndex : 2,
+            };
+            this._primitiveType = gfx.PT_TRIANGLES;
+            this._start = 0;
+            this._count = -1;
+        },
+
+        getPrimitiveCount () {
+            return this._count;
+        }
+    });
+
+    middleware.MiddlewareIA = MiddlewareIA;
+})();
