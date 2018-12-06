@@ -24,24 +24,24 @@
  ****************************************************************************/
 
 if (CC_RUNTIME) {
-    require('jsb-adapter/engine/rt-sys.js');
-    require('jsb-adapter/engine/rt_input.js');
-    require('jsb-adapter/engine/rt-loadSubpackage.js');
-    require('jsb-adapter/engine/rt-game.js');
+    require('./rt-sys.js');
+    require('./rt_input.js');
+    require('./rt-loadSubpackage.js');
+    require('./rt-game.js');
 } else {
-    require('jsb-adapter/engine/jsb-sys.js');
-    require('jsb-adapter/engine/jsb-game.js');
-    require('jsb-adapter/engine/jsb-videoplayer.js');
-    require('jsb-adapter/engine/jsb-webview.js');
+    require('./jsb-sys.js');
+    require('./jsb-game.js');
+    require('./jsb-videoplayer.js');
+    require('./jsb-webview.js');
 }
-require('jsb-adapter/engine/jsb-node.js');
-require('jsb-adapter/engine/jsb-audio.js');
-require('jsb-adapter/engine/jsb-loader.js');
-require('jsb-adapter/engine/jsb-editbox.js');
-require('jsb-adapter/engine/jsb-reflection.js');
-require('jsb-adapter/engine/jsb-cocosanalytics.js');
-require('jsb-adapter/engine/jsb-assets-manager.js');
-require('jsb-adapter/engine/jsb-editor-support.js');
-require('jsb-adapter/engine/jsb-dragonbones.js');
-require('jsb-adapter/engine/jsb-spine-skeleton.js');
-require('jsb-adapter/engine/jsb-spine-assembler.js');
+require('./jsb-node.js');
+require('./jsb-audio.js');
+require('./jsb-loader.js');
+require('./jsb-editbox.js');
+require('./jsb-reflection.js');
+require('./jsb-cocosanalytics.js');
+require('./jsb-assets-manager.js');
+require('./jsb-editor-support.js');
+require('./jsb-dragonbones.js');
+require('./jsb-spine-skeleton.js');
+require('./jsb-spine-assembler.js');
