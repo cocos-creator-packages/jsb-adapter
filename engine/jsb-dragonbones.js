@@ -24,6 +24,7 @@
  ****************************************************************************/
 (function(){
     if (window.dragonBones === undefined || window.middleware === undefined) return;
+    if (dragonBones.DragonBonesAtlasAsset === undefined) return;
 
     ////////////////////////////////////////////////////////////
     // override dragonBones library by native dragonBones
