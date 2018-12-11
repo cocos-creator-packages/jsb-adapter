@@ -23,7 +23,7 @@
  THE SOFTWARE.
  ****************************************************************************/
 (function(){
-    if (window.spine === undefined || window.middleware === undefined) return;
+    if (window.sp === undefined || window.spine === undefined || window.middleware === undefined) return;
 
     var StencilManager = cc.StencilManager.sharedManager;
     var Skeleton = sp.Skeleton;
