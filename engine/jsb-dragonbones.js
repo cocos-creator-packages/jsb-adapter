@@ -380,7 +380,8 @@
             return;
         }
 
-        this._nativeDisplay = this._factory.buildArmatureDisplay(this.armatureName, this.dragonAsset._dragonBonesData.name);
+        var atlasName = this.dragonAtlasAsset._textureAtlasData.name;
+        this._nativeDisplay = this._factory.buildArmatureDisplay(this.armatureName, this.dragonAsset._dragonBonesData.name, "", atlasName);
         if (!this._nativeDisplay) {
             this._clearRenderData();
             return;
