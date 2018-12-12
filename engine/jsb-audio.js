@@ -42,11 +42,6 @@ let handleVolume  = function (volume) {
     return volume;
 };
 
-if (CC_RUNTIME) {
-    var rt = loadRuntime();
-    jsb.AudioEngine = rt.AudioEngine;
-}
-
 (function (proto, audioEngine) {
 
     // Using the new audioEngine
