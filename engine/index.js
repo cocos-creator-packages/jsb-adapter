@@ -39,7 +39,6 @@ require('./jsb-audio.js');
 require('./jsb-loader.js');
 require('./jsb-editbox.js');
 require('./jsb-reflection.js');
-require('./jsb-cocosanalytics.js');
 require('./jsb-assets-manager.js');
 require('./jsb-editor-support.js');
 require('./jsb-dragonbones.js');
