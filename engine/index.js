@@ -23,23 +23,15 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-if (CC_RUNTIME) {
-    require('./rt-sys.js');
-    require('./rt_input.js');
-    require('./rt-loadSubpackage.js');
-    require('./rt-game.js');
-} else {
-    require('./jsb-sys.js');
-    require('./jsb-game.js');
-    require('./jsb-videoplayer.js');
-    require('./jsb-webview.js');
-}
+require('./jsb-sys.js');
+require('./jsb-game.js');
+require('./jsb-videoplayer.js');
+require('./jsb-webview.js');
 require('./jsb-node.js');
 require('./jsb-audio.js');
 require('./jsb-loader.js');
 require('./jsb-editbox.js');
 require('./jsb-reflection.js');
-require('./jsb-cocosanalytics.js');
 require('./jsb-assets-manager.js');
 require('./jsb-editor-support.js');
 require('./jsb-dragonbones.js');
