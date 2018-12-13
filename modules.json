@@ -125,8 +125,7 @@
   {
     "name": "EditBox",
     "entries": [
-      "./engine/jsb-editbox.js",
-      "./engine/rt_input.js"
+      "./engine/jsb-editbox.js"
     ],
     "dependencies": ["WebGL Renderer"]
   },
