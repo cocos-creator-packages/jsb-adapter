@@ -78,7 +78,6 @@ function _getFontFamily (fontHandle) {
 let downloadBinary, downloadText, loadFont;
 downloadText = function (item) {
     var url = item.url;
-
     var result = jsb.fileUtils.getStringFromFile(url);
     if (typeof result === 'string' && result) {
         return result;
@@ -100,34 +99,21 @@ downloadBinary = function (item) {
     }
 };
 
-if (CC_RUNTIME) {
-    loadFont = function (item) {
-        let url = item.url;
-        let fontFamilyName = _getFontFamily(url);
+loadFont = function (item, callback) {
+    let url = item.url;
+    let fontFamilyName = _getFontFamily(url);
 
-        // load from local font
-        let localPath = "url('" + url + "')";
-        jsb.loadFont(fontFamilyName, localPath);
-        return fontFamilyName;
-    };
-}
-else {
-    loadFont = function (item, callback) {
-        let url = item.url;
-        let fontFamilyName = _getFontFamily(url);
+    let fontFace = new FontFace(fontFamilyName, "url('" + url + "')");
+    document.fonts.add(fontFace);
 
-        let fontFace = new FontFace(fontFamilyName, "url('" + url + "')");
-        document.fonts.add(fontFace);
-
-        fontFace.load();
-        fontFace.loaded.then(function() {
-            callback(null, fontFamilyName);
-        }, function () {
-            cc.warnID(4933, fontFamilyName);
-            callback(null, fontFamilyName);
-        });
-    };
-}
+    fontFace.load();
+    fontFace.loaded.then(function() {
+        callback(null, fontFamilyName);
+    }, function () {
+        cc.warnID(4933, fontFamilyName);
+        callback(null, fontFamilyName);
+    });
+};
 
 cc.loader.addDownloadHandlers({
     // JS
