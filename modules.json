@@ -125,27 +125,26 @@
   {
     "name": "EditBox",
     "entries": [
-      "./dist/engine/jsb-editbox.js",
-      "./dist/engine/rt_input.js"
+      "./engine/jsb-editbox.js"
     ],
     "dependencies": ["WebGL Renderer"]
   },
   {
     "name": "VideoPlayer",
     "entries": [
-      "./dist/engine/jsb-videoplayer.js"
+      "./engine/jsb-videoplayer.js"
     ]
   },
   {
     "name": "WebView",
     "entries": [
-      "./dist/engine/jsb-webview.js"
+      "./engine/jsb-webview.js"
     ]
   },
   {
     "name": "Audio",
     "entries": [
-      "./dist/engine/jsb-audio.js"
+      "./engine/jsb-audio.js"
     ]
   },
   {

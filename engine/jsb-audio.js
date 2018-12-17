@@ -32,7 +32,7 @@ cc.Audio = function (src) {
 };
 
 let handleVolume  = function (volume) {
-    if (!volume) {
+    if (volume === undefined) {
         // set default volume as 1
         volume = 1;
     }
@@ -41,11 +41,6 @@ let handleVolume  = function (volume) {
     }
     return volume;
 };
-
-if (CC_RUNTIME) {
-    var rt = loadRuntime();
-    jsb.AudioEngine = rt.AudioEngine;
-}
 
 (function (proto, audioEngine) {
 
