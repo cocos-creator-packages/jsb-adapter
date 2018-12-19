@@ -30,8 +30,50 @@ function downloadScript (item, callback) {
     return null;
 }
 
-function downloadAudio (item) {
-    return item.url;
+let audioDownloader = new jsb.Downloader();
+let audioUrlMap = {};  // key: url, value: { loadingItem, callback }
+
+audioDownloader.setOnFileTaskSuccess(task => {
+    let { item, callback } = audioUrlMap[task.requestURL];
+    if (!(item && callback)) {
+        return;
+    }
+
+    item.url = task.storagePath;
+    item.rawUrl = task.storagePath;
+    
+    callback(null, item);
+    delete audioUrlMap[task.requestURL];
+});
+
+audioDownloader.setOnTaskError((task, errorCode, errorCodeInternal, errorStr) => {
+    let { callback } = audioUrlMap[task.requestURL];
+    callback && callback(errorStr, null);
+    delete audioUrlMap[task.requestURL];
+});
+
+function downloadAudio (item, callback) {
+    if (/^http/.test(item.url)) {
+        let index = item.url.lastIndexOf('/');
+        let fileName = item.url.substr(index+1);
+        let storagePath = jsb.fileUtils.getWritablePath() + fileName;
+
+        // load from local cache
+        if (jsb.fileUtils.isFileExist(storagePath)) {
+            item.url = storagePath;
+            item.rawUrl = storagePath;
+            callback && callback(null, item);
+        }
+        // download remote audio
+        else {
+            audioUrlMap[item.url] = { item, callback };
+            audioDownloader.createDownloadFileTask(item.url, storagePath);
+        }
+        // Don't return anything to use async loading.
+    }
+    else {
+        return item.url;
+    }
 }
 
 function loadAudio (item, callback) {
@@ -75,9 +117,9 @@ function _getFontFamily (fontHandle) {
     return fontFamilyName;
 }
 
-let downloadBinary, downloadText, loadFont;
-downloadText = function (item) {
+function downloadText (item) {
     var url = item.url;
+
     var result = jsb.fileUtils.getStringFromFile(url);
     if (typeof result === 'string' && result) {
         return result;
@@ -85,9 +127,9 @@ downloadText = function (item) {
     else {
         return new Error('Download text failed: ' + url);
     }
-};
+}
 
-downloadBinary = function (item) {
+function downloadBinary (item) {
     var url = item.url;
 
     var result = jsb.fileUtils.getDataFromFile(url);
@@ -97,9 +139,9 @@ downloadBinary = function (item) {
     else {
         return new Error('Download binary file failed: ' + url);
     }
-};
+}
 
-loadFont = function (item, callback) {
+function loadFont (item, callback) {
     let url = item.url;
     let fontFamilyName = _getFontFamily(url);
 
@@ -113,7 +155,7 @@ loadFont = function (item, callback) {
         cc.warnID(4933, fontFamilyName);
         callback(null, fontFamilyName);
     });
-};
+}
 
 cc.loader.addDownloadHandlers({
     // JS
