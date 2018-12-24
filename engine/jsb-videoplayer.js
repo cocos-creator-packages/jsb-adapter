@@ -41,9 +41,6 @@
         let cbs = this.__eventListeners;
         cbs.loadedmetadata = function () {
             self._loadedmeta = true;
-            if (sys.os === sys.OS_IOS && sys.isBrowser) {
-                triggerFullScene(video, self._fullScreenEnabled);
-            }
             self._dispatchEvent(_impl.EventType.META_LOADED);
         };
         cbs.ended = function () {
