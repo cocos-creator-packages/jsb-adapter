@@ -29,6 +29,9 @@
         return;
     }
 
+    var math = cc.vmath;
+    var _mat4_temp = math.mat4.create();
+
     var _impl = cc.WebView.Impl;
     var _p = cc.WebView.Impl.prototype;
 
