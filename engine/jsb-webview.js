@@ -251,8 +251,8 @@
         let offsetX = container && container.style.paddingLeft ? parseInt(container.style.paddingLeft) : 0;
         let offsetY = container && container.style.paddingBottom ? parseIn(container.style.paddingBottom) : 0;
         this._updateSize(this._w, this._h);
-        let w = this._div.clientWidth * scaleX;
-        let h = this._div.clientHeight * scaleY;
+        let w = this._w * scaleX;
+        let h = this._h * scaleY;
         let appx = (w * _mat4_temp.m00) * node._anchorPoint.x;
         let appy = (h * _mat4_temp.m05) * node._anchorPoint.y;
 
