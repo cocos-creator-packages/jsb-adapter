@@ -94,6 +94,14 @@
         var nativeSkeleton = comp._skeleton;
         if (!nativeSkeleton) return;
 
+        var node = comp.node;
+        if (!node) return;
+
+        if (comp.__preColor__ === undefined || !node.color.equals(comp.__preColor__)) {
+            nativeSkeleton.setColor(node.color);
+            comp.__preColor__ = node.color;
+        }
+
         var iaPool = comp._iaPool;
         var poolIdx = 0;
 
