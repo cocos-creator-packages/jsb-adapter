@@ -244,18 +244,7 @@
         }
     }
 
-    skeleton.update = function (dt) {
-        if (this.paused) return;
-        var skeleton = this._skeleton;
-        if (!skeleton) return;
-        var node = this.node;
-        if (!node) return;
-
-        if (this.__preColor__ === undefined || !node.color.equals(this.__preColor__)) {
-            skeleton.setColor(node.color);
-            this.__preColor__ = node.color;
-        }
-    }
+    skeleton.update = undefined;
 
     skeleton.updateWorldTransform = function () {
         this._skeleton && this._skeleton.updateWorldTransform();
