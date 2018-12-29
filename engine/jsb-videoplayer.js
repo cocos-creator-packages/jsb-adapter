@@ -1,7 +1,7 @@
 /****************************************************************************
  Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
 
- http://www.cocos.com
+ https://www.cocos.com/
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated engine source code (the "Software"), a limited,
@@ -281,6 +281,11 @@
 
         let appx = (w * _mat4_temp.m00) * node._anchorPoint.x;
         let appy = (h * _mat4_temp.m05) * node._anchorPoint.y;
+
+        let viewport = cc.view._viewportRect;
+        offsetX += viewport.x / dpr;
+        offsetY += viewport.y / dpr;
+
         let tx = _mat4_temp.m12 * scaleX - appx + offsetX,
             ty = _mat4_temp.m13 * scaleY - appy + offsetY;
 
