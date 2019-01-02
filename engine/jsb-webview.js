@@ -1,8 +1,8 @@
 /****************************************************************************
  Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
- http://www.cocos.com
-
+ https://www.cocos.com/
+ 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated engine source code (the "Software"), a limited,
  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
@@ -29,6 +29,9 @@
         return;
     }
 
+    var math = cc.vmath;
+    var _mat4_temp = math.mat4.create();
+
     var _impl = cc.WebView.Impl;
     var _p = cc.WebView.Impl.prototype;
 
@@ -46,7 +49,6 @@
             let cbs = this.__eventListeners,
                 self = this;
             cbs.load = function () {
-                self._loaded = true;
                 self._dispatchEvent(_impl.EventType.LOADED);
             };
             cbs.error = function () {
@@ -61,6 +63,7 @@
         let iframe = this._iframe;
         if (iframe && iframe.style) {
             iframe.style.opacity = opacity / 255;
+            // TODO, add impl to Native
         }
     };
     _p.createDomElementIfNeeded = function (w, h) {
@@ -251,22 +254,16 @@
             d = _mat4_temp.m05 * scaleY;
         let offsetX = container && container.style.paddingLeft ? parseInt(container.style.paddingLeft) : 0;
         let offsetY = container && container.style.paddingBottom ? parseIn(container.style.paddingBottom) : 0;
-
-        let w, h;
-        if (_impl._polyfill.zoomInvalid) {
-            this._updateSize(this._w * a, this._h * d);
-            a = 1;
-            d = 1;
-            w = this._w * scaleX;
-            h = this._h * scaleY;
-        } else {
-            this._updateSize(this._w, this._h);
-            w = this._w * scaleX;
-            h = this._h * scaleY;
-        }
-
+        this._updateSize(this._w, this._h);
+        let w = this._w * scaleX;
+        let h = this._h * scaleY;
         let appx = (w * _mat4_temp.m00) * node._anchorPoint.x;
         let appy = (h * _mat4_temp.m05) * node._anchorPoint.y;
+
+        let viewport = cc.view._viewportRect;
+        offsetX += viewport.x / dpr;
+        offsetY += viewport.y / dpr;
+
         let tx = _mat4_temp.m12 * scaleX - appx + offsetX,
             ty = _mat4_temp.m13 * scaleY - appy + offsetY;
 
