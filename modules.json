@@ -63,12 +63,12 @@
   },
   {
     "name": "Spine Skeleton",
-    "entries": [],
+    "entries": ["./engine/jsb-spine-assembler.js","./engine/jsb-spine-skeleton.js"],
     "dependencies": ["WebGL Renderer"]
   },
   {
     "name": "DragonBones",
-    "entries": [],
+    "entries": ["./engine/jsb-dragonbones.js"],
     "dependencies": ["WebGL Renderer"]
   },
   {
