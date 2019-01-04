@@ -216,6 +216,9 @@
         }
     };
 
+    _p.isPlaying = function () {
+        return this._playing;
+    };
 
     _p.duration = function () {
         let video = this._video;
