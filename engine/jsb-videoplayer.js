@@ -155,6 +155,34 @@
         video.setURL(this._url);
     };
 
+    _p.getURL = function() {
+        return this._url;
+    };
+
+    _p.play = function () {
+        let video = this._video;
+        if (!video || !this._visible || this._playing) return;
+
+        video.play();
+        this._playing = true;
+    };
+
+    _p.pause = function () {
+        let video = this._video;
+        if (!this._playing || !video) return;
+
+        video.pause();
+        this._playing = false;
+    };
+
+    _p.resume = function () {
+        let video = this._video;
+        if (!this._playing || !video) return;
+
+        video.resume();
+        this._playing = true;
+    };
+
     _p.stop = function () {
         let video = this._video;
         if (!video || !this._visible) return;
@@ -218,6 +246,55 @@
         return this._video.isKeepAspectRatioEnabled();
     };
 
+    _p.isFullScreenEnabled = function () {
+        return this._fullScreenEnabled;
+    };
+
+    _p.setEventListener = function (event, callback) {
+        this._EventList[event] = callback;
+    };
+
+    _p.removeEventListener = function (event) {
+        this._EventList[event] = null;
+    };
+
+    _p._dispatchEvent = function (event) {
+        let callback = this._EventList[event];
+        if (callback)
+            callback.call(this, this, this._video.src);
+    };
+
+    _p.onPlayEvent = function () {
+        let callback = this._EventList[_impl.EventType.PLAYING];
+        callback.call(this, this, this._video.src);
+    };
+
+    _p.enable = function () {
+        let list = _impl.elements;
+        if (list.indexOf(this) === -1)
+            list.push(this);
+        this.setVisible(true);
+    };
+
+    _p.disable = function () {
+        let list = _impl.elements;
+        let index = list.indexOf(this);
+        if (index !== -1)
+            list.splice(index, 1);
+        this.setVisible(false);
+    };
+
+    _p.destroy = function () {
+        this.disable();
+        this.removeDom();
+    };
+
+    _p.setVisible = function (visible) {
+        if (this._visible !== visible) {
+            this._visible = !!visible;
+            this._updateVisibility();
+        }
+    };
 
     _p.setFullScreenEnabled = function (enable) {
         let video = this._video;
@@ -291,5 +368,40 @@
 
         var height = cc.view.getFrameSize().height;
         this._video.setFrame(tx, height - h - ty, this._w * a, this._h * d)
-    }
+    };
+
+    _impl.EventType = {
+        PLAYING: 0,
+        PAUSED: 1,
+        STOPPED: 2,
+        COMPLETED: 3,
+        META_LOADED: 4,
+        CLICKED: 5,
+        READY_TO_PLAY: 6
+    };
+
+    // video 队列，所有 vidoe 在 onEnter 的时候都会插入这个队列
+    _impl.elements = [];
+    // video 在 game_hide 事件中被自动暂停的队列，用于回复的时候重新开始播放
+    _impl.pauseElements = [];
+
+    cc.game.on(cc.game.EVENT_HIDE, function () {
+        let list = _impl.elements;
+        for (let element, i = 0; i < list.length; i++) {
+            element = list[i];
+            if (element.isPlaying()) {
+                element.pause();
+                _impl.pauseElements.push(element);
+            }
+        }
+    });
+
+    cc.game.on(cc.game.EVENT_SHOW, function () {
+        let list = _impl.pauseElements;
+        let element = list.pop();
+        while (element) {
+            element.play();
+            element = list.pop();
+        }
+    });
 })();
