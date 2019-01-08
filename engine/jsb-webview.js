@@ -32,6 +32,16 @@
     var math = cc.vmath;
     var _mat4_temp = math.mat4.create();
 
+    cc.WebView.Impl = cc.Class({
+        extends: cc.WebView.Impl,
+        ctor () {
+            // keep webview data
+            this.onJSCallbackObj = null;
+            this.javascriptInterfaceSchemeObj = null;
+            this.loadDataObj = null;
+            this.loadHTMLStringObj = null;
+        }
+    });
     var _impl = cc.WebView.Impl;
     var _p = cc.WebView.Impl.prototype;
 
@@ -59,6 +69,21 @@
             this._iframe.setOnDidFailLoading(cbs.error);
         }
     };
+    _p._initData = function () {
+        this.onJSCallbackObj && this.setOnJSCallback(this.onJSCallbackObj);
+        this.javascriptInterfaceSchemeObj && this.setJavascriptInterfaceScheme(this.javascriptInterfaceSchemeObj);
+        this.loadDataObj && this.loadData(this.loadDataObj.data, this.loadDataObj.MIMEType, this.loadDataObj.encoding, this.loadDataObj.baseURL);
+        this.loadHTMLStringObj && this.loadHTMLString(this.loadHTMLStringObj.string, this.loadHTMLStringObj.baseURL);
+        deleteObjs(this);
+    };
+    // delete special objs
+    function deleteObjs (impl) {
+        delete impl.onJSCallbackObj;
+        delete impl.javascriptInterfaceSchemeObj;
+        delete impl.loadDataObj;
+        delete impl.loadHTMLStringObj;
+    }
+
     _p._setOpacity = function (opacity) {
         let iframe = this._iframe;
         if (iframe && iframe.style) {
@@ -70,6 +95,7 @@
         if (!this._iframe){
             this._iframe = jsb.WebView.create();
             this._initEvent();
+            this._initData();
         }
     };
     _p.removeDom = function () {
@@ -81,10 +107,14 @@
             this._iframe = null;
         }
     };
+
     _p.setOnJSCallback = function (callback) {
         let iframe = this._iframe;
         if (iframe) {
             iframe.setOnJSCallback(callback);
+        }
+        else {
+            this.onJSCallbackObj = callback;
         }
     };
     _p.setJavascriptInterfaceScheme = function (scheme) {
@@ -92,17 +122,34 @@
         if (iframe) {
             iframe.setJavascriptInterfaceScheme(scheme);
         }
+        else {
+            this.javascriptInterfaceSchemeObj = scheme;
+        }
     };
     _p.loadData = function (data, MIMEType, encoding, baseURL) {
         let iframe = this._iframe;
         if (iframe) {
             iframe.loadData(data, MIMEType, encoding, baseURL);
         }
+        else {
+            this.loadDataObj = {
+                data: data,
+                MIMEType: MIMEType,
+                encoding: encoding,
+                baseURL: baseURL
+            };
+        }
     };
     _p.loadHTMLString = function (string, baseURL) {
         let iframe = this._iframe;
         if (iframe) {
             iframe.loadHTMLString(string, baseURL);
+        }
+        else {
+            this.loadHTMLStringObj = {
+                string: string,
+                baseURL: baseURL
+            };
         }
     };
     /**
