@@ -283,6 +283,10 @@
         this._skeleton && this._skeleton.setSlotsToSetupPose();
     }
 
+    skeleton.setSlotsRange = function (startSlotIndex, endSlotIndex) {
+        this._skeleton && this._skeleton.setSlotsRange(startSlotIndex, endSlotIndex);
+    }
+
     skeleton.findBone = function (boneName) {
         if (this._skeleton) return this._skeleton.findBone(boneName);
         return null;
