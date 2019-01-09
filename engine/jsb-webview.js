@@ -32,6 +32,14 @@
     var math = cc.vmath;
     var _mat4_temp = math.mat4.create();
 
+    cc.WebView.Impl = cc.Class({
+        extends: cc.WebView.Impl,
+        ctor () {
+            // keep webview data
+            this.jsCallback = null;
+            this.interfaceSchema = null;
+        }
+    });
     var _impl = cc.WebView.Impl;
     var _p = cc.WebView.Impl.prototype;
 
@@ -59,6 +67,13 @@
             this._iframe.setOnDidFailLoading(cbs.error);
         }
     };
+    _p._initExtraSetting = function () {
+        this.jsCallback && this.setOnJSCallback(this.jsCallback);
+        this.interfaceSchema && this.setJavascriptInterfaceScheme(this.interfaceSchema);
+        // remove obj
+        this.jsCallback = null;
+        this.interfaceSchema = null;
+    };
     _p._setOpacity = function (opacity) {
         let iframe = this._iframe;
         if (iframe && iframe.style) {
@@ -70,6 +85,7 @@
         if (!this._iframe){
             this._iframe = jsb.WebView.create();
             this._initEvent();
+            this._initExtraSetting();
         }
     };
     _p.removeDom = function () {
@@ -81,16 +97,23 @@
             this._iframe = null;
         }
     };
+
     _p.setOnJSCallback = function (callback) {
         let iframe = this._iframe;
         if (iframe) {
             iframe.setOnJSCallback(callback);
+        }
+        else {
+            this.jsCallback = callback;
         }
     };
     _p.setJavascriptInterfaceScheme = function (scheme) {
         let iframe = this._iframe;
         if (iframe) {
             iframe.setJavascriptInterfaceScheme(scheme);
+        }
+        else {
+            this.interfaceSchema = scheme;
         }
     };
     _p.loadData = function (data, MIMEType, encoding, baseURL) {
