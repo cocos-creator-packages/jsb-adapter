@@ -25,61 +25,49 @@
 (function(){
     if (window.sp === undefined || window.spine === undefined || window.middleware === undefined) return;
 
-    var StencilManager = cc.StencilManager.sharedManager;
     var Skeleton = sp.Skeleton;
-    var renderer = cc.renderer;
-    var renderEngine = renderer.renderEngine;
-    var gfx = renderEngine.gfx;
-    var SpriteMaterial = renderEngine.SpriteMaterial;
+    var gfx = cc.gfx;
+    var VertexFormat = gfx.VertexFormat;
     var assembler = Skeleton._assembler;
-
-    var STENCIL_SEP = '@';
     
     var _slotColor = cc.color(0, 0, 255, 255);
     var _boneColor = cc.color(255, 0, 0, 255);
     var _originColor = cc.color(0, 255, 0, 255);
     
-    var _updateKeyWithStencilRef = function (key, stencilRef) {
-        return key.replace(/@\d+$/, STENCIL_SEP + stencilRef);
-    }
-    
     var _getSlotMaterial = function (comp, tex, src, dst) {
     
-        var key = tex.url + src + dst + STENCIL_SEP + '0';
+        var key = tex.url + src + dst;
 
-        comp._material = comp._material || new SpriteMaterial();
-        let baseMaterial = comp._material;
+        let baseMaterial = comp.sharedMaterials[0];
+        if (!baseMaterial) return null;
+
         let materialCache = comp._materialCache;
         let material = materialCache[key];
 
         if (!material) {
+            material = new cc.Material();
+            material.copy(baseMaterial);
 
-            var baseKey = baseMaterial._hash;
-            if (!materialCache[baseKey]) {
-                material = baseMaterial;
-            } else {
-                material = baseMaterial.clone();
-            }
-
-            material.useModel = true;
-            // update texture
-            material.texture = tex;
-            material.useColor = false;
+            material.define('_USE_MODEL', true);
+            material.define('USE_TINT', comp.useTint);
+            material.setProperty('texture', tex);
     
             // update blend function
-            var pass = material._mainTech.passes[0];
+            let pass = material.effect.getDefaultTechnique().passes[0];
             pass.setBlend(
+                true,
                 gfx.BLEND_FUNC_ADD,
                 src, dst,
                 gfx.BLEND_FUNC_ADD,
                 src, dst
             );
+            material.updateHash(key);
             materialCache[key] = material;
-            material.updateHash(key);
         }
-        else if (material.texture !== tex) {
-            material.texture = tex;
+        else if (material.getProperty('texture') !== tex) {
+            material.setProperty('texture', tex);
             material.updateHash(key);
+            materialCache[key] = material;
         }
         return material;
     }
@@ -106,11 +94,11 @@
         var poolIdx = 0;
 
         var materialData = comp._materialData;
-        var materialCache = comp._materialCache;
 
         var materialIdx = 0,realTextureIndex,realTexture;
         var matLen = materialData[materialIdx++];
         var indiceOffset = materialData[materialIdx++];
+        var useTint = comp.useTint;
 
         if (matLen == 0) return;
 
@@ -122,26 +110,17 @@
                 materialData[materialIdx++],
                 materialData[materialIdx++]);
 
-            // For generate new material for skeleton render data nested in mask,
-            // otherwise skeleton inside/outside mask with same material will interfere each other
-            var key = material._hash;
-            var newKey = _updateKeyWithStencilRef(key, StencilManager.getStencilRef());
-            if (key !== newKey) {
-                material = materialCache[newKey] || material.clone();
-                material.updateHash(newKey);
-                if (!materialCache[newKey]) {
-                    materialCache[newKey] = material;
-                }
-            }
-
             var segmentCount = materialData[materialIdx++];
             var ia = iaPool[poolIdx];
             if (!ia) {
                 ia = new middleware.MiddlewareIA();
                 iaPool[poolIdx] = ia;
             }
+
+            ia.setVertexFormat(useTint? VertexFormat.XY_UV_Two_Color : VertexFormat.XY_UV_Color);
+
             ia._start = indiceOffset;
-            ia._count = segmentCount;
+            ia.count = segmentCount;
             indiceOffset += segmentCount;
             poolIdx ++;
 
@@ -165,7 +144,7 @@
                 graphics.lineWidth = 5;
     
                 var debugSlotsLen = debugData[debugIdx++];
-                for(var i=0;i<debugSlotsLen;i+=8){
+                for(var i=0; i<debugSlotsLen; i += 8){
                     graphics.moveTo(debugData[debugIdx++], debugData[debugIdx++]);
                     graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
                     graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);

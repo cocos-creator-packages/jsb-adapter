@@ -317,7 +317,7 @@
     var RenderFlow = cc.RenderFlow;
     var renderer = cc.renderer;
     var renderEngine = renderer.renderEngine;
-    var gfx = renderEngine.gfx;
+    var gfx = cc.gfx;
 
     Object.defineProperty(armatureDisplayProto, 'armatureName', {
         get () {
@@ -429,7 +429,7 @@
         this._iaPool = [];
         this._iaPool.push(new middleware.MiddlewareIA());
         
-        this._iaRenderData = new renderEngine.IARenderData();
+        this._iaRenderData = new cc.IARenderData();
     }
 
     armatureDisplayProto.addEventListener = function (eventType, listener, target) {
@@ -457,55 +457,41 @@
     ////////////////////////////////////////////////////////////
     // override webgl-assembler
     ////////////////////////////////////////////////////////////
-    var StencilManager = cc.StencilManager.sharedManager;
-    var SpriteMaterial = renderEngine.SpriteMaterial;
-
-    var STENCIL_SEP = '@';
     var _slotColor = cc.color(0, 0, 255, 255);
     var _boneColor = cc.color(255, 0, 0, 255);
     var _originColor = cc.color(0, 255, 0, 255);
 
-    var _updateKeyWithStencilRef = function (key, stencilRef) {
-        return key.replace(/@\d+$/, STENCIL_SEP + stencilRef);
-    }
-
     var _getSlotMaterial = function (comp, tex, src, dst) {
+        var key = tex.url + src + dst;
+        let baseMaterial = comp.sharedMaterials[0];
+        if (!baseMaterial) return null;
 
-        var key = tex.url + src + dst + STENCIL_SEP + '0';
-
-        comp._material = comp._material || new SpriteMaterial();
-        let baseMaterial = comp._material;
         let materialCache = comp._materialCache;
         let material = materialCache[key];
         
         if (!material) {
+            material = new cc.Material();
+            material.copy(baseMaterial);
 
-            var baseKey = baseMaterial._hash;
-            if (!materialCache[baseKey]) {
-                material = baseMaterial;
-            } else {
-                material = baseMaterial.clone();
-            }
-
-            material.useModel = true;
-            // update texture
-            material.texture = tex;
-            material.useColor = false;
-
+            material.define('_USE_MODEL', true);
+            material.setProperty('texture', tex);
+    
             // update blend function
-            var pass = material._mainTech.passes[0];
+            let pass = material.effect.getDefaultTechnique().passes[0];
             pass.setBlend(
+                true,
                 gfx.BLEND_FUNC_ADD,
                 src, dst,
                 gfx.BLEND_FUNC_ADD,
                 src, dst
             );
+            material.updateHash(key);
             materialCache[key] = material;
-            material.updateHash(key);
         }
-        else if (material.texture !== tex) {
-            material.texture = tex;
+        else if (material.getProperty('texture') !== tex) {
+            material.setProperty('texture', tex);
             material.updateHash(key);
+            materialCache[key] = material;
         }
         return material;
     }
@@ -536,7 +522,6 @@
         }
 
         var materialData = comp._materialData;
-        var materialCache = comp._materialCache;
 
         var materialIdx = 0,realTextureIndex,realTexture;
         var matLen = materialData[materialIdx++];
@@ -551,18 +536,6 @@
                 materialData[materialIdx++],
                 materialData[materialIdx++]);
 
-            // For generate new material for skeleton render data nested in mask,
-            // otherwise skeleton inside/outside mask with same material will interfere each other
-            var key = material._hash;
-            var newKey = _updateKeyWithStencilRef(key, StencilManager.getStencilRef());
-            if (key !== newKey) {
-                material = materialCache[newKey] || material.clone();
-                material.updateHash(newKey);
-                if (!materialCache[newKey]) {
-                    materialCache[newKey] = material;
-                }
-            }
-
             var segmentCount = materialData[materialIdx++];
             var ia = iaPool[poolIdx];
             if (!ia) {
@@ -570,7 +543,7 @@
                 iaPool[poolIdx] = ia;
             }
             ia._start = indiceOffset;
-            ia._count = segmentCount;
+            ia.count = segmentCount;
             indiceOffset += segmentCount;
             poolIdx++;
 

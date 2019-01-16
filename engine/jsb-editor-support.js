@@ -25,12 +25,17 @@
 (function(){
     if (window.middleware === undefined) return;
 
-    var renderEngine = cc.renderer.renderEngine;
-    var gfx = renderEngine.gfx;
+    var gfx = cc.gfx;
 
     var middlewareMgr = middleware.MiddlewareManager.getInstance();
     var director = cc.director;
-    var vbid = middlewareMgr.getGLVBID();
+
+    var vbid = {};
+    // const 1 map native macro VF_XYUVC which declaration in MiddlewareMacro.h
+    vbid[gfx.VertexFormat.XY_UV_Color.name] = middlewareMgr.getGLVBID(1);
+    // const 2 map native macro VF_XYUVCC which declaration in MiddlewareMacro.h
+    vbid[gfx.VertexFormat.XY_UV_Two_Color.name] = middlewareMgr.getGLVBID(2);
+
     var ibid = middlewareMgr.getGLIBID();
 
     director.on(cc.Director.EVENT_BEFORE_DRAW,function(){
@@ -39,13 +44,16 @@
 
     var MiddlewareIA = cc.Class({
         ctor () {
+
+            var tempFormat = gfx.VertexFormat.XY_UV_Color;
             this._vertexBuffer = {
-                _format : gfx.VertexFormat.XY_UV_Color,
+                _format : tempFormat,
                 _usage : gfx.USAGE_DYNAMIC,
                 _glID : {
-                    _id : vbid,
+                    _id : vbid[tempFormat.name],
                 }
             };
+
             this._indexBuffer = {
                 _format : gfx.INDEX_FMT_UINT16,
                 _usage : gfx.USAGE_STATIC,
@@ -56,11 +64,12 @@
             };
             this._primitiveType = gfx.PT_TRIANGLES;
             this._start = 0;
-            this._count = -1;
+            this.count = -1;
         },
 
-        getPrimitiveCount () {
-            return this._count;
+        setVertexFormat (format) {
+            this._vertexBuffer._format = format;
+            this._vertexBuffer._glID._id = vbid[format.name];
         }
     });
 

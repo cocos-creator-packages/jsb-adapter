@@ -148,6 +148,29 @@
         }
     });
 
+    Object.defineProperty(skeleton, "useTint", {
+        get () {
+            return this._useTint || false;
+        },
+        set (value) {
+            this._useTint = value;
+            var baseMaterial = this.sharedMaterials[0];
+            if (!baseMaterial) return;
+            baseMaterial.define('USE_TINT', this._useTint);
+            // Update cache material useTint property
+            var cache = this._materialCache;
+            for (var mKey in cache) {
+                var material = cache[mKey];
+                if (material) {
+                    material.define('USE_TINT', this._useTint);
+                }
+            }
+            if (this._skeleton) {
+                this._skeleton.setUseTint(this._useTint);
+            }
+        }
+    });
+
     var _onLoad = skeleton.onLoad;
     skeleton.onLoad = function () {
         if (_onLoad) {
@@ -157,7 +180,7 @@
         this._iaPool = [];
         this._iaPool.push(new middleware.MiddlewareIA());
 
-        this._iaRenderData = new renderEngine.IARenderData();
+        this._iaRenderData = new cc.IARenderData();
     }
 
     skeleton.setSkeletonData = function (skeletonData) {
@@ -207,6 +230,7 @@
         this._skeleton.setOpacityModifyRGB(this.premultipliedAlpha);
         this._skeleton.setDebugSlotsEnabled(this.debugSlots);
         this._skeleton.setDebugBonesEnabled(this.debugBones);
+        this._skeleton.setUseTint(this.useTint);
 
         this._materialData = this._skeleton.getMaterialData();
 
@@ -260,6 +284,10 @@
 
     skeleton.setSlotsToSetupPose = function () {
         this._skeleton && this._skeleton.setSlotsToSetupPose();
+    }
+
+    skeleton.setSlotsRange = function (startSlotIndex, endSlotIndex) {
+        this._skeleton && this._skeleton.setSlotsRange(startSlotIndex, endSlotIndex);
     }
 
     skeleton.findBone = function (boneName) {
