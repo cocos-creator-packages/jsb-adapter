@@ -26,11 +26,8 @@
     if (window.sp === undefined || window.spine === undefined || window.middleware === undefined) return;
 
     var Skeleton = sp.Skeleton;
-    var renderer = cc.renderer;
-    var renderEngine = renderer.renderEngine;
-    var gfx = renderEngine.gfx;
+    var gfx = cc.gfx;
     var VertexFormat = gfx.VertexFormat;
-    var SpineMaterial = renderEngine.SpineMaterial;
     var assembler = Skeleton._assembler;
     
     var _slotColor = cc.color(0, 0, 255, 255);
@@ -41,46 +38,36 @@
     
         var key = tex.url + src + dst;
 
-        comp._material = comp._material || new SpineMaterial();
-        let baseMaterial = comp._material;
+        let baseMaterial = comp.sharedMaterials[0];
+        if (!baseMaterial) return null;
+
         let materialCache = comp._materialCache;
         let material = materialCache[key];
 
         if (!material) {
+            material = new cc.Material();
+            material.copy(baseMaterial);
 
-            var baseKey = baseMaterial._hash;
-            if (!materialCache[baseKey]) {
-                material = baseMaterial;
-            } else {
-                material = baseMaterial.clone();
-            }
-
-            material.useModel = true;
-            // update texture
-            material.texture = tex;
-            material.useTint = comp.useTint;
+            material.define('_USE_MODEL', true);
+            material.define('USE_TINT', comp.useTint);
+            material.setProperty('texture', tex);
     
             // update blend function
-            var pass = material._mainTech.passes[0];
+            let pass = material.effect.getDefaultTechnique().passes[0];
             pass.setBlend(
+                true,
                 gfx.BLEND_FUNC_ADD,
                 src, dst,
                 gfx.BLEND_FUNC_ADD,
                 src, dst
             );
-
-            if (materialCache[material._hash]) {
-                delete materialCache[material._hash];
-            }
+            material.updateHash(key);
             materialCache[key] = material;
-            material.updateHash(key);
         }
-        else if (material.texture !== tex) {
-            if (materialCache[material._hash]) {
-                delete materialCache[material._hash];
-            }
-            material.texture = tex;
+        else if (material.getProperty('texture') !== tex) {
+            material.setProperty('texture', tex);
             material.updateHash(key);
+            materialCache[key] = material;
         }
         return material;
     }
@@ -107,7 +94,6 @@
         var poolIdx = 0;
 
         var materialData = comp._materialData;
-        var materialCache = comp._materialCache;
 
         var materialIdx = 0,realTextureIndex,realTexture;
         var matLen = materialData[materialIdx++];
@@ -134,7 +120,7 @@
             ia.setVertexFormat(useTint? VertexFormat.XY_UV_Two_Color : VertexFormat.XY_UV_Color);
 
             ia._start = indiceOffset;
-            ia._count = segmentCount;
+            ia.count = segmentCount;
             indiceOffset += segmentCount;
             poolIdx ++;
 
@@ -158,7 +144,7 @@
                 graphics.lineWidth = 5;
     
                 var debugSlotsLen = debugData[debugIdx++];
-                for(var i=0;i<debugSlotsLen;i+=8){
+                for(var i=0; i<debugSlotsLen; i += 8){
                     graphics.moveTo(debugData[debugIdx++], debugData[debugIdx++]);
                     graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
                     graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);

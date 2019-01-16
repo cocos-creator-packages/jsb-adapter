@@ -154,12 +154,15 @@
         },
         set (value) {
             this._useTint = value;
+            var baseMaterial = this.sharedMaterials[0];
+            if (!baseMaterial) return;
+            baseMaterial.define('USE_TINT', this._useTint);
             // Update cache material useTint property
             var cache = this._materialCache;
             for (var mKey in cache) {
                 var material = cache[mKey];
                 if (material) {
-                    material.useTint = this._useTint;
+                    material.define('USE_TINT', this._useTint);
                 }
             }
             if (this._skeleton) {
@@ -177,7 +180,7 @@
         this._iaPool = [];
         this._iaPool.push(new middleware.MiddlewareIA());
 
-        this._iaRenderData = new renderEngine.IARenderData();
+        this._iaRenderData = new cc.IARenderData();
     }
 
     skeleton.setSkeletonData = function (skeletonData) {
