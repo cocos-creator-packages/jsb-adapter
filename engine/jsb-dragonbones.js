@@ -374,6 +374,11 @@
         this._nativeDisplay = undefined;
     }
 
+    armatureDisplayProto.update = undefined;
+
+    // Shield use batch in native
+    armatureDisplayProto._updateBatch = function () {}
+
     armatureDisplayProto._buildArmature = function () {
         if (!this.dragonAsset || !this.dragonAtlasAsset || !this.armatureName) {
             this._clearRenderData();
@@ -457,24 +462,15 @@
     ////////////////////////////////////////////////////////////
     // override webgl-assembler
     ////////////////////////////////////////////////////////////
-    var StencilManager = cc.StencilManager.sharedManager;
-    var SpriteMaterial = renderEngine.SpriteMaterial;
-
-    var STENCIL_SEP = '@';
     var _slotColor = cc.color(0, 0, 255, 255);
     var _boneColor = cc.color(255, 0, 0, 255);
     var _originColor = cc.color(0, 255, 0, 255);
 
-    var _updateKeyWithStencilRef = function (key, stencilRef) {
-        return key.replace(/@\d+$/, STENCIL_SEP + stencilRef);
-    }
-
     var _getSlotMaterial = function (comp, tex, src, dst) {
-
-        var key = tex.url + src + dst + STENCIL_SEP + '0';
-
-        comp._material = comp._material || new SpriteMaterial();
+        var key = tex.url + src + dst;
         let baseMaterial = comp._material;
+        if (!baseMaterial) return null;
+
         let materialCache = comp._materialCache;
         let material = materialCache[key];
         
@@ -510,6 +506,9 @@
         return material;
     }
 
+    // native enable useModel
+    assembler.useModel = true;
+
     // native no need implement
     assembler.genRenderDatas = function (comp, batchData) {
     }
@@ -536,7 +535,6 @@
         }
 
         var materialData = comp._materialData;
-        var materialCache = comp._materialCache;
 
         var materialIdx = 0,realTextureIndex,realTexture;
         var matLen = materialData[materialIdx++];
@@ -550,18 +548,6 @@
             var material = _getSlotMaterial(comp, realTexture,
                 materialData[materialIdx++],
                 materialData[materialIdx++]);
-
-            // For generate new material for skeleton render data nested in mask,
-            // otherwise skeleton inside/outside mask with same material will interfere each other
-            var key = material._hash;
-            var newKey = _updateKeyWithStencilRef(key, StencilManager.getStencilRef());
-            if (key !== newKey) {
-                material = materialCache[newKey] || material.clone();
-                material.updateHash(newKey);
-                if (!materialCache[newKey]) {
-                    materialCache[newKey] = material;
-                }
-            }
 
             var segmentCount = materialData[materialIdx++];
             var ia = iaPool[poolIdx];
