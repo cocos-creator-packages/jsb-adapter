@@ -107,7 +107,6 @@
         var poolIdx = 0;
 
         var materialData = comp._materialData;
-        var materialCache = comp._materialCache;
 
         var materialIdx = 0,realTextureIndex,realTexture;
         var matLen = materialData[materialIdx++];
@@ -124,17 +123,19 @@
                 materialData[materialIdx++],
                 materialData[materialIdx++]);
 
+            var glIB = materialData[materialIdx++];
+            var glVB = materialData[materialIdx++];
             var segmentCount = materialData[materialIdx++];
+
             var ia = iaPool[poolIdx];
             if (!ia) {
                 ia = new middleware.MiddlewareIA();
                 iaPool[poolIdx] = ia;
             }
-
-            ia.setVertexFormat(useTint? VertexFormat.XY_UV_Two_Color : VertexFormat.XY_UV_Color);
-
             ia._start = indiceOffset;
             ia._count = segmentCount;
+            ia.setParam(useTint? VertexFormat.XY_UV_Two_Color : VertexFormat.XY_UV_Color, glIB, glVB);
+
             indiceOffset += segmentCount;
             poolIdx ++;
 

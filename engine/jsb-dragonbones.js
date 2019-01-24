@@ -318,6 +318,7 @@
     var renderer = cc.renderer;
     var renderEngine = renderer.renderEngine;
     var gfx = renderEngine.gfx;
+    var VertexFormat = gfx.VertexFormat;
 
     Object.defineProperty(armatureDisplayProto, 'armatureName', {
         get () {
@@ -549,7 +550,10 @@
                 materialData[materialIdx++],
                 materialData[materialIdx++]);
 
+            var glIB = materialData[materialIdx++];
+            var glVB = materialData[materialIdx++];
             var segmentCount = materialData[materialIdx++];
+
             var ia = iaPool[poolIdx];
             if (!ia) {
                 ia = new middleware.MiddlewareIA();
@@ -557,6 +561,8 @@
             }
             ia._start = indiceOffset;
             ia._count = segmentCount;
+            ia.setParam(VertexFormat.XY_UV_Color, glIB, glVB);
+
             indiceOffset += segmentCount;
             poolIdx++;
 
