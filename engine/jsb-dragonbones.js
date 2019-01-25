@@ -454,6 +454,7 @@
     armatureDisplayProto.onDestroy = function(){
         _onDestroy.call(this);
         if (this._nativeDisplay) {
+            this._nativeDisplay.dispose();
             this._nativeDisplay._comp = undefined;
             this._nativeDisplay = undefined;
         }
