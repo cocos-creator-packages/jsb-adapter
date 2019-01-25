@@ -374,6 +374,11 @@
         this._nativeDisplay = undefined;
     }
 
+    armatureDisplayProto.update = undefined;
+
+    // Shield use batch in native
+    armatureDisplayProto._updateBatch = function () {}
+
     armatureDisplayProto._buildArmature = function () {
         if (!this.dragonAsset || !this.dragonAtlasAsset || !this.armatureName) {
             this._clearRenderData();
@@ -495,6 +500,9 @@
         }
         return material;
     }
+
+    // native enable useModel
+    assembler.useModel = true;
 
     // native no need implement
     assembler.genRenderDatas = function (comp, batchData) {
