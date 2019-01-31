@@ -228,6 +228,7 @@
         this._skeleton.setDebugSlotsEnabled(this.debugSlots);
         this._skeleton.setDebugBonesEnabled(this.debugBones);
         this._skeleton.setUseTint(this.useTint);
+        this._skeleton.setTimeScale(this.timeScale);
 
         this._materialData = this._skeleton.getMaterialData();
 
