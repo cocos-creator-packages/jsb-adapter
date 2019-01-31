@@ -138,7 +138,8 @@
 
     Object.defineProperty(skeleton, "timeScale", {
         get () {
-            return this._timeScale || 1.0;
+            // this._timeScale || 1.0 will return 1.0 if this._timeScale is 0
+            return null != this._timeScale ? this._timeScale : 1.0;
         },
         set (value) {
             this._timeScale = value;
@@ -231,6 +232,7 @@
         this._skeleton.setDebugSlotsEnabled(this.debugSlots);
         this._skeleton.setDebugBonesEnabled(this.debugBones);
         this._skeleton.setUseTint(this.useTint);
+        this._skeleton.setTimeScale(this.timeScale);
 
         this._materialData = this._skeleton.getMaterialData();
 
