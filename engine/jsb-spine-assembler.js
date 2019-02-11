@@ -85,6 +85,9 @@
         return material;
     }
     
+    // native enable useModel
+    assembler.useModel = true;
+
     assembler.genRenderDatas = function (comp, batchData) {
     }
     
@@ -144,7 +147,7 @@
             renderer._flushIA(comp._iaRenderData);
         }
     
-        if (comp.debugBones || comp.debugSlots) {
+        if ((comp.debugBones || comp.debugSlots) && comp._debugRenderer) {
     
             var graphics = comp._debugRenderer;
             graphics.clear();
