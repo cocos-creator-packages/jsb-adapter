@@ -63,9 +63,15 @@
             return this._count;
         },
 
-        setParam (format, glIBID, glVBID) {
+        setVertexFormat (format) {
             this._vertexBuffer._format = format;
+        },
+
+        setGLIBID (glIBID) {
             this._indexBuffer._glID._id = glIBID;
+        },
+
+        setGLVBID (glVBID) {
             this._vertexBuffer._glID._id = glVBID;
         }
     });

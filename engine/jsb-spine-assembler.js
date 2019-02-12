@@ -137,7 +137,9 @@
             }
             ia._start = indiceOffset;
             ia._count = segmentCount;
-            ia.setParam(useTint? VertexFormat.XY_UV_Two_Color : VertexFormat.XY_UV_Color, glIB, glVB);
+            ia.setVertexFormat(useTint? VertexFormat.XY_UV_Two_Color : VertexFormat.XY_UV_Color);
+            ia.setGLIBID(glIB);
+            ia.setGLVBID(glVB);
 
             indiceOffset += segmentCount;
             poolIdx ++;
