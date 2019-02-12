@@ -294,7 +294,7 @@ DOMImplementation.prototype = {
 		// Introduced in DOM Level 2:
 		//readonly attribute DOMString        internalSubset;
 		
-		//TODO:..
+		//REFINE:..
 		//  readonly attribute NamedNodeMap     entities;
 		//  readonly attribute NamedNodeMap     notations;
 		return node;
@@ -1201,7 +1201,7 @@ try{
 					}
 					break;
 				default:
-					//TODO:
+					//REFINE:
 					this.data = data;
 					this.value = data;
 					this.nodeValue = data;

@@ -567,7 +567,7 @@ function depthRangeOpt(zNear, zFar) {
     }
     buffer_data[next_index] = GL_COMMAND_DEPTH_RANGE;
     buffer_data[next_index + 1] = zNear;
-    buffer_data[next_index + 1] = zFar;
+    buffer_data[next_index + 2] = zFar;
     next_index += 3;
     ++commandCount;
 }
@@ -579,7 +579,7 @@ function detachShaderOpt(program, shader) {
     }
     buffer_data[next_index] = GL_COMMAND_DETACH_SHADER;
     buffer_data[next_index + 1] = program ? program._id : 0;
-    buffer_data[next_index + 1] = shader ? shader._id : 0;
+    buffer_data[next_index + 2] = shader ? shader._id : 0;
     next_index += 3;
     ++commandCount;
 }

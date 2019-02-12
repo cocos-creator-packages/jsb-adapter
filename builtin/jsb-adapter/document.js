@@ -1,6 +1,5 @@
 const HTMLElement = require('./HTMLElement');
 const Image = require('./Image');
-const Audio = require('./Audio');
 const HTMLCanvasElement = require('./HTMLCanvasElement');
 const HTMLVideoElement = require('./HTMLVideoElement');
 const HTMLScriptElement = require('./HTMLScriptElement');
@@ -34,8 +33,6 @@ class Document extends Node {
   createElement(tagName) {
     if (tagName === 'canvas') {
       return new HTMLCanvasElement()
-    } else if (tagName === 'audio') {
-      return new Audio()
     } else if (tagName === 'img') {
       return new Image()
     } else if (tagName === 'video') {

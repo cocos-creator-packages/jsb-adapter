@@ -195,7 +195,7 @@ function parse(source,defaultNSMapCopy,entityMap,domBuilder,errorHandler){
 		if(end>start){
 			start = end;
 		}else{
-			//TODO: 这里有可能sax回退，有位置错误风险
+			//REFINE: 这里有可能sax回退，有位置错误风险
 			appendText(Math.max(tagStart,start)+1);
 		}
 	}

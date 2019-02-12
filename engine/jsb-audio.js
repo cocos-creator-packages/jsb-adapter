@@ -52,7 +52,7 @@ let handleVolume  = function (volume) {
 
     proto.play = function () {
         audioEngine.stop(this.id);
-     
+
         let clip = this.src;
         if (clip.loaded) {
             this.id = audioEngine.play2d(clip._nativeAsset, this.loop, this.volume);
@@ -147,7 +147,7 @@ let handleVolume  = function (volume) {
         if (typeof clip === 'string') {
             // backward compatibility since 1.10
             cc.warnID(8401, 'cc.audioEngine', 'cc.AudioClip', 'AudioClip', 'cc.AudioClip', 'audio');
-            let path = clip;            
+            let path = clip;
             let md5Pipe = cc.loader.md5Pipe;
             if (md5Pipe) {
                 path = md5Pipe.transformURL(path);
