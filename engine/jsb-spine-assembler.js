@@ -85,6 +85,9 @@
         return material;
     }
     
+    // native enable useModel
+    assembler.useModel = true;
+
     assembler.genRenderDatas = function (comp, batchData) {
     }
     
@@ -107,7 +110,6 @@
         var poolIdx = 0;
 
         var materialData = comp._materialData;
-        var materialCache = comp._materialCache;
 
         var materialIdx = 0,realTextureIndex,realTexture;
         var matLen = materialData[materialIdx++];
@@ -124,17 +126,21 @@
                 materialData[materialIdx++],
                 materialData[materialIdx++]);
 
+            var glIB = materialData[materialIdx++];
+            var glVB = materialData[materialIdx++];
             var segmentCount = materialData[materialIdx++];
+
             var ia = iaPool[poolIdx];
             if (!ia) {
                 ia = new middleware.MiddlewareIA();
                 iaPool[poolIdx] = ia;
             }
-
-            ia.setVertexFormat(useTint? VertexFormat.XY_UV_Two_Color : VertexFormat.XY_UV_Color);
-
             ia._start = indiceOffset;
             ia._count = segmentCount;
+            ia.setVertexFormat(useTint? VertexFormat.XY_UV_Two_Color : VertexFormat.XY_UV_Color);
+            ia.setGLIBID(glIB);
+            ia.setGLVBID(glVB);
+
             indiceOffset += segmentCount;
             poolIdx ++;
 
@@ -143,7 +149,7 @@
             renderer._flushIA(comp._iaRenderData);
         }
     
-        if (comp.debugBones || comp.debugSlots) {
+        if ((comp.debugBones || comp.debugSlots) && comp._debugRenderer) {
     
             var graphics = comp._debugRenderer;
             graphics.clear();

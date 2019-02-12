@@ -101,7 +101,7 @@
         },
         set (value) {
             this._debugSlots = value;
-            this._initDebugDraw();
+            this._updateDebugDraw();
             if (this._skeleton) {
                 this._skeleton.setDebugSlotsEnabled(this._debugSlots);
             }
@@ -114,7 +114,7 @@
         },
         set (value) {
             this._debugBones = value;
-            this._initDebugDraw();
+            this._updateDebugDraw();
             if (this._skeleton) {
                 this._skeleton.setDebugBonesEnabled(this._debugBones);
             }
@@ -180,6 +180,9 @@
         this._iaRenderData = new renderEngine.IARenderData();
     }
 
+    // Shield use batch in native
+    skeleton._updateBatch = function () {}
+
     skeleton.setSkeletonData = function (skeletonData) {
         null != skeletonData.width && null != skeletonData.height && this.node.setContentSize(skeletonData.width, skeletonData.height);
 
@@ -228,6 +231,7 @@
         this._skeleton.setDebugSlotsEnabled(this.debugSlots);
         this._skeleton.setDebugBonesEnabled(this.debugBones);
         this._skeleton.setUseTint(this.useTint);
+        this._skeleton.setTimeScale(this.timeScale);
 
         this._materialData = this._skeleton.getMaterialData();
 
