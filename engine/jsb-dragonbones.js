@@ -556,11 +556,11 @@
             }
             ia._start = indiceOffset;
 
-            ia._count = segmentCount;
+            ia.count = segmentCount;
             ia.setVertexFormat(VertexFormat.XY_UV_Color);
             ia.setGLIBID(glIB);
             ia.setGLVBID(glVB);
-            
+
             indiceOffset += segmentCount;
             poolIdx++;
 

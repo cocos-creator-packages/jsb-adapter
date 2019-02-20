@@ -124,7 +124,7 @@
             }
             ia._start = indiceOffset;
             
-            ia._count = segmentCount;
+            ia.count = segmentCount;
             ia.setVertexFormat(useTint? VertexFormat.XY_UV_Two_Color : VertexFormat.XY_UV_Color);
             ia.setGLIBID(glIB);
             ia.setGLVBID(glVB);
