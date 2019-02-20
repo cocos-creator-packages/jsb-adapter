@@ -30,27 +30,18 @@
     var middlewareMgr = middleware.MiddlewareManager.getInstance();
     var director = cc.director;
 
-    var vbid = {};
-    // const 1 map native macro VF_XYUVC which declaration in MiddlewareMacro.h
-    vbid[gfx.VertexFormat.XY_UV_Color.name] = middlewareMgr.getGLVBID(1);
-    // const 2 map native macro VF_XYUVCC which declaration in MiddlewareMacro.h
-    vbid[gfx.VertexFormat.XY_UV_Two_Color.name] = middlewareMgr.getGLVBID(2);
-
-    var ibid = middlewareMgr.getGLIBID();
-
     director.on(cc.Director.EVENT_BEFORE_DRAW,function(){
         middlewareMgr.update(director._deltaTime);
     })
 
     var MiddlewareIA = cc.Class({
         ctor () {
-
             var tempFormat = gfx.VertexFormat.XY_UV_Color;
             this._vertexBuffer = {
                 _format : tempFormat,
                 _usage : gfx.USAGE_DYNAMIC,
                 _glID : {
-                    _id : vbid[tempFormat.name],
+                    _id : 0,
                 }
             };
 
@@ -58,7 +49,7 @@
                 _format : gfx.INDEX_FMT_UINT16,
                 _usage : gfx.USAGE_STATIC,
                 _glID : {
-                    _id : ibid,
+                    _id : 0,
                 },
                 _bytesPerIndex : 2,
             };
@@ -69,7 +60,14 @@
 
         setVertexFormat (format) {
             this._vertexBuffer._format = format;
-            this._vertexBuffer._glID._id = vbid[format.name];
+        },
+
+        setGLIBID (glIBID) {
+            this._indexBuffer._glID._id = glIBID;
+        },
+
+        setGLVBID (glVBID) {
+            this._vertexBuffer._glID._id = glVBID;
         }
     });
 
