@@ -290,7 +290,8 @@
         this._factory = factory;
 
         let armatureKey = this._uuid + "#" + atlasUUID;
-        if (this._dragonBonesDatas[armatureKey]) return armatureKey;
+        let dragonBonesData = this._factory.getDragonBonesData(armatureKey);
+        if (dragonBonesData) return armatureKey;
 
         let filePath = null;
         if (this.dragonBonesJson) {
@@ -298,18 +299,14 @@
         } else {
             filePath = cc.loader.md5Pipe ? cc.loader.md5Pipe.transformURL(this.nativeUrl, true) : this.nativeUrl;
         }
-        let dragonBonesData = this._factory.parseDragonBonesDataByPath(filePath, armatureKey);
-        this._dragonBonesDatas[armatureKey] = dragonBonesData;
+        this._factory.parseDragonBonesDataByPath(filePath, armatureKey);
         return armatureKey;
     };
 
     dbAsset._clear = function () {
         if (this._factory) {
-            for (var key in this._dragonBonesDatas) {
-                this._factory.removeDragonBonesDataByUUID(this._uuid, true);
-            }
+            this._factory.removeDragonBonesDataByUUID(this._uuid, true);
         }
-        this._dragonBonesDatas = {};
     };
 
     ////////////////////////////////////////////////////////////
