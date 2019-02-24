@@ -151,6 +151,12 @@
         this.removeDBEventListener(type, listener);
     };
 
+    nativeArmatureDisplayProto.once = function (type, listener, target) {
+        this.initEvent();
+        this._eventTarget.once(type, listener, target);
+        this.addDBEventListener(type, listener);
+    };
+
     //-------------------
     // native slot
     //-------------------
@@ -437,11 +443,17 @@
         this._iaRenderData = new renderEngine.IARenderData();
     };
 
+    armatureDisplayProto.once = function (eventType, listener, target) {
+        if (this._nativeDisplay) {
+            this._nativeDisplay.once(eventType, listener, target);
+        }
+    };
+
     armatureDisplayProto.addEventListener = function (eventType, listener, target) {
         if (this._nativeDisplay) {
             this._nativeDisplay.on(eventType, listener, target);
         }
-    }
+    };
 
     armatureDisplayProto.removeEventListener = function (eventType, listener, target) {
         if (this._nativeDisplay) {
