@@ -67,7 +67,7 @@
         display._init();
 
         return display;
-    }
+    };
 
     //-------------------
     // native armature
@@ -77,33 +77,33 @@
         get () {
             return this.getAnimation();
         }
-    })
+    });
 
     Object.defineProperty(armatureProto, 'display', {
         get () {
             return this.getDisplay();
         }
-    })
+    });
 
     Object.defineProperty(armatureProto, 'name', {
         get () {
             return this.getName();
         }
-    })
+    });
 
     armatureProto.addEventListener = function (eventType, listener, target) {
         if (!this.__persistentDisplay__) {
             this.__persistentDisplay__ = this.getDisplay();
         }
         this.__persistentDisplay__.on(eventType, listener, target);
-    }
+    };
 
     armatureProto.removeEventListener = function (eventType, listener, target) {
         if (!this.__persistentDisplay__) {
             this.__persistentDisplay__ = this.getDisplay();
         }
         this.__persistentDisplay__.off(eventType, listener, target);
-    }
+    };
 
     //--------------------------
     // native CCArmatureDisplay
@@ -114,12 +114,12 @@
         get : function () {
             return this;
         }
-    })
+    });
 
     nativeArmatureDisplayProto.getRootNode = function () {
         var rootDisplay = this.getRootDisplay();
         return rootDisplay && rootDisplay._ccNode;
-    }
+    };
 
     nativeArmatureDisplayProto.convertToWorldSpace = function (point) {
         var newPos = this.convertToRootSpace(point);
@@ -127,7 +127,7 @@
         if (!ccNode) return newPos;
         var finalPos = ccNode.convertToWorldSpace(newPos);
         return finalPos;
-    }
+    };
 
     nativeArmatureDisplayProto.initEvent = function () {
         if (this._eventTarget) {
@@ -137,19 +137,25 @@
         this.setDBEventCallback(function(eventObject) {
             this._eventTarget.emit(eventObject.type, eventObject);
         });
-    }
+    };
 
     nativeArmatureDisplayProto.on = function (type, listener, target) {
         this.initEvent();
         this._eventTarget.on(type, listener, target);
         this.addDBEventListener(type, listener);
-    }
+    };
 
     nativeArmatureDisplayProto.off = function (type, listener, target) {
         this.initEvent();
         this._eventTarget.off(type, listener, target);
         this.removeDBEventListener(type, listener);
-    }
+    };
+
+    nativeArmatureDisplayProto.once = function (type, listener, target) {
+        this.initEvent();
+        this._eventTarget.once(type, listener, target);
+        this.addDBEventListener(type, listener);
+    };
 
     //-------------------
     // native slot
@@ -162,19 +168,19 @@
         set (val) {
             this.setChildArmature(val);
         }
-    })
+    });
 
     Object.defineProperty(slotProto, 'display', {
         get () {
             return this.getDisplay();
         }
-    })
+    });
 
     Object.defineProperty(slotProto, 'name', {
         get () {
             return this.getName();
         }
-    })
+    });
 
     //------------------------
     // native TransformObject
@@ -184,19 +190,19 @@
         get () {
             return this.getGlobal();
         }
-    })
+    });
 
     Object.defineProperty(transformObjectProto, 'origin', {
         get () {
             return this.getOrigin();
         }
-    })
+    });
 
     Object.defineProperty(transformObjectProto, 'offset', {
         get () {
             return this.getOffset();
         }
-    })
+    });
 
     ////////////////////////////////////////////////////////////
     // override DragonBonesAtlasAsset
@@ -207,12 +213,6 @@
     var textureMap = new WeakMap();
     var textureIdx2Name = {};
 
-    var _reset = dbAtlas.reset;
-    dbAtlas.reset = function () {
-        _reset.call(this);
-        this.recordTexture();
-    }
-
     dbAtlas.recordTexture = function () {
         if (this._texture && this._oldTexture !== this._texture) {
             var texKey = textureKeyMap[gTextureIdx] = {key:gTextureIdx};
@@ -221,13 +221,13 @@
             this._texture.__textureIndex__ = gTextureIdx;
             gTextureIdx++;
         }
-    }
+    };
 
     dbAtlas.getTextureByIndex = function (textureIdx) {
         var texKey = textureKeyMap[textureIdx];
         if (!texKey) return;
         return textureMap.get(texKey);
-    }
+    };
 
     dbAtlas.updateTextureAtlasData = function (factory) {
         var url = this._texture.url;
@@ -257,56 +257,57 @@
         this.jsbTexture.setRealTextureIndex(index);
         this.jsbTexture.setPixelsWide(this._texture.width);
         this.jsbTexture.setPixelsHigh(this._texture.height);
-        this._textureAtlasData = factory.parseTextureAtlasData(this.atlasJson, this.jsbTexture);
+        this._textureAtlasData = factory.parseTextureAtlasData(this.atlasJson, this.jsbTexture, this._uuid);
 
         textureIdx2Name[url] = {name:this._textureAtlasData.name,index:index};
-    }
+    };
 
     dbAtlas.init = function (factory) {
+        this._factory = factory;
         if (this._textureAtlasData) {
-            factory.addTextureAtlasData(this._textureAtlasData);
+            factory.addTextureAtlasData(this._textureAtlasData, this._uuid);
         }
         else {
             this.updateTextureAtlasData(factory);
         }
-    }
+    };
+
+    dbAtlas._clear = function () {
+        if (this._factory) {
+            this._factory.removeTextureAtlasData(this._uuid, true);
+            this._factory.removeDragonBonesDataByUUID(this._uuid, true);
+        }
+        this._textureAtlasData = null;
+        this.recordTexture();
+    };
 
     ////////////////////////////////////////////////////////////
     // override DragonBonesAsset
     ////////////////////////////////////////////////////////////
     var dbAsset = dragonBones.DragonBonesAsset.prototype;
 
-    dbAsset.init = function (factory) {
+    dbAsset.init = function (factory, atlasUUID) {
         this._factory = factory;
 
-        if (this._dragonBonesData) {
-            var sameNamedDragonBonesData = this._factory.getDragonBonesData(this._dragonBonesData.name);
-            if (!sameNamedDragonBonesData) {
-                this._factory.addDragonBonesData(this._dragonBonesData);
-            }
+        let armatureKey = this._uuid + "#" + atlasUUID;
+        let dragonBonesData = this._factory.getDragonBonesData(armatureKey);
+        if (dragonBonesData) return armatureKey;
+
+        let filePath = null;
+        if (this.dragonBonesJson) {
+            filePath = this.dragonBonesJson;
+        } else {
+            filePath = cc.loader.md5Pipe ? cc.loader.md5Pipe.transformURL(this.nativeUrl, true) : this.nativeUrl;
         }
-        else {
-            if (this.dragonBonesJson) {
-                this.initWithRawData(this.dragonBonesJson, false);
-            } else {
-                var nativeUrl = cc.loader.md5Pipe ? cc.loader.md5Pipe.transformURL(this.nativeUrl, true) : this.nativeUrl;
-                this.initWithRawData(nativeUrl, true);
-            }
-        }
+        this._factory.parseDragonBonesDataByPath(filePath, armatureKey);
+        return armatureKey;
     };
 
-    dbAsset.initWithRawData = function (nativeUrl, isBinary) {
-        var dragonBonesData = this._factory.parseDragonBonesDataOnly(nativeUrl);
-        var sameNamedDragonBonesData = this._factory.getDragonBonesData(dragonBonesData.name);
-        if (sameNamedDragonBonesData) {
-            this._dragonBonesData = sameNamedDragonBonesData;
+    dbAsset._clear = function () {
+        if (this._factory) {
+            this._factory.removeDragonBonesDataByUUID(this._uuid, true);
         }
-        else {
-            this._dragonBonesData = dragonBonesData;
-            this._factory.handleTextureAtlasData(isBinary);
-            this._factory.addDragonBonesData(dragonBonesData);
-        }
-    }
+    };
 
     ////////////////////////////////////////////////////////////
     // override ArmatureDisplay
@@ -340,7 +341,7 @@
             this._refresh();
         },
         visible: false
-    })
+    });
 
     Object.defineProperty(armatureDisplayProto, 'debugBones', {
         get () {
@@ -353,7 +354,7 @@
                 this._nativeDisplay.setDebugBonesEnabled(this._debugBones);
             }
         }
-    })
+    });
 
     Object.defineProperty(armatureDisplayProto, "premultipliedAlpha", {
         get () {
@@ -368,12 +369,12 @@
                 this._nativeDisplay.setOpacityModifyRGB(this._premultipliedAlpha);
             }
         }
-    })
+    });
 
     armatureDisplayProto._clearRenderData = function () {
         this._materialData = undefined;
         this._nativeDisplay = undefined;
-    }
+    };
 
     armatureDisplayProto.update = undefined;
 
@@ -386,8 +387,9 @@
             return;
         }
 
-        var atlasName = this.dragonAtlasAsset._textureAtlasData.name;
-        this._nativeDisplay = this._factory.buildArmatureDisplay(this.armatureName, this.dragonAsset._dragonBonesData.name, "", atlasName);
+        let atlasUUID = this.dragonAtlasAsset._uuid;
+        this._armatureKey = this.dragonAsset.init(this._factory, atlasUUID);
+        this._nativeDisplay = this._factory.buildArmatureDisplay(this.armatureName, this._armatureKey, "", atlasUUID);
         if (!this._nativeDisplay) {
             this._clearRenderData();
             return;
@@ -407,7 +409,7 @@
         if (this.animationName) {
             this.playAnimation(this.animationName, this.playTimes);
         }
-    }
+    };
 
     armatureDisplayProto.onEnable = function () {
         renderCompProto.onEnable.call(this);
@@ -417,14 +419,14 @@
         this.node._renderFlag &= ~RenderFlow.FLAG_UPDATE_RENDER_DATA;
         this.node._renderFlag &= ~RenderFlow.FLAG_RENDER;
         this.node._renderFlag |= RenderFlow.FLAG_CUSTOM_IA_RENDER;
-    }
+    };
 
     armatureDisplayProto.onDisable = function () {
         renderCompProto.onDisable.call(this);
         if (this._armature) {
             this._factory.remove(this._armature);
         }
-    }
+    };
 
     var _onLoad = armatureDisplayProto.onLoad;
     armatureDisplayProto.onLoad = function () {
@@ -436,19 +438,25 @@
         this._iaPool.push(new middleware.MiddlewareIA());
         
         this._iaRenderData = new renderEngine.IARenderData();
-    }
+    };
+
+    armatureDisplayProto.once = function (eventType, listener, target) {
+        if (this._nativeDisplay) {
+            this._nativeDisplay.once(eventType, listener, target);
+        }
+    };
 
     armatureDisplayProto.addEventListener = function (eventType, listener, target) {
         if (this._nativeDisplay) {
             this._nativeDisplay.on(eventType, listener, target);
         }
-    }
+    };
 
     armatureDisplayProto.removeEventListener = function (eventType, listener, target) {
         if (this._nativeDisplay) {
             this._nativeDisplay.off(eventType, listener, target);
         }
-    }
+    };
 
     var _onDestroy = armatureDisplayProto.onDestroy;
     armatureDisplayProto.onDestroy = function(){
@@ -459,7 +467,7 @@
             this._nativeDisplay = undefined;
         }
         this._materialCache = undefined;
-    }
+    };
 
     ////////////////////////////////////////////////////////////
     // override webgl-assembler
@@ -506,18 +514,18 @@
             material.updateHash(key);
         }
         return material;
-    }
+    };
 
     // native enable useModel
     assembler.useModel = true;
 
     // native no need implement
     assembler.genRenderDatas = function (comp, batchData) {
-    }
+    };
 
     // native no need implement
     assembler.updateRenderData = function (comp, batchData) {
-    }
+    };
 
     assembler.renderIA = function (comp, renderer) {
 
@@ -608,5 +616,5 @@
             }
             
         }
-    }
+    };
 })();
