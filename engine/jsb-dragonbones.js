@@ -335,10 +335,15 @@
 
             if (this._armature) {
                 this._armature.dispose();
+                this._factory.remove(this._armature);
                 this._armature = null;
             }
             this._nativeDisplay = null;
+            
             this._refresh();
+            if (this._armature) {
+                this._factory.add(this._armature);
+            }
         },
         visible: false
     });
