@@ -60,3 +60,29 @@ cc.Node.prototype.getWorldMatrixInAB = function () {
     _mat4ToArray(_typedArray_temp, this._worldMatrix);
     return _typedArray_temp;
 };
+
+cc.Texture2D.prototype._getHash = function () {
+    if (!this._hashDirty) {
+        return this._hash;
+    }
+    const gl = window.__gl;
+    const Filter = cc.Texture2D.Filter;
+    const WrapMode = cc.Texture2D.WrapMode;
+    // those data is only use to keep the hash format.
+    let hasMipmap = this._hasMipmap ? 1 : 0;
+    let premultiplyAlpha = this._premultiplyAlpha ? 1 : 0;
+    let flipY = this._flipY ? 1 : 0;
+    let minFilter = this._minFilter === Filter.LINEAR ? 1 : 2;
+    let magFilter = this._magFilter === Filter.LINEAR ? 1 : 2;
+    let wrapS = this._wrapS === WrapMode.REPEAT ? 1 : (this._wrapS === WrapMode.CLAMP_TO_EDGE ? 2 : 3);
+    let wrapT = this._wrapT === WrapMode.REPEAT ? 1 : (this._wrapT === WrapMode.CLAMP_TO_EDGE ? 2 : 3);
+    let pixelFormat = this._format;
+    
+    if (this._image) {
+        if (this._image._glFormat != gl.RGBA) pixelFormat = 0;
+        premultiplyAlpha = this._image._premultiplyAlpha ? 1 : 0;
+    }
+    this._hash = parseInt(`${minFilter}${magFilter}${pixelFormat}${wrapS}${wrapT}${hasMipmap}${premultiplyAlpha}${flipY}`);
+    this._hashDirty = false;
+    return this._hash; 
+}
