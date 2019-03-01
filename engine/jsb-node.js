@@ -66,23 +66,15 @@ cc.Texture2D.prototype._getHash = function () {
         return this._hash;
     }
     const gl = window.__gl;
-    const Filter = cc.Texture2D.Filter;
-    const WrapMode = cc.Texture2D.WrapMode;
-    // those data is only use to keep the hash format.
-    let hasMipmap = this._hasMipmap ? 1 : 0;
-    let premultiplyAlpha = this._premultiplyAlpha ? 1 : 0;
-    let flipY = this._flipY ? 1 : 0;
-    let minFilter = this._minFilter === Filter.LINEAR ? 1 : 2;
-    let magFilter = this._magFilter === Filter.LINEAR ? 1 : 2;
-    let wrapS = this._wrapS === WrapMode.REPEAT ? 1 : (this._wrapS === WrapMode.CLAMP_TO_EDGE ? 2 : 3);
-    let wrapT = this._wrapT === WrapMode.REPEAT ? 1 : (this._wrapT === WrapMode.CLAMP_TO_EDGE ? 2 : 3);
+    // those data are only use to keep the hash format.
+    let hasMipmap = 0, premultiplyAlpha = 0, minFilter = 1, magFilter = 1, wrapS = 2, wrapT = 2, flipY = 0;
     let pixelFormat = this._format;
-    
-    if (this._image) {
-        if (this._image._glFormat != gl.RGBA) pixelFormat = 0;
-        premultiplyAlpha = this._image._premultiplyAlpha ? 1 : 0;
+    let image = this._image;
+    if (image) {
+        if (image._glFormat !== gl.RGBA) pixelFormat = 0;
+        premultiplyAlpha = image._premultiplyAlpha;
     }
-    this._hash = parseInt(`${minFilter}${magFilter}${pixelFormat}${wrapS}${wrapT}${hasMipmap}${premultiplyAlpha}${flipY}`);
+    this._hash = Number(`${minFilter}${magFilter}${pixelFormat}${wrapS}${wrapT}${hasMipmap}${premultiplyAlpha}${flipY}`);
     this._hashDirty = false;
-    return this._hash; 
+    return this._hash;
 }
