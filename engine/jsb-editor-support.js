@@ -25,19 +25,19 @@
 (function(){
     if (window.middleware === undefined) return;
 
-    var renderEngine = cc.renderer.renderEngine;
-    var gfx = renderEngine.gfx;
+    let renderEngine = cc.renderer.renderEngine;
+    let gfx = renderEngine.gfx;
 
-    var middlewareMgr = middleware.MiddlewareManager.getInstance();
-    var director = cc.director;
+    let middlewareMgr = middleware.MiddlewareManager.getInstance();
+    let director = cc.director;
 
     director.on(cc.Director.EVENT_BEFORE_DRAW,function(){
         middlewareMgr.update(director._deltaTime);
     })
 
-    var MiddlewareIA = cc.Class({
+    let MiddlewareIA = cc.Class({
         ctor () {
-            var tempFormat = gfx.VertexFormat.XY_UV_Color;
+            let tempFormat = gfx.VertexFormat.XY_UV_Color;
             this._vertexBuffer = {
                 _format : tempFormat,
                 _usage : gfx.USAGE_DYNAMIC,
@@ -77,4 +77,13 @@
     });
 
     middleware.MiddlewareIA = MiddlewareIA;
+
+    let renderInfoMgr = middleware.RenderInfoMgr.getInstance();
+    middleware.renderInfoMgr = renderInfoMgr;
+    middleware.renderInfo = renderInfoMgr.getRenderInfo();
+    renderInfoMgr.__middleware__ = middleware;
+    renderInfoMgr.setResizeCallback(function() {
+        let middleware = this.__middleware__;
+        middleware.renderInfo = this.getRenderInfo();
+    });
 })();
