@@ -79,7 +79,7 @@
     middleware.MiddlewareIA = MiddlewareIA;
 
     let renderInfoMgr = middleware.RenderInfoMgr.getInstance();
-    middleware.renderInfoMgr = renderInfoMgr;
+    window.renderInfoMgr = renderInfoMgr;
     middleware.renderInfo = renderInfoMgr.getRenderInfo();
     renderInfoMgr.__middleware__ = middleware;
     renderInfoMgr.setResizeCallback(function() {
