@@ -41,7 +41,6 @@
             cc.errorID(7504);
             return;
         }
-        let jsonFile = cc.loader.md5Pipe ? cc.loader.md5Pipe.transformURL(this.nativeUrl, true) : this.nativeUrl;
         let atlasText = this.atlasText;
         if (!atlasText) {
             cc.errorID(7508, this.name);
@@ -66,7 +65,7 @@
             jsbTextures[texKeys[i]] = spTex;
         }
         this._jsbTextures = jsbTextures;
-        spine.initSkeletonData(uuid, jsonFile, atlasText, jsbTextures, this.scale);
+        spine.initSkeletonData(uuid, this.skeletonJsonStr, atlasText, jsbTextures, this.scale);
 
         this._inited = true;
     };
