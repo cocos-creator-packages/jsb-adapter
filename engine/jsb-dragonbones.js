@@ -26,6 +26,19 @@
     if (window.dragonBones === undefined || window.middleware === undefined) return;
     if (dragonBones.DragonBonesAtlasAsset === undefined) return;
 
+    // dragonbones global time scale.
+    Object.defineProperty(dragonBones, 'timeScale', {
+        get () {
+            return this._timeScale;
+        },
+        set (value) {
+            this._timeScale = value;
+            let factory = this.CCFactory.getInstance();
+            factory.setTimeScale(value);
+        },
+        configurable: true,
+    });
+
     ////////////////////////////////////////////////////////////
     // override dragonBones library by native dragonBones
     ////////////////////////////////////////////////////////////
@@ -550,7 +563,8 @@
         }
 
         let infoOffset = comp._renderInfoOffset[0];
-        let renderInfo = middleware.renderInfo;
+        let renderInfoMgr = middleware.renderInfoMgr;
+        let renderInfo = renderInfoMgr.renderInfo;
 
         let materialIdx = 0,realTextureIndex,realTexture;
         let matLen = renderInfo[infoOffset + materialIdx++];

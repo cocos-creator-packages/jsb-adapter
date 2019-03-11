@@ -110,7 +110,8 @@
         let poolIdx = 0;
 
         let infoOffset = comp._renderInfoOffset[0];
-        let renderInfo = middleware.renderInfo;
+        let renderInfoMgr = middleware.renderInfoMgr;
+        let renderInfo = renderInfoMgr.renderInfo;
 
         let materialIdx = 0,realTextureIndex,realTexture;
         let matLen = renderInfo[infoOffset + materialIdx++];

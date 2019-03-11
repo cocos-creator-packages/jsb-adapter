@@ -26,6 +26,18 @@
 (function(){
     if (window.sp === undefined || window.spine === undefined || window.middleware === undefined) return;
 
+    // spine global time scale
+    Object.defineProperty(sp, 'timeScale', {
+        get () {
+            return this._timeScale;
+        },
+        set (value) {
+            this._timeScale = value;
+            spine.SpineAnimation.setGlobalTimeScale(value);
+        },
+        configurable: true,
+    });
+
     let skeletonDataProto = sp.SkeletonData.prototype;
     skeletonDataProto.destroy = function () {
         this._jsbTextures = null;
