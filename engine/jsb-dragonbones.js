@@ -277,6 +277,13 @@
 
     dbAtlas.init = function (factory) {
         this._factory = factory;
+
+        // If create by manual, uuid is empty.
+        if (!this._uuid) {
+            let atlasJsonObj = JSON.parse(this.atlasJson);
+            this._uuid = atlasJsonObj.name;
+        }
+
         if (this._textureAtlasData) {
             factory.addTextureAtlasData(this._textureAtlasData, this._uuid);
         }
@@ -301,6 +308,13 @@
 
     dbAsset.init = function (factory, atlasUUID) {
         this._factory = factory;
+
+        // If create by manual, uuid is empty.
+        // Only support json format, if remote load dbbin, must set uuid by manual.
+        if (!this._uuid && this.dragonBonesJson) {
+            let rawData = JSON.parse(this.dragonBonesJson);
+            this._uuid = rawData.name;
+        }
 
         let armatureKey = this._uuid + "#" + atlasUUID;
         let dragonBonesData = this._factory.getDragonBonesData(armatureKey);
