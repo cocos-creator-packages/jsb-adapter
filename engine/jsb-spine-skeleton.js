@@ -137,16 +137,16 @@
     });
 
     Object.defineProperty(skeleton, "timeScale", {
-      get () {
-        // this._timeScale || 1.0 will return 1.0 if this._timeScale is 0
-        return this._timeScale;
-      },
-      set (value) {
-          this._timeScale = null != value ? value : 1.0;
-          if (this._skeleton) {
-              this._skeleton.setTimeScale(this._timeScale);
-          }
-      }
+        get () {
+            // this._timeScale || 1.0 will return 1.0 if this._timeScale is 0
+            return this._timeScale;
+        },
+        set (value) {
+            this._timeScale = null != value ? value : 1.0;
+            if (this._skeleton) {
+                this._skeleton.setTimeScale(this._timeScale);
+            }
+        }
     });
 
     Object.defineProperty(skeleton, "useTint", {
