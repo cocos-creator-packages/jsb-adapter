@@ -194,7 +194,8 @@
 
     Object.defineProperty(skeleton, "timeScale", {
         get () {
-            return this._timeScale || 1.0;
+            if (this._timeScale === undefined) return 1.0;
+            return this._timeScale;
         },
         set (value) {
             this._timeScale = value;
