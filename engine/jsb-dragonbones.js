@@ -444,6 +444,10 @@
 
     armatureDisplayProto._activateMaterial = function () {
         let texture = this.dragonAtlasAsset && this.dragonAtlasAsset.texture;
+        if (!texture) {
+            this.disableRender();
+            return;
+        }
 
         // Get material
         let material = this.sharedMaterials[0];
@@ -451,21 +455,18 @@
             material = cc.Material.getInstantiatedBuiltinMaterial('sprite', this);
             material.define('_USE_MODEL', true);
             material.define('USE_TEXTURE', true);
+        } else {
+            material = cc.Material.getInstantiatedMaterial(material, this);
         }
 
-        if (texture) {
-            material.setProperty('texture', texture);
-            this.markForUpdateRenderData(false);
-            this.markForRender(false);
-            this.markForCustomIARender(true);
-        }
-        else {
-            this.disableRender();
-        }
+        material.setProperty('texture', texture);
+        this.sharedMaterials[0] = material;
 
-        this.setMaterial(0, material);
+        this.markForUpdateRenderData(false);
+        this.markForRender(false);
+        this.markForCustomIARender(true);
     },
-
+    
     armatureDisplayProto.onEnable = function () {
         renderCompProto.onEnable.call(this);
         if (this._armature) {
