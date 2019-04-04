@@ -26,17 +26,16 @@
     if (window.middleware === undefined) return;
 
     var gfx = cc.gfx;
-
-    var middlewareMgr = middleware.MiddlewareManager.getInstance();
-    var director = cc.director;
+    let middlewareMgr = middleware.MiddlewareManager.getInstance();
+    let director = cc.director;
 
     director.on(cc.Director.EVENT_BEFORE_DRAW,function(){
         middlewareMgr.update(director._deltaTime);
     })
 
-    var MiddlewareIA = cc.Class({
+    let MiddlewareIA = cc.Class({
         ctor () {
-            var tempFormat = gfx.VertexFormat.XY_UV_Color;
+            let tempFormat = gfx.VertexFormat.XY_UV_Color;
             this._vertexBuffer = {
                 _format : tempFormat,
                 _usage : gfx.USAGE_DYNAMIC,
@@ -72,4 +71,12 @@
     });
 
     middleware.MiddlewareIA = MiddlewareIA;
+
+    let renderInfoMgr = middleware.RenderInfoMgr.getInstance();
+    middleware.renderInfoMgr = renderInfoMgr;
+    renderInfoMgr.renderInfo = renderInfoMgr.getRenderInfo();
+    renderInfoMgr.__middleware__ = middleware;
+    renderInfoMgr.setResizeCallback(function() {
+        this.renderInfo = this.getRenderInfo();
+    });
 })();
