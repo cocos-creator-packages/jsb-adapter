@@ -339,13 +339,11 @@
     ////////////////////////////////////////////////////////////
     // override ArmatureDisplay
     ////////////////////////////////////////////////////////////
-    var armatureDisplayProto = dragonBones.ArmatureDisplay.prototype;
-    var assembler = dragonBones.ArmatureDisplay._assembler;
-    var renderCompProto = cc.RenderComponent.prototype;
-    var RenderFlow = cc.RenderFlow;
-    var renderer = cc.renderer;
-    var gfx = cc.gfx;
-    var VertexFormat = gfx.VertexFormat;
+    let armatureDisplayProto = dragonBones.ArmatureDisplay.prototype;
+    let assembler = dragonBones.ArmatureDisplay._assembler;
+    let renderCompProto = cc.RenderComponent.prototype;
+    let gfx = cc.gfx;
+    let VertexFormat = gfx.VertexFormat;
 
     Object.defineProperty(armatureDisplayProto, 'armatureName', {
         get () {
@@ -465,16 +463,14 @@
         this.markForUpdateRenderData(false);
         this.markForRender(false);
         this.markForCustomIARender(true);
-    },
+    };
     
     armatureDisplayProto.onEnable = function () {
         renderCompProto.onEnable.call(this);
         if (this._armature) {
             this._factory.add(this._armature);
         }
-        this.markForUpdateRenderData(false);
-        this.markForRender(false);
-        this.markForCustomIARender(true);
+        this._activateMaterial();
     };
 
     armatureDisplayProto.onDisable = function () {
@@ -531,8 +527,8 @@
     let _boneColor = cc.color(255, 0, 0, 255);
     let _originColor = cc.color(0, 255, 0, 255);
 
-    var _getSlotMaterial = function (comp, tex, src, dst) {
-        var key = tex.url + src + dst;
+    let _getSlotMaterial = function (comp, tex, src, dst) {
+        let key = tex.url + src + dst;
         let baseMaterial = comp.sharedMaterials[0];
         if (!baseMaterial) return null;
 

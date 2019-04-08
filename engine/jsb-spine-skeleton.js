@@ -85,6 +85,7 @@
     let RenderFlow = cc.RenderFlow;
     let renderer = cc.renderer;
     let renderEngine = renderer.renderEngine;
+    let renderCompProto = cc.RenderComponent.prototype;
 
     let animation = spine.SpineAnimation.prototype;
     // The methods are added to be compatibility with old versions.
@@ -211,7 +212,7 @@
         },
         set (value) {
             this._useTint = value;
-            var baseMaterial = this.sharedMaterials[0];
+            let baseMaterial = this.sharedMaterials[0];
             if (!baseMaterial) return;
             baseMaterial.define('USE_TINT', this._useTint);
             // Update cache material useTint property
@@ -284,20 +285,33 @@
         }
     };
 
-    let _onEnable = skeleton.onEnable;
+    skeleton._activateMaterial = function () {
+        let material = this.sharedMaterials[0];
+        if (!material) {
+            material = cc.Material.getInstantiatedBuiltinMaterial('spine', this);
+            material.define('_USE_MODEL', true);
+        }
+        else {
+            material = cc.Material.getInstantiatedMaterial(material, this);
+        }
+
+        this.sharedMaterials[0] = material;
+
+        this.markForUpdateRenderData(false);
+        this.markForRender(false);
+        this.markForCustomIARender(true);
+    };
+
     skeleton.onEnable = function () {
-        _onEnable.call(this);
+        renderCompProto.onEnable.call(this);
         if (this._skeleton) {
             this._skeleton.onEnable();
         }
-        this.node._renderFlag &= ~RenderFlow.FLAG_UPDATE_RENDER_DATA;
-        this.node._renderFlag &= ~RenderFlow.FLAG_RENDER;
-        this.node._renderFlag |= RenderFlow.FLAG_CUSTOM_IA_RENDER;
+        this._activateMaterial();
     };
 
-    let _onDisable = skeleton.onDisable;
     skeleton.onDisable = function () {
-        _onDisable.call(this);
+        renderCompProto.onDisable.call(this);
         if (this._skeleton) {
             this._skeleton.onDisable();
         }
