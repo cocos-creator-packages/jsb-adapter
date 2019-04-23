@@ -58,10 +58,8 @@ class HTMLCanvasElement extends HTMLElement {
                 this._data = new ImageData(this._width, this._height);
                 this._context2D._canvas = this;
                 this._context2D._setCanvasBufferUpdatedCallback(function (data) {
-                    // Because the blend factor is modified to SRC_ALPHA, here must perform unpremult alpha.
-                    let data2 = self.unpremultAlpha(data, self._width, self._height);
                     // FIXME: Canvas's data will take 2x memory size, one in C++, another is obtained by Uint8Array here.
-                    self._data = new ImageData(data2, self._width, self._height);
+                    self._data = new ImageData(data, self._width, self._height);
                     // If the width of canvas could be divided by 2, it means that the bytes per row could be divided by 8.
                     self._alignment = self._width % 2 === 0 ? 8 : 4;
                 });
@@ -108,29 +106,30 @@ class HTMLCanvasElement extends HTMLElement {
         return this._height;
     }
 
+    get data() {
+        if (this._data) {
+            this.unpremultAlpha();
+            return this._data.data;
+        } 
+        return null;
+    }
+
     getBoundingClientRect() {
         return new DOMRect(0, 0, this._width, this._height);
     }
 
-    unpremultAlpha(data, w, h) {
-        if (!data) return null;
-        var temp = new Uint8ClampedArray(w * h * 4);
-        var alpha = 0;
-        for (let i = 0, len = data.length / 4; i < len; i++) {
-            alpha = data[i * 4 + 3];
+    // Because the blend factor is modified to SRC_ALPHA, here must perform unpremult alpha.
+    unpremultAlpha() {
+        var data = this._data.data;
+        var alpha;
+        for (let i = 0, len = data.length; i < len; i += 4) {
+            alpha = data[i + 3];
             if (alpha > 0 && alpha < 255) {
-                temp[i * 4 + 0] = clamp(data[i * 4 + 0] / alpha * 255);
-                temp[i * 4 + 1] = clamp(data[i * 4 + 1] / alpha * 255);
-                temp[i * 4 + 2] = clamp(data[i * 4 + 2] / alpha * 255);
-                temp[i * 4 + 3] = data[i * 4 + 3];
-            } else {
-                temp[i * 4 + 0] = data[i * 4 + 0];
-                temp[i * 4 + 1] = data[i * 4 + 1];
-                temp[i * 4 + 2] = data[i * 4 + 2];
-                temp[i * 4 + 3] = data[i * 4 + 3];
+                data[i + 0] = clamp(data[i + 0] / alpha * 255);
+                data[i + 1] = clamp(data[i + 1] / alpha * 255);
+                data[i + 2] = clamp(data[i + 2] / alpha * 255);
             }           
         }
-        return temp
     }
 }
 
