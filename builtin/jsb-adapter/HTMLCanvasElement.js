@@ -2,6 +2,11 @@ const HTMLElement = require('./HTMLElement');
 const ImageData = require('./ImageData');
 const DOMRect = require('./DOMRect');
 
+let clamp = function (value) {
+    value = Math.round(value);
+    return value < 0 ? 0 : value < 255 ? value : 255;
+};
+
 class CanvasGradient {
     constructor() {
         console.log("==> CanvasGradient constructor");
@@ -101,8 +106,30 @@ class HTMLCanvasElement extends HTMLElement {
         return this._height;
     }
 
+    get data() {
+        if (this._data) {
+            this.unpremultAlpha();
+            return this._data.data;
+        } 
+        return null;
+    }
+
     getBoundingClientRect() {
         return new DOMRect(0, 0, this._width, this._height);
+    }
+
+    // Because the blend factor is modified to SRC_ALPHA, here must perform unpremult alpha.
+    unpremultAlpha() {
+        var data = this._data.data;
+        var alpha;
+        for (let i = 0, len = data.length; i < len; i += 4) {
+            alpha = data[i + 3];
+            if (alpha > 0 && alpha < 255) {
+                data[i + 0] = clamp(data[i + 0] / alpha * 255);
+                data[i + 1] = clamp(data[i + 1] / alpha * 255);
+                data[i + 2] = clamp(data[i + 2] / alpha * 255);
+            }           
+        }
     }
 }
 
