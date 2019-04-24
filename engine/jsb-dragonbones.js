@@ -404,11 +404,11 @@
     });
 
     armatureDisplayProto._clearRenderData = function () {
-        this._renderInfoOffset = undefined;
-        this._nativeDisplay = undefined;
+        this._renderInfoOffset = null;
+        this._nativeDisplay = null;
     };
 
-    armatureDisplayProto.update = undefined;
+    armatureDisplayProto.update = null;
 
     // Shield use batch in native
     armatureDisplayProto._updateBatch = function () {}
@@ -417,6 +417,12 @@
         if (!this.dragonAsset || !this.dragonAtlasAsset || !this.armatureName) {
             this._clearRenderData();
             return;
+        }
+
+        if (this._nativeDisplay) {
+            this._nativeDisplay.dispose();
+            this._nativeDisplay._comp = null;
+            this._nativeDisplay = null;
         }
 
         let atlasUUID = this.dragonAtlasAsset._uuid;
@@ -432,6 +438,8 @@
 
         this._nativeDisplay.setOpacityModifyRGB(this.premultipliedAlpha);
         this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
+
+        this._recoverRegisterEvent();
 
         this._armature = this._nativeDisplay.armature();
         this._armature.animation.timeScale = this.timeScale;
@@ -476,18 +484,21 @@
         if (this._nativeDisplay) {
             this._nativeDisplay.once(eventType, listener, target);
         }
+        this._addEventRecord(this.once, eventType, listener, target);
     };
 
     armatureDisplayProto.addEventListener = function (eventType, listener, target) {
         if (this._nativeDisplay) {
             this._nativeDisplay.on(eventType, listener, target);
         }
+        this._addEventRecord(this.addEventListener, eventType, listener, target);
     };
 
     armatureDisplayProto.removeEventListener = function (eventType, listener, target) {
         if (this._nativeDisplay) {
             this._nativeDisplay.off(eventType, listener, target);
         }
+        this._removeFromEventRecord(eventType, listener, target);
     };
 
     let _onDestroy = armatureDisplayProto.onDestroy;
@@ -495,10 +506,10 @@
         _onDestroy.call(this);
         if (this._nativeDisplay) {
             this._nativeDisplay.dispose();
-            this._nativeDisplay._comp = undefined;
-            this._nativeDisplay = undefined;
+            this._nativeDisplay._comp = null;
+            this._nativeDisplay = null;
         }
-        this._materialCache = undefined;
+        this._materialCache = null;
     };
 
     ////////////////////////////////////////////////////////////
