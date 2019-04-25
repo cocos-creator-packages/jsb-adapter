@@ -447,6 +447,12 @@
             return;
         }
 
+        if (!texture.loaded) {
+            this.disableRender();
+            texture.once('load', this._activateMaterial, this);
+            return;
+        }
+
         // Get material
         let material = this.sharedMaterials[0];
         if (!material) {
@@ -458,7 +464,7 @@
         }
 
         material.setProperty('texture', texture);
-        this.sharedMaterials[0] = material;
+        this.setMaterial(0, material);
 
         this.markForUpdateRenderData(false);
         this.markForRender(false);
