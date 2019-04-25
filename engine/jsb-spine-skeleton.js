@@ -277,6 +277,8 @@
         this._eventListener && this.setEventListener(this._eventListener);
         this._interruptListener && this.setInterruptListener(this._interruptListener);
         this._disposeListener && this.setDisposeListener(this._disposeListener);
+
+        this._activateMaterial();
     };
 
     skeleton.setAnimationStateData = function (stateData) {
@@ -286,20 +288,31 @@
     };
 
     skeleton._activateMaterial = function () {
-        let material = this.sharedMaterials[0];
-        if (!material) {
-            material = cc.Material.getInstantiatedBuiltinMaterial('spine', this);
-            material.define('_USE_MODEL', true);
-        }
-        else {
-            material = cc.Material.getInstantiatedMaterial(material, this);
+        if (!this.skeletonData) {
+            this.disableRender();
+            return;
         }
 
-        this.sharedMaterials[0] = material;
+        this.skeletonData.ensureTexturesLoaded(function (result) {
+            if (!result) {
+                this.disableRender();
+                return;
+            }
 
-        this.markForUpdateRenderData(false);
-        this.markForRender(false);
-        this.markForCustomIARender(true);
+            let material = this.sharedMaterials[0];
+            if (!material) {
+                material = cc.Material.getInstantiatedBuiltinMaterial('spine', this);
+                material.define('_USE_MODEL', true);
+            }
+            else {
+                material = cc.Material.getInstantiatedMaterial(material, this);
+            }
+
+            this.setMaterial(0, material);
+            this.markForUpdateRenderData(false);
+            this.markForRender(false);
+            this.markForCustomIARender(true);
+        }, this);
     };
 
     skeleton.onEnable = function () {
