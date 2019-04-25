@@ -435,11 +435,23 @@
 
         this._nativeDisplay._ccNode = this.node;
         this._nativeDisplay._comp = this;
+        this._nativeDisplay._eventTarget = this._eventTarget;
 
         this._nativeDisplay.setOpacityModifyRGB(this.premultipliedAlpha);
         this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
+        this._nativeDisplay.setDBEventCallback(function(eventObject) {
+            this._eventTarget.emit(eventObject.type, eventObject);
+        });
 
-        this._recoverRegisterEvent();
+        // add all event into native display
+        let callbackTable = this._eventTarget._callbackTable;
+        // just use to adapt to native api
+        let emptyHandle = function () {};
+        for (let key in callbackTable) {
+            let list = callbackTable[key];
+            if (!list || !list.callbacks || !list.callbacks.length) continue;
+            this._nativeDisplay.addDBEventListener(key, emptyHandle);
+        }
 
         this._armature = this._nativeDisplay.armature();
         this._armature.animation.timeScale = this.timeScale;
@@ -482,23 +494,23 @@
 
     armatureDisplayProto.once = function (eventType, listener, target) {
         if (this._nativeDisplay) {
-            this._nativeDisplay.once(eventType, listener, target);
+            this._nativeDisplay.addDBEventListener(eventType, listener);
         }
-        this._addEventRecord(this.once, eventType, listener, target);
+        this._eventTarget.once(eventType, listener, target);
     };
 
     armatureDisplayProto.addEventListener = function (eventType, listener, target) {
         if (this._nativeDisplay) {
-            this._nativeDisplay.on(eventType, listener, target);
+            this._nativeDisplay.addDBEventListener(eventType, listener);
         }
-        this._addEventRecord(this.addEventListener, eventType, listener, target);
+        this._eventTarget.on(eventType, listener, target);
     };
 
     armatureDisplayProto.removeEventListener = function (eventType, listener, target) {
         if (this._nativeDisplay) {
-            this._nativeDisplay.off(eventType, listener, target);
+            this._nativeDisplay.removeDBEventListener(eventType, listener);
         }
-        this._removeFromEventRecord(eventType, listener, target);
+        this._eventTarget.off(eventType, listener, target);
     };
 
     let _onDestroy = armatureDisplayProto.onDestroy;
