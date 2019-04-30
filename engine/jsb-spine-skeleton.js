@@ -26,6 +26,45 @@
 (function(){
     if (window.sp === undefined || window.spine === undefined || window.middleware === undefined) return;
 
+    // generate get set function
+    for (let classKey in spine) {
+        let spineProto = spine[classKey] && spine[classKey].prototype;
+        if (!spineProto) continue;
+        for (let getName in spineProto) {
+            let getPos = getName.search(/^get/);
+            if (getPos == -1) continue;
+            let propName = getName.replace(/^get/, '');
+            let nameArr = propName.split('');
+            let lowerFirst = nameArr[0].toLowerCase();
+            let upperFirst = nameArr[0].toUpperCase();
+            nameArr.splice(0, 1);
+            let left = nameArr.join('');
+            propName = lowerFirst + left;
+            let setName = 'set' + upperFirst + left;
+            if (spineProto.hasOwnProperty(propName)) continue;
+            let setFunc = spineProto[setName];
+            let hasSetFunc = typeof setFunc === 'function';
+            if (hasSetFunc) {
+                Object.defineProperty(spineProto, propName, {
+                    get () {
+                        return this[getName]();
+                    },
+                    set (val) {
+                        this[setName](val);
+                    },
+                    configurable: true,
+                });
+            } else {
+                Object.defineProperty(spineProto, propName, {
+                    get () {
+                        return this[getName]();
+                    },
+                    configurable: true,
+                });
+            }
+        }
+    }
+
     // spine global time scale
     Object.defineProperty(sp, 'timeScale', {
         get () {
@@ -33,7 +72,7 @@
         },
         set (value) {
             this._timeScale = value;
-            spine.SpineAnimation.setGlobalTimeScale(value);
+            spine.SkeletonAnimation.setGlobalTimeScale(value);
         },
         configurable: true,
     });
@@ -86,7 +125,7 @@
     let renderer = cc.renderer;
     let renderEngine = renderer.renderEngine;
 
-    let animation = spine.SpineAnimation.prototype;
+    let animation = spine.SkeletonAnimation.prototype;
     // The methods are added to be compatibility with old versions.
     animation.setCompleteListener = function (listener) {
         this._compeleteListener = listener;
@@ -255,7 +294,7 @@
             this._skeleton = null;
         }
 
-        let skeletonAni = new spine.SpineAnimation();
+        let skeletonAni = new spine.SkeletonAnimation();
         try {
             spine.initSkeletonRenderer(skeletonAni, uuid);
         } catch (e) {
