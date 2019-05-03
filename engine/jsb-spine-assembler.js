@@ -149,7 +149,7 @@
             renderer._flushIA(comp._iaRenderData);
         }
     
-        if ((comp.debugBones || comp.debugSlots) && comp._debugRenderer) {
+        if ((comp.debugBones || comp.debugSlots || comp.debugMesh) && comp._debugRenderer) {
     
             let graphics = comp._debugRenderer;
             graphics.clear();
@@ -167,48 +167,50 @@
 
                 switch (debugType) {
                     case 1: // slots
-                    graphics.strokeColor = _slotColor;
-                    for(let i = 0; i < debugLen; i += 8){
-                        graphics.moveTo(debugData[debugIdx++], debugData[debugIdx++]);
-                        graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
-                        graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
-                        graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
-                        graphics.close();
-                        graphics.stroke();
-                    }
+                        graphics.strokeColor = _slotColor;
+                        for(let i = 0; i < debugLen; i += 8){
+                            graphics.moveTo(debugData[debugIdx++], debugData[debugIdx++]);
+                            graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
+                            graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
+                            graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
+                            graphics.close();
+                            graphics.stroke();
+                        }
                     break;
                     case 2: // mesh
-                    graphics.strokeColor = _meshColor;
-                    for(let i = 0; i < debugLen; i += 6) {
-                        graphics.moveTo(debugData[debugIdx++], debugData[debugIdx++]);
-                        graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
-                        graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
-                        graphics.close();
-                        graphics.stroke();
-                    }
+                        graphics.strokeColor = _meshColor;
+                        for(let i = 0; i < debugLen; i += 6) {
+                            graphics.moveTo(debugData[debugIdx++], debugData[debugIdx++]);
+                            graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
+                            graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
+                            graphics.close();
+                            graphics.stroke();
+                        }
                     break;
                     case 3: // bones
-                    graphics.strokeColor = _boneColor;
-                    graphics.fillColor = _slotColor; // Root bone color is same as slot color.
-                    for (let i = 0; i < debugLen; i += 4) {
-                        let bx = debugData[debugIdx++];
-                        let by = debugData[debugIdx++];
-                        let x = debugData[debugIdx++];
-                        let y = debugData[debugIdx++];
-        
-                        // Bone lengths.
-                        graphics.moveTo(bx, by);
-                        graphics.lineTo(x, y);
-                        graphics.stroke();
-        
-                        // Bone origins.
-                        graphics.circle(bx, by, Math.PI * 1.5);
-                        graphics.fill();
-                        if (i === 0) {
-                            graphics.fillColor = _originColor;
+                        graphics.strokeColor = _boneColor;
+                        graphics.fillColor = _slotColor; // Root bone color is same as slot color.
+                        for (let i = 0; i < debugLen; i += 4) {
+                            let bx = debugData[debugIdx++];
+                            let by = debugData[debugIdx++];
+                            let x = debugData[debugIdx++];
+                            let y = debugData[debugIdx++];
+            
+                            // Bone lengths.
+                            graphics.moveTo(bx, by);
+                            graphics.lineTo(x, y);
+                            graphics.stroke();
+            
+                            // Bone origins.
+                            graphics.circle(bx, by, Math.PI * 1.5);
+                            graphics.fill();
+                            if (i === 0) {
+                                graphics.fillColor = _originColor;
+                            }
                         }
-                    }
                     break;
+                    default:
+                    return;
                 }
             }
         }
