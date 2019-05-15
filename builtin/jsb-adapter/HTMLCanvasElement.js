@@ -41,6 +41,8 @@ class HTMLCanvasElement extends HTMLElement {
         this._context2D = null;
         this._data = null;
         this._alignment = 4; // Canvas is used for rendering text only and we make sure the data format is RGBA.
+        // Whether the pixel data is premultiplied, the data returned from the native platform is all premultiplied.
+        this._premultiplied = false;
     }
 
     //REFINE: implement opts.
@@ -60,6 +62,7 @@ class HTMLCanvasElement extends HTMLElement {
                 this._context2D._setCanvasBufferUpdatedCallback(function (data) {
                     // FIXME: Canvas's data will take 2x memory size, one in C++, another is obtained by Uint8Array here.
                     self._data = new ImageData(data, self._width, self._height);
+                    self._premultiplied = true;
                     // If the width of canvas could be divided by 2, it means that the bytes per row could be divided by 8.
                     self._alignment = self._width % 2 === 0 ? 8 : 4;
                 });
@@ -108,7 +111,10 @@ class HTMLCanvasElement extends HTMLElement {
 
     get data() {
         if (this._data) {
-            this.unpremultAlpha();
+            if (this._premultiplied) {
+                this._premultiplied = false;
+                this.unpremultAlpha();
+            }
             return this._data.data;
         } 
         return null;
