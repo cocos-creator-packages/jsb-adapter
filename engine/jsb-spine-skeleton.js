@@ -23,6 +23,8 @@
  THE SOFTWARE.
  ****************************************************************************/
 
+"use strict";
+
 (function(){
     if (window.sp === undefined || window.spine === undefined || window.middleware === undefined) return;
 
@@ -86,6 +88,18 @@
     let renderer = cc.renderer;
     let renderEngine = renderer.renderEngine;
     let renderCompProto = cc.RenderComponent.prototype;
+    var _slotColor = cc.color(0, 0, 255, 255);
+    var _boneColor = cc.color(255, 0, 0, 255);
+    var _originColor = cc.color(0, 255, 0, 255);
+    
+    sp.ANIMATION_EVENT_TYPE = {
+        START: 0,
+        INTERRUPT: 1,
+        END: 2,
+        DISPOSE: 3,
+        COMPLETE: 4,
+        EVENT: 5
+    };
 
     let animation = spine.SpineAnimation.prototype;
     // The methods are added to be compatibility with old versions.
@@ -104,42 +118,43 @@
 
         this.setStartListener(function (trackEntry) {
             if (this._target && this._callback) {
-                this._callback.call(this._target, this, trackEntry, sp.AnimationEventType.START, null, 0);
+                this._callback.call(this._target, this, trackEntry, sp.ANIMATION_EVENT_TYPE.START, null, 0);
             }
         });
 
         this.setInterruptListener(function (trackEntry) {
             if (this._target && this._callback) {
-                this._callback.call(this._target, this, trackEntry, sp.AnimationEventType.INTERRUPT, null, 0);
+                this._callback.call(this._target, this, trackEntry, sp.ANIMATION_EVENT_TYPE.INTERRUPT, null, 0);
             }
         });
 
         this.setEndListener(function (trackEntry) {
             if (this._target && this._callback) {
-                this._callback.call(this._target, this, trackEntry, sp.AnimationEventType.END, null, 0);
+                this._callback.call(this._target, this, trackEntry, sp.ANIMATION_EVENT_TYPE.END, null, 0);
             }
         });
 
         this.setDisposeListener(function (trackEntry) {
             if (this._target && this._callback) {
-                this._callback.call(this._target, this, trackEntry, sp.AnimationEventType.DISPOSE, null, 0);
+                this._callback.call(this._target, this, trackEntry, sp.ANIMATION_EVENT_TYPE.DISPOSE, null, 0);
             }
         });
 
         this.setCompleteListener(function (trackEntry, loopCount) {
             if (this._target && this._callback) {
-                this._callback.call(this._target, this, trackEntry, sp.AnimationEventType.COMPLETE, null, loopCount);
+                this._callback.call(this._target, this, trackEntry, sp.ANIMATION_EVENT_TYPE.COMPLETE, null, loopCount);
             }
         });
 
         this.setEventListener(function (trackEntry, event) {
             if (this._target && this._callback) {
-                this._callback.call(this._target, this, trackEntry, sp.AnimationEventType.EVENT, event, 0);
+                this._callback.call(this._target, this, trackEntry, sp.ANIMATION_EVENT_TYPE.EVENT, event, 0);
             }
         });
     };
 
-    let skeleton = sp.Skeleton.prototype;
+    sp.Skeleton._assembler = undefined;
+    var skeleton = sp.Skeleton.prototype;
     Object.defineProperty(skeleton, 'paused', {
         get () {
             return this._paused || false;
@@ -234,11 +249,16 @@
         if (_onLoad) {
             _onLoad.call(this);
         }
-
         this._iaPool = [];
         this._iaPool.push(new middleware.MiddlewareIA());
         this._iaRenderData = new cc.IARenderData();
     };
+
+    skeleton.initNativeHandle = function () {
+        this._assembler = undefined;
+        this._renderHandle = new middleware.MiddlewareRenderHandle();
+        this._renderHandle.bind(this);
+    },
 
     // Shield use batch in native
     skeleton._updateBatch = function () {};
@@ -267,7 +287,7 @@
         }
         this._skeleton = skeletonAni;
         this._skeleton._comp = this;
-
+        
         this._skeleton.setOpacityModifyRGB(this.premultipliedAlpha);
         this._skeleton.setDebugSlotsEnabled(this.debugSlots);
         this._skeleton.setDebugBonesEnabled(this.debugBones);
@@ -275,6 +295,7 @@
         this._skeleton.setTimeScale(this.timeScale);
 
         this._renderInfoOffset = this._skeleton.getRenderInfoOffset();
+        this._skeleton.bindNodeProxy(this.node._proxy);
 
         // init skeleton listener
         this._startListener && this.setStartListener(this._startListener);
@@ -336,7 +357,71 @@
         }
     };
 
-    skeleton.update = undefined;
+    skeleton.update = function (dt) {
+        if (this.paused) return;
+        var skeleton = this._skeleton;
+        if (!skeleton) return;
+        var node = this.node;
+        if (!node) return;
+
+        if (this.__preColor__ === undefined || !node.color.equals(this.__preColor__)) {
+            skeleton.setColor(node.color);
+            this.__preColor__ = node.color;
+        }
+
+        if (this.debugBones || this.debugSlots) {
+            var debugData = this._debugData || this._skeleton.getDebugData();
+            if (!debugData) return;
+
+            var graphics = this._debugRenderer;
+            graphics.clear();
+    
+            var debugIdx = 0;
+    
+            if (this.debugSlots) {
+                // Debug Slot
+                graphics.strokeColor = _slotColor;
+                graphics.lineWidth = 5;
+    
+                var debugSlotsLen = debugData[debugIdx++];
+                for(var i=0;i<debugSlotsLen;i+=8){
+                    graphics.moveTo(debugData[debugIdx++], debugData[debugIdx++]);
+                    graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
+                    graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
+                    graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
+                    graphics.close();
+                    graphics.stroke();
+                }
+            }
+    
+            if (this.debugBones) {
+    
+                graphics.lineWidth = 5;
+                graphics.strokeColor = _boneColor;
+                graphics.fillColor = _slotColor; // Root bone color is same as slot color.
+    
+                var debugBonesLen = debugData[debugIdx++];
+                for (var i = 0; i < debugBonesLen; i += 4) {
+                    var bx = debugData[debugIdx++];
+                    var by = debugData[debugIdx++];
+                    var x = debugData[debugIdx++];
+                    var y = debugData[debugIdx++];
+    
+                    // Bone lengths.
+                    graphics.moveTo(bx, by);
+                    graphics.lineTo(x, y);
+                    graphics.stroke();
+    
+                    // Bone origins.
+                    graphics.circle(bx, by, Math.PI * 2);
+                    graphics.fill();
+                    if (i === 0) {
+                        graphics.fillColor = _originColor;
+                    }
+                }
+            }
+        }
+    }
 
     skeleton.updateWorldTransform = function () {
         this._skeleton && this._skeleton.updateWorldTransform();
