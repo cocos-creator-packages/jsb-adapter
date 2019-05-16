@@ -125,26 +125,27 @@
   {
     "name": "EditBox",
     "entries": [
-      "./engine/jsb-editbox.js"
+      "./dist/engine/jsb-editbox.js",
+      "./dist/engine/rt_input.js"
     ],
     "dependencies": ["WebGL Renderer"]
   },
   {
     "name": "VideoPlayer",
     "entries": [
-      "./engine/jsb-videoplayer.js"
+      "./dist/engine/jsb-videoplayer.js"
     ]
   },
   {
     "name": "WebView",
     "entries": [
-      "./engine/jsb-webview.js"
+      "./dist/engine/jsb-webview.js"
     ]
   },
   {
     "name": "Audio",
     "entries": [
-      "./engine/jsb-audio.js"
+      "./dist/engine/jsb-audio.js"
     ]
   },
   {
@@ -182,8 +183,7 @@
     "entries": []
   },
   {
-    "name": "Native NetWork",
-    "entries": []
+    "name": "Native NetWork"
   },
   {
     "name": "3D",

@@ -25,6 +25,9 @@
 (function(){
     if (window.dragonBones === undefined || window.middleware === undefined) return;
     if (dragonBones.DragonBonesAtlasAsset === undefined) return;
+    
+    var renderEngine = cc.renderer.renderEngine;
+    var SpriteMaterial = renderEngine.SpriteMaterial;
 
     // dragonbones global time scale.
     Object.defineProperty(dragonBones, 'timeScale', {
@@ -242,6 +245,30 @@
         return textureMap.get(texKey);
     };
 
+    dbAtlas.buildMaterial = function (tex) {
+
+        this._material = this._material || new SpriteMaterial();
+        this._materialCache = this._materialCache || {};
+        var baseMaterial = this._material;
+        var materialCache = this._materialCache;
+    
+        var baseKey = baseMaterial._hash;
+        var material = undefined;
+        if (!materialCache[baseKey]) {
+            material = baseMaterial;
+        } else {
+            material = baseMaterial.clone();
+        }
+
+        material.useModel = true;
+        material.texture = tex;
+        material.useColor = false;
+        material.updateHash();
+
+        materialCache[material._hash] = material;
+        return material;
+    }
+
     dbAtlas.updateTextureAtlasData = function (factory) {
         let url = this._texture.url;
         let preAtlasInfo = textureIdx2Name[url];
@@ -271,6 +298,16 @@
         this.jsbTexture.setPixelsWide(this._texture.width);
         this.jsbTexture.setPixelsHigh(this._texture.height);
         this._textureAtlasData = factory.parseTextureAtlasData(this.atlasJson, this.jsbTexture, this._uuid);
+
+        var material = this.buildMaterial(this._texture);
+
+        // var pass = material._mainTech.passes[0];
+        // pass._programName = 'skeleton';
+        // pass._native.setProgramName('skeleton');
+
+        var nativeEffect = material.effect._nativeObj;
+        this.jsbTexture.setNativeEffect(nativeEffect);
+        this.jsbTexture.setNativeTexture(this._texture.getImpl());
 
         textureIdx2Name[url] = {name:this._textureAtlasData.name,index:index};
     };
@@ -410,6 +447,12 @@
     // Shield use batch in native
     armatureDisplayProto._updateBatch = function () {}
 
+    armatureDisplayProto.initNativeHandle = function () {
+        this._assembler = undefined;
+        this._renderHandle = new middleware.MiddlewareRenderHandle();
+        this._renderHandle.bind(this);
+    }
+
     armatureDisplayProto._buildArmature = function () {
         if (!this.dragonAsset || !this.dragonAtlasAsset || !this.armatureName) {
             this._clearRenderData();
@@ -434,6 +477,7 @@
         this._nativeDisplay._comp = this;
         this._nativeDisplay._eventTarget = this._eventTarget;
 
+        this._nativeDisplay.bindNodeProxy(this.node._proxy);
         this._nativeDisplay.setOpacityModifyRGB(this.premultipliedAlpha);
         this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
         this._nativeDisplay.setDBEventCallback(function(eventObject) {
@@ -497,7 +541,10 @@
             this._factory.add(this._armature);
         }
         this._activateMaterial();
-    };
+        this.node._renderFlag &= ~RenderFlow.FLAG_UPDATE_RENDER_DATA;
+        this.node._renderFlag &= ~RenderFlow.FLAG_RENDER;
+        this.node._renderFlag &= ~RenderFlow.FLAG_CUSTOM_IA_RENDER;
+    }
 
     armatureDisplayProto.onDisable = function () {
         renderCompProto.onDisable.call(this);
