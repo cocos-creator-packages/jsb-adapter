@@ -60,14 +60,10 @@ if (CC_NATIVERENDERER) {
         require('./assemblers/label/index.js');
         require('./assemblers/label/ttf.js');
         require('./assemblers/label/bmfont.js');
-        require('./assemblers/graphics/impl.js');
-        require('./assemblers/graphics/index.js');
-        require('./assemblers/mask-assembler.js');
+        if (cc.Graphics) {
+            require('./assemblers/graphics/impl.js');
+            require('./assemblers/graphics/index.js');
+            require('./assemblers/mask-assembler.js');
+        }
     });
-}
-else {
-    require('./absent/jsb-editor-support.js');
-    require('./absent/jsb-dragonbones.js');
-    require('./absent/jsb-spine-skeleton.js');
-    require('./absent/jsb-spine-assembler.js');
 }
