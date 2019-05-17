@@ -25,9 +25,6 @@
 (function(){
     if (window.dragonBones === undefined || window.middleware === undefined) return;
     if (dragonBones.DragonBonesAtlasAsset === undefined) return;
-    
-    var renderEngine = cc.renderer.renderEngine;
-    var SpriteMaterial = renderEngine.SpriteMaterial;
 
     // dragonbones global time scale.
     Object.defineProperty(dragonBones, 'timeScale', {
@@ -41,6 +38,10 @@
         },
         configurable: true,
     });
+
+    let _slotColor = cc.color(0, 0, 255, 255);
+    let _boneColor = cc.color(255, 0, 0, 255);
+    let _originColor = cc.color(0, 255, 0, 255);
 
     ////////////////////////////////////////////////////////////
     // override dragonBones library by native dragonBones
@@ -245,30 +246,6 @@
         return textureMap.get(texKey);
     };
 
-    dbAtlas.buildMaterial = function (tex) {
-
-        this._material = this._material || new SpriteMaterial();
-        this._materialCache = this._materialCache || {};
-        var baseMaterial = this._material;
-        var materialCache = this._materialCache;
-    
-        var baseKey = baseMaterial._hash;
-        var material = undefined;
-        if (!materialCache[baseKey]) {
-            material = baseMaterial;
-        } else {
-            material = baseMaterial.clone();
-        }
-
-        material.useModel = true;
-        material.texture = tex;
-        material.useColor = false;
-        material.updateHash();
-
-        materialCache[material._hash] = material;
-        return material;
-    }
-
     dbAtlas.updateTextureAtlasData = function (factory) {
         let url = this._texture.url;
         let preAtlasInfo = textureIdx2Name[url];
@@ -298,15 +275,6 @@
         this.jsbTexture.setPixelsWide(this._texture.width);
         this.jsbTexture.setPixelsHigh(this._texture.height);
         this._textureAtlasData = factory.parseTextureAtlasData(this.atlasJson, this.jsbTexture, this._uuid);
-
-        var material = this.buildMaterial(this._texture);
-
-        // var pass = material._mainTech.passes[0];
-        // pass._programName = 'skeleton';
-        // pass._native.setProgramName('skeleton');
-
-        var nativeEffect = material.effect._nativeObj;
-        this.jsbTexture.setNativeEffect(nativeEffect);
         this.jsbTexture.setNativeTexture(this._texture.getImpl());
 
         textureIdx2Name[url] = {name:this._textureAtlasData.name,index:index};
@@ -361,7 +329,7 @@
         if (this.dragonBonesJson) {
             filePath = this.dragonBonesJson;
         } else {
-            filePath = cc.loader.md5Pipe ? cc.loader.md5Pipe.transformURL(this.nativeUrl) : this.nativeUrl;
+            filePath = cc.loader.md5Pipe ? cc.loader.md5Pipe.transformURL(this.nativeUrl, true) : this.nativeUrl;
         }
         this._factory.parseDragonBonesDataByPath(filePath, armatureKey);
         return armatureKey;
@@ -376,11 +344,10 @@
     ////////////////////////////////////////////////////////////
     // override ArmatureDisplay
     ////////////////////////////////////////////////////////////
+    dragonBones.ArmatureDisplay._assembler = null;
     let armatureDisplayProto = dragonBones.ArmatureDisplay.prototype;
-    let assembler = dragonBones.ArmatureDisplay._assembler;
     let renderCompProto = cc.RenderComponent.prototype;
-    let gfx = cc.gfx;
-    let VertexFormat = gfx.VertexFormat;
+    let RenderFlow = cc.RenderFlow;
 
     Object.defineProperty(armatureDisplayProto, 'armatureName', {
         get () {
@@ -438,20 +405,25 @@
     });
 
     armatureDisplayProto._clearRenderData = function () {
-        this._renderInfoOffset = null;
         this._nativeDisplay = null;
     };
-
-    armatureDisplayProto.update = null;
 
     // Shield use batch in native
     armatureDisplayProto._updateBatch = function () {}
 
     armatureDisplayProto.initNativeHandle = function () {
-        this._assembler = undefined;
+        this._assembler = null;
         this._renderHandle = new middleware.MiddlewareRenderHandle();
         this._renderHandle.bind(this);
-    }
+    };
+
+    let _updateMaterial = armatureDisplayProto._updateMaterial;
+    armatureDisplayProto._updateMaterial = function(material) {
+        _updateMaterial.call(this, material);
+        let nativeEffect = material.effect._nativeObj;
+        this._nativeDisplay.setNativeEffect(nativeEffect);
+        this._renderHandle.clearNativeEffect();
+    };
 
     armatureDisplayProto._buildArmature = function () {
         if (!this.dragonAsset || !this.dragonAtlasAsset || !this.armatureName) {
@@ -476,14 +448,17 @@
         this._nativeDisplay._ccNode = this.node;
         this._nativeDisplay._comp = this;
         this._nativeDisplay._eventTarget = this._eventTarget;
-
         this._nativeDisplay.bindNodeProxy(this.node._proxy);
         this._nativeDisplay.setOpacityModifyRGB(this.premultipliedAlpha);
         this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
         this._nativeDisplay.setDBEventCallback(function(eventObject) {
             this._eventTarget.emit(eventObject.type, eventObject);
         });
-
+        this._material.texture = this.dragonAtlasAsset._texture;
+        this._material.useColor = false;
+        this._material.useModel = true;
+        this._updateMaterial(this._material);
+      
         // add all event into native display
         let callbackTable = this._eventTarget._callbackTable;
         // just use to adapt to native api
@@ -496,55 +471,22 @@
 
         this._armature = this._nativeDisplay.armature();
         this._armature.animation.timeScale = this.timeScale;
-        
-        this._renderInfoOffset = this._nativeDisplay.getRenderInfoOffset();
 
         if (this.animationName) {
             this.playAnimation(this.animationName, this.playTimes);
         }
     };
 
-    armatureDisplayProto._activateMaterial = function () {
-        let texture = this.dragonAtlasAsset && this.dragonAtlasAsset.texture;
-        if (!texture) {
-            this.disableRender();
-            return;
-        }
 
-        if (!texture.loaded) {
-            this.disableRender();
-            texture.once('load', this._activateMaterial, this);
-            return;
-        }
-
-        // Get material
-        let material = this.sharedMaterials[0];
-        if (!material) {
-            material = cc.Material.getInstantiatedBuiltinMaterial('sprite', this);
-            material.define('_USE_MODEL', true);
-            material.define('USE_TEXTURE', true);
-        } else {
-            material = cc.Material.getInstantiatedMaterial(material, this);
-        }
-
-        material.setProperty('texture', texture);
-        this.setMaterial(0, material);
-
-        this.markForUpdateRenderData(false);
-        this.markForRender(false);
-        this.markForCustomIARender(true);
-    };
-    
     armatureDisplayProto.onEnable = function () {
         renderCompProto.onEnable.call(this);
         if (this._armature) {
             this._factory.add(this._armature);
         }
-        this._activateMaterial();
         this.node._renderFlag &= ~RenderFlow.FLAG_UPDATE_RENDER_DATA;
         this.node._renderFlag &= ~RenderFlow.FLAG_RENDER;
         this.node._renderFlag &= ~RenderFlow.FLAG_CUSTOM_IA_RENDER;
-    }
+    };
 
     armatureDisplayProto.onDisable = function () {
         renderCompProto.onDisable.call(this);
@@ -558,10 +500,6 @@
         if (_onLoad) {
             _onLoad.call(this);
         }
-
-        this._iaPool = [];
-        this._iaPool.push(new middleware.MiddlewareIA());
-        this._iaRenderData = new cc.IARenderData();
     };
 
     armatureDisplayProto.once = function (eventType, listener, target) {
@@ -595,125 +533,18 @@
         }
         this._materialCache = null;
     };
-
-    ////////////////////////////////////////////////////////////
-    // override webgl-assembler
-    ////////////////////////////////////////////////////////////
-    let _slotColor = cc.color(0, 0, 255, 255);
-    let _boneColor = cc.color(255, 0, 0, 255);
-    let _originColor = cc.color(0, 255, 0, 255);
-
-    let _getSlotMaterial = function (comp, tex, src, dst) {
-        let key = tex.url + src + dst;
-        let baseMaterial = comp.sharedMaterials[0];
-        if (!baseMaterial) return null;
-
-        let materialCache = comp._materialCache;
-        let material = materialCache[key];
-        
-        if (!material) {
-            material = new cc.Material();
-            material.copy(baseMaterial);
-
-            material.define('_USE_MODEL', true);
-            material.setProperty('texture', tex);
     
-            // update blend function
-            let pass = material.effect.getDefaultTechnique().passes[0];
+    armatureDisplayProto.update = function() {
+        if (this._debugDraw && this.debugBones) {
 
-            pass.setBlend(
-                true,
-                gfx.BLEND_FUNC_ADD,
-                src, dst,
-                gfx.BLEND_FUNC_ADD,
-                src, dst
-            );
-            material.updateHash(key);
-            materialCache[key] = material;
-        }
-        else if (material.getProperty('texture') !== tex) {
-            material.setProperty('texture', tex);
-            material.updateHash(key);
-            materialCache[key] = material;
-        }
-        return material;
-    };
+            let nativeDisplay = this._nativeDisplay;
+            this._debugData = this._debugData || nativeDisplay.getDebugData();
+            if (!this._debugData) return;
 
-    // native enable useModel
-    assembler.useModel = true;
-
-    // native no need implement
-    assembler.genRenderDatas = function (comp, batchData) {
-    };
-
-    // native no need implement
-    assembler.updateRenderData = function (comp, batchData) {
-    };
-
-    assembler.renderIA = function (comp, renderer) {
-
-        let nativeDisplay = comp._nativeDisplay;
-        if (!nativeDisplay) {
-            return;
-        }
-
-        let node = comp.node;
-        let iaPool = comp._iaPool;
-        let poolIdx = 0;
-
-        if (comp.__preColor__ === undefined || 
-        !node.color.equals(comp.__preColor__)) {
-            nativeDisplay.setColor(node.color);
-            comp.__preColor__ = node.color;
-        }
-
-        let infoOffset = comp._renderInfoOffset[0];
-        let renderInfoMgr = middleware.renderInfoMgr;
-        let renderInfo = renderInfoMgr.renderInfo;
-
-        let materialIdx = 0,realTextureIndex,realTexture;
-        let matLen = renderInfo[infoOffset + materialIdx++];
-        if (matLen == 0) return;
-
-        for (let index = 0; index < matLen; index++) {
-            realTextureIndex = renderInfo[infoOffset + materialIdx++];
-            realTexture = comp.dragonAtlasAsset.getTextureByIndex(realTextureIndex);
-            
-            let material = _getSlotMaterial(comp, realTexture,
-                renderInfo[infoOffset + materialIdx++],
-                renderInfo[infoOffset + materialIdx++]);
-
-            let glIB = renderInfo[infoOffset + materialIdx++];
-            let glVB = renderInfo[infoOffset + materialIdx++];
-            let indiceOffset = renderInfo[infoOffset + materialIdx++];
-            let segmentCount = renderInfo[infoOffset + materialIdx++];
-
-            let ia = iaPool[poolIdx];
-            if (!ia) {
-                ia = new middleware.MiddlewareIA();
-                iaPool[poolIdx] = ia;
-            }
-            ia._start = indiceOffset;
-
-            ia.count = segmentCount;
-            ia.setVertexFormat(VertexFormat.XY_UV_Color);
-            ia.setGLIBID(glIB);
-            ia.setGLVBID(glVB);
-
-            poolIdx++;
-
-            comp._iaRenderData.ia = ia;
-            comp._iaRenderData.material = material;
-            renderer._flushIA(comp._iaRenderData);
-        }
-
-        if (comp.debugBones && comp._debugDraw) {
-
-            let graphics = comp._debugDraw;
+            let graphics = this._debugDraw;
             graphics.clear();
 
-            comp._debugData = comp._debugData || nativeDisplay.getDebugData();
-            let debugData = comp._debugData;
+            let debugData = this._debugData;
             let debugIdx = 0;
 
             graphics.lineWidth = 5;

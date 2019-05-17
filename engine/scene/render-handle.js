@@ -32,6 +32,12 @@ cc.js.mixin(renderer.RenderHandle.prototype, {
         this.meshCount = 0;
         this._material = null;
         this._delayed = false;
+        this._comp = null;
+    },
+
+    destroy () {
+        RenderFlow.off(BEFORE_RENDER, this.updateRenderData, this);
+        this._comp = null;
     },
 
     bind (component) {
@@ -60,7 +66,7 @@ cc.js.mixin(renderer.RenderHandle.prototype, {
         this.reserveMeshCount(index+1);
 
         this.vDatas[index] = vertices;
-        this.uintVDatas[index] = new Uint32Array(vertices.buffer);
+        this.uintVDatas[index] = new Uint32Array(vertices.buffer, 0, vertices.length);
         this.iDatas[index] = indices;
         this.meshCount = this.vDatas.length;
 

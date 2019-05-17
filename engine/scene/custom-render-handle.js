@@ -24,7 +24,10 @@
 
 cc.js.mixin(renderer.CustomRenderHandle.prototype, {
     _ctor () {
-      
+        this._comp = null;
+    },
+    destroy () {
+        this._comp = null;
     },
     bind (component) {
         if (this._comp !== component && component instanceof cc.RenderComponent) {

@@ -31,6 +31,10 @@ cc.js.mixin(renderer.GraphicsRenderHandle.prototype, {
         this.meshCount = 0;
         this._material = null;
         this._delayed = false;
+        this._comp = null;
+    },
+    destroy () {
+        this._comp = null;
     },
     bind (component) {
         if (this._comp !== component && component instanceof cc.RenderComponent) {
@@ -70,7 +74,7 @@ cc.js.mixin(renderer.GraphicsRenderHandle.prototype, {
         this.reserveMeshCount(index+1);
 
         this.vDatas[index] = vertices;
-        this.uintVDatas[index] = new Uint32Array(vertices.buffer);
+        this.uintVDatas[index] = new Uint32Array(vertices.buffer, 0, vertices.length);
         this.iDatas[index] = indices;
         this.meshCount = this.vDatas.length;
 
