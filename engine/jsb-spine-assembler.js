@@ -101,6 +101,9 @@
         let node = comp.node;
         if (!node) return;
 
+        let renderInfoOffset = comp._renderInfoOffset;
+        if (!renderInfoOffset) return;
+
         if (comp.__preColor__ === undefined || !node.color.equals(comp.__preColor__)) {
             nativeSkeleton.setColor(node.color);
             comp.__preColor__ = node.color;
@@ -109,11 +112,15 @@
         let iaPool = comp._iaPool;
         let poolIdx = 0;
 
-        let infoOffset = comp._renderInfoOffset[0];
+        let infoOffset = renderInfoOffset[0];
         let renderInfoMgr = middleware.renderInfoMgr;
         let renderInfo = renderInfoMgr.renderInfo;
 
         let materialIdx = 0,realTextureIndex,realTexture;
+        // verify render border
+        let border = renderInfo[infoOffset + materialIdx++];
+        if (border !== 0xffffffff) return;
+
         let matLen = renderInfo[infoOffset + materialIdx++];
         let useTint = comp.useTint;
 
@@ -122,7 +129,8 @@
         for (let index = 0; index < matLen; index++) {
             realTextureIndex = renderInfo[infoOffset + materialIdx++];
             realTexture = comp.skeletonData.textures[realTextureIndex];
-            
+            if (!realTexture) return;
+
             let material = _getSlotMaterial(comp, realTexture,
                 renderInfo[infoOffset + materialIdx++],
                 renderInfo[infoOffset + materialIdx++]);
