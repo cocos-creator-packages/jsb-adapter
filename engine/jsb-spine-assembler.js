@@ -119,7 +119,7 @@
         let materialIdx = 0,realTextureIndex,realTexture;
         // verify render border
         let border = renderInfo[infoOffset + materialIdx++];
-        if (border != 0xffffffff) return;
+        if (border !== 0xffffffff) return;
 
         let matLen = renderInfo[infoOffset + materialIdx++];
         let useTint = comp.useTint;

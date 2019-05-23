@@ -609,7 +609,7 @@
         let materialIdx = 0,realTextureIndex,realTexture;
         // verify render border
         let border = renderInfo[infoOffset + materialIdx++];
-        if (border != 0xffffffff) return;
+        if (border !== 0xffffffff) return;
 
         let matLen = renderInfo[infoOffset + materialIdx++];
         if (matLen == 0) return;
