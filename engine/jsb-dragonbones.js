@@ -83,6 +83,17 @@
     };
 
     //-------------------
+    // native animation state
+    //-------------------
+    let animationStateProto = dragonBones.AnimationState.prototype;
+    let _isPlaying = animationStateProto.isPlaying;
+    Object.defineProperty(animationStateProto, 'isPlaying', {
+        get () {
+            return _isPlaying.call(this);
+        }
+    });
+
+    //-------------------
     // native armature
     //-------------------
     let armatureProto = dragonBones.Armature.prototype;
