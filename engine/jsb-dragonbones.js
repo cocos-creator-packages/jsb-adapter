@@ -457,6 +457,7 @@
         this._armature.animation.timeScale = this.timeScale;
         
         this._renderInfoOffset = this._nativeDisplay.getRenderInfoOffset();
+        this._renderInfoOffset[0] = 0;
 
         if (this.animationName) {
             this.playAnimation(this.animationName, this.playTimes);
@@ -471,6 +472,9 @@
         this.node._renderFlag &= ~RenderFlow.FLAG_UPDATE_RENDER_DATA;
         this.node._renderFlag &= ~RenderFlow.FLAG_RENDER;
         this.node._renderFlag |= RenderFlow.FLAG_CUSTOM_IA_RENDER;
+        if (this._renderInfoOffset) {
+            this._renderInfoOffset[0] = 0;
+        }
     };
 
     armatureDisplayProto.onDisable = function () {
@@ -603,6 +607,7 @@
         }
 
         let infoOffset = renderInfoOffset[0];
+        renderInfoOffset[0] = 0;
         let renderInfoMgr = middleware.renderInfoMgr;
         let renderInfo = renderInfoMgr.renderInfo;
 

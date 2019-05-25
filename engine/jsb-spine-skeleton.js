@@ -272,6 +272,7 @@
         this._skeleton.setTimeScale(this.timeScale);
 
         this._renderInfoOffset = this._skeleton.getRenderInfoOffset();
+        this._renderInfoOffset[0] = 0;
 
         // init skeleton listener
         this._startListener && this.setStartListener(this._startListener);
@@ -297,6 +298,9 @@
         this.node._renderFlag &= ~RenderFlow.FLAG_UPDATE_RENDER_DATA;
         this.node._renderFlag &= ~RenderFlow.FLAG_RENDER;
         this.node._renderFlag |= RenderFlow.FLAG_CUSTOM_IA_RENDER;
+        if (this._renderInfoOffset) {
+            this._renderInfoOffset[0] = 0;
+        }
     };
 
     let _onDisable = skeleton.onDisable;
