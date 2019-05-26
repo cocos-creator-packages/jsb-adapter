@@ -604,6 +604,9 @@
             return;
         }
 
+        let renderInfoOffset = comp._renderInfoOffset;
+        if (!renderInfoOffset) return;
+
         let node = comp.node;
         let iaPool = comp._iaPool;
         let poolIdx = 0;
@@ -614,18 +617,23 @@
             comp.__preColor__ = node.color;
         }
 
-        let infoOffset = comp._renderInfoOffset[0];
+        let infoOffset = renderInfoOffset[0];
         let renderInfoMgr = middleware.renderInfoMgr;
         let renderInfo = renderInfoMgr.renderInfo;
 
         let materialIdx = 0,realTextureIndex,realTexture;
+        // verify render border
+        let border = renderInfo[infoOffset + materialIdx++];
+        if (border !== 0xffffffff) return;
+
         let matLen = renderInfo[infoOffset + materialIdx++];
         if (matLen == 0) return;
 
         for (let index = 0; index < matLen; index++) {
             realTextureIndex = renderInfo[infoOffset + materialIdx++];
             realTexture = comp.dragonAtlasAsset.getTextureByIndex(realTextureIndex);
-            
+            if (!realTexture) return;
+
             let material = _getSlotMaterial(comp, realTexture,
                 renderInfo[infoOffset + materialIdx++],
                 renderInfo[infoOffset + materialIdx++]);
