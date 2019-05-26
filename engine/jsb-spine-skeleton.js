@@ -219,7 +219,7 @@
             for (let mKey in cache) {
                 let material = cache[mKey];
                 if (material) {
-                    material.useTint = this._useTint;
+                    material.define('USE_TINT', this._useTint);
                 }
             }
             if (this._skeleton) {
@@ -244,9 +244,9 @@
         this._renderHandle.bind(this);
     };
 
-    let _updateMaterial = skeleton._updateMaterial;
-    skeleton._updateMaterial = function(material) {
-        _updateMaterial.call(this, material);
+    let _setMaterial = skeleton.setMaterial;
+    skeleton.setMaterial = function(index, material) {
+        _setMaterial.call(this, index, material);
         let nativeEffect = material.effect._nativeObj;
         this._skeleton.setNativeEffect(nativeEffect);
         this._renderHandle.clearNativeEffect();
@@ -291,10 +291,6 @@
         this._skeleton.setTimeScale(this.timeScale);
         this._skeleton.bindNodeProxy(this.node._proxy);
 
-        this._material.texture = texValues[0];
-        this._material.useModel = true;
-        this._updateMaterial(this._material);
-
         // init skeleton listener
         this._startListener && this.setStartListener(this._startListener);
         this._endListener && this.setEndListener(this._endListener);
@@ -302,6 +298,38 @@
         this._eventListener && this.setEventListener(this._eventListener);
         this._interruptListener && this.setInterruptListener(this._interruptListener);
         this._disposeListener && this.setDisposeListener(this._disposeListener);
+
+        this._activateMaterial();
+    };
+
+    skeleton._activateMaterial = function () {
+        if (!this.skeletonData) {
+            this.disableRender();
+            return;
+        }
+
+        this.skeletonData.ensureTexturesLoaded(function (result) {
+            if (!result) {
+                return;
+            }
+
+            let material = this.sharedMaterials[0];
+            if (!material) {
+                material = cc.Material.getInstantiatedBuiltinMaterial('spine', this);
+                material.define('_USE_MODEL', true);
+            }
+            else {
+                material = cc.Material.getInstantiatedMaterial(material, this);
+            }
+
+            let texValues = this.skeletonData.textures;
+            material.setProperty('texture', texValues[0]);
+            this.setMaterial(0, material);
+
+            this.markForUpdateRenderData(false);
+            this.markForRender(true);
+            this.markForCustomIARender(false);
+        }, this);
     };
 
     skeleton.setAnimationStateData = function (stateData) {
@@ -316,9 +344,7 @@
         if (this._skeleton) {
             this._skeleton.onEnable();
         }
-        this.node._renderFlag &= ~RenderFlow.FLAG_UPDATE_RENDER_DATA;
-        this.node._renderFlag &= ~RenderFlow.FLAG_RENDER;
-        this.node._renderFlag &= ~RenderFlow.FLAG_CUSTOM_IA_RENDER;
+        this._activateMaterial();
     };
 
     let _onDisable = skeleton.onDisable;

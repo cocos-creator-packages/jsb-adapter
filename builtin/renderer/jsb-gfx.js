@@ -136,11 +136,13 @@ function convertOptions(options) {
 }
 
 _p = gfx.Texture2D.prototype;
+let _textureID = 0;
 _p._ctor = function(device, options) {
     if (device) {
         convertOptions(options);
         this.init(device, options);
     }
+    this._id = _textureID++;
 };
 _p.destroy = function() { 
 };

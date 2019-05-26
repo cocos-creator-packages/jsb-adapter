@@ -213,10 +213,12 @@ cc.Sprite._assembler.radialFilled = {
         let frame = sprite.spriteFrame;
         let renderHandle = sprite._renderHandle;
         if (frame) {
-            if (sprite._material._texture !== frame._texture) {
+            let material = sprite._materials[0];
+            let prop = material.getProperty('texture');
+            if (prop !== frame._texture) {
                 sprite._activateMaterial();
             }
-            renderHandle.updateMaterial(0, sprite._material);
+            renderHandle.updateMaterial(0, material);
         }
 
         if (frame && sprite._vertsDirty) {

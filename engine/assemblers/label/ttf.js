@@ -57,7 +57,7 @@ cc.Label._assembler.ttf = cc.js.addon({
 
     _updateVerts (comp) {
         let renderHandle = comp._renderHandle;
-        renderHandle.updateMaterial(0, comp.getMaterial());
+        renderHandle.updateMaterial(0, comp.getMaterial(0));
 
         let node = comp.node,
             width = node.width,

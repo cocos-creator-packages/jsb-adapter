@@ -17,16 +17,10 @@ require('./jsb-adapter');
 require('./jsb_audioengine');
 require('./jsb_input');
 // external interface of native renderer
-require('./renderer/config');
-require('./renderer/effect');
 require('./renderer/enums');
-require('./renderer/input-assembler');
+require('./renderer/jsb-vertex-format');
 require('./renderer/jsb-gfx');
 require('./renderer/jsb-renderer');
-require('./renderer/jsb-vertex-format');
-require('./renderer/model');
-require('./renderer/pass');
-require('./renderer/technique');
 
 let _oldRequestFrameCallback = null;
 let _requestAnimationFrameID = 0;
