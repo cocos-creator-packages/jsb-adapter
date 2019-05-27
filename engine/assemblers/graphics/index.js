@@ -62,15 +62,15 @@ function clamp (v, min, max) {
 
 cc.Graphics._assembler = {
     useModel: true,
+    delayUpdateRenderData: true,
     createImpl (graphics) {
         return new Impl(graphics);
     },
 
     updateRenderData (graphics) {
         let datas = graphics._impl.getRenderDatas(graphics);
-        graphics._activateMaterial();
         for (let i = 0, l = datas.length; i < l; i++) {
-            graphics._renderHandle.updateMaterial(i, graphics.getMaterial());
+            graphics._renderHandle.updateMaterial(i, graphics.sharedMaterials[0]);
         }
     },
 

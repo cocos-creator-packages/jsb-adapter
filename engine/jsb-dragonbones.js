@@ -417,9 +417,9 @@
         this._renderHandle.bind(this);
     };
 
-    let _updateMaterial = armatureDisplayProto._updateMaterial;
-    armatureDisplayProto._updateMaterial = function(material) {
-        _updateMaterial.call(this, material);
+    let _setMaterial = armatureDisplayProto.setMaterial;
+    armatureDisplayProto.setMaterial = function(index, material) {
+        _setMaterial.call(this, index, material);
         let nativeEffect = material.effect._nativeObj;
         this._nativeDisplay.setNativeEffect(nativeEffect);
         this._renderHandle.clearNativeEffect();
@@ -454,11 +454,8 @@
         this._nativeDisplay.setDBEventCallback(function(eventObject) {
             this._eventTarget.emit(eventObject.type, eventObject);
         });
-        this._material.texture = this.dragonAtlasAsset._texture;
-        this._material.useColor = false;
-        this._material.useModel = true;
-        this._updateMaterial(this._material);
-      
+        this._activateMaterial();
+
         // add all event into native display
         let callbackTable = this._eventTarget._callbackTable;
         // just use to adapt to native api
@@ -477,15 +474,43 @@
         }
     };
 
+    armatureDisplayProto._activateMaterial = function () {
+        let texture = this.dragonAtlasAsset && this.dragonAtlasAsset.texture;
+        if (!texture) {
+            this.disableRender();
+            return;
+        }
+
+        if (!texture.loaded) {
+            this.disableRender();
+            texture.once('load', this._activateMaterial, this);
+            return;
+        }
+
+        // Get material
+        let material = this.sharedMaterials[0];
+        if (!material) {
+            material = cc.Material.getInstantiatedBuiltinMaterial('sprite', this);
+            material.define('_USE_MODEL', true);
+            material.define('USE_TEXTURE', true);
+        } else {
+            material = cc.Material.getInstantiatedMaterial(material, this);
+        }
+
+        material.setProperty('texture', this.dragonAtlasAsset._texture);
+        this.setMaterial(0, material);
+
+        this.markForUpdateRenderData(false);
+        this.markForRender(true);
+        this.markForCustomIARender(false);
+    };
 
     armatureDisplayProto.onEnable = function () {
         renderCompProto.onEnable.call(this);
         if (this._armature) {
             this._factory.add(this._armature);
         }
-        this.node._renderFlag &= ~RenderFlow.FLAG_UPDATE_RENDER_DATA;
-        this.node._renderFlag &= ~RenderFlow.FLAG_RENDER;
-        this.node._renderFlag &= ~RenderFlow.FLAG_CUSTOM_IA_RENDER;
+        this._activateMaterial();
     };
 
     armatureDisplayProto.onDisable = function () {

@@ -21,6 +21,8 @@
  ****************************************************************************/
 
 "use strict";
+const RenderFlow = cc.RenderFlow;
+const BEFORE_RENDER = RenderFlow.EventType.BEFORE_RENDER;
 
 cc.js.mixin(renderer.GraphicsRenderHandle.prototype, {
     _ctor () {
@@ -34,6 +36,7 @@ cc.js.mixin(renderer.GraphicsRenderHandle.prototype, {
         this._comp = null;
     },
     destroy () {
+        RenderFlow.off(BEFORE_RENDER, this.updateRenderData, this);
         this._comp = null;
     },
     bind (component) {
@@ -92,6 +95,12 @@ cc.js.mixin(renderer.GraphicsRenderHandle.prototype, {
         }
         if (newEffect !== oldEffect) {
             this.updateNativeEffect(index, newEffect ? newEffect._nativeObj : null);
+        }
+    },
+    delayUpdateRenderData () {
+        if (this._comp) {
+            RenderFlow.on(BEFORE_RENDER, this.updateRenderData, this);
+            this._delayed = true;
         }
     },
     updateRenderData () {

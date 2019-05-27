@@ -21,57 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/ 
- 
-import InputAssembler from './input-assembler';
-import config from './config';
-import Effect from './effect';
-import Technique from './technique';
-import Pass from './pass';
-import Model from './model';
 
 const renderer = window.renderer;
-
-// projection
-renderer.PROJ_PERSPECTIVE = 0;
-renderer.PROJ_ORTHO = 1;
-
-// lights
-renderer.LIGHT_DIRECTIONAL = 0;
-renderer.LIGHT_POINT = 1;
-renderer.LIGHT_SPOT = 2;
-
-// shadows
-renderer.SHADOW_NONE = 0;
-renderer.SHADOW_HARD = 1;
-renderer.SHADOW_SOFT = 2;
-
-// parameter type
-renderer.PARAM_INT = 0;
-renderer.PARAM_INT2 = 1;
-renderer.PARAM_INT3 = 2;
-renderer.PARAM_INT4 = 3;
-renderer.PARAM_FLOAT = 4;
-renderer.PARAM_FLOAT2 = 5;
-renderer.PARAM_FLOAT3 = 6;
-renderer.PARAM_FLOAT4 = 7;
-renderer.PARAM_COLOR3 = 8;
-renderer.PARAM_COLOR4 = 9;
-renderer.PARAM_MAT2 = 10;
-renderer.PARAM_MAT3 = 11;
-renderer.PARAM_MAT4 = 12;
-renderer.PARAM_TEXTURE_2D = 13;
-renderer.PARAM_TEXTURE_CUBE = 14;
-
-// clear flags
-renderer.CLEAR_COLOR = 1;
-renderer.CLEAR_DEPTH = 2;
-renderer.CLEAR_STENCIL = 4;
-renderer.InputAssembler = InputAssembler;
-renderer.config = config;
-renderer.Effect = Effect;
-renderer.Technique = Technique;
-renderer.Pass = Pass;
-renderer.Model = Model;
 
 var models = [];
 var sizeOfModel = 13;
@@ -116,13 +67,104 @@ var fillModelData = function() {
   }
 }
 
+// program lib
+_p = renderer.ProgramLib.prototype;
+let _define = _p.define;
+let _shdID = 0;
+let _templates = {};
+let libDefine = function (prog) {
+    let { name, defines, glsl1 } = prog;
+    let { vert, frag } = glsl1 || prog;
+    if (_templates[name]) {
+      console.warn(`Failed to define shader ${name}: already exists.`);
+      return;
+    }
+
+    let id = ++_shdID;
+
+    // calculate option mask offset
+    let offset = 0;
+    for (let i = 0; i < defines.length; ++i) {
+      let def = defines[i];
+      let cnt = 1;
+
+      if (def.type === 'number') {
+        let range = def.range || [];
+        def.min = range[0] || 0;
+        def.max = range[1] || 4;
+        cnt = Math.ceil(Math.log2(def.max - def.min));
+
+        def._map = function (value) {
+          return (value - this.min) << this._offset;
+        }.bind(def);
+      } else { // boolean
+        def._map = function (value) {
+          if (value) {
+            return 1 << this._offset;
+          }
+          return 0;
+        }.bind(def);
+      }
+
+      offset += cnt;
+      def._offset = offset;
+    }
+
+    let uniforms = prog.uniforms || [];
+
+    if (prog.samplers) {
+      for (let i = 0; i < prog.samplers.length; i++) {
+        uniforms.push(prog.samplers[i])
+      }
+    }
+    if (prog.blocks) {
+      for (let i = 0; i < prog.blocks.length; i++) {
+        let defines = prog.blocks[i].defines;
+        let members = prog.blocks[i].members;
+        for (let j = 0; j < members.length; j++) {
+          uniforms.push({
+            defines,
+            name: members[j].name,
+            type: members[j].type,
+          })
+        }
+      }
+    }
+
+    // store it
+    _templates[name] = {
+      id,
+      name,
+      vert,
+      frag,
+      defines,
+      attributes: prog.attributes,
+      uniforms,
+      extensions: prog.extensions
+    };
+    _define.call(this, name, vert, frag, defines);
+}
+
+let libGetTemplate = function (name) {
+    return _templates[name];
+}
+
 // ForwardRenderer adapter
 var _p = renderer.ForwardRenderer.prototype;
 _p._ctor = function(device, builtin) {
   if (device) {
-    this.init(device, builtin.programTemplates, builtin.defaultTexture, window.innerWidth, window.innerHeight);
+    this.init(device, [], builtin.defaultTexture, window.innerWidth, window.innerHeight);
+    let templates = builtin.programTemplates;
+    this._programLib = this.getProgramLib();
+    this._programLib.define = libDefine;
+    this._programLib.getTemplate = libGetTemplate;
+    
+    for (let i = 0; i < templates.length; ++i) {
+        this._programLib.define(templates[i]);
+    }
   }
 };
+
 _p.render = function(scene) {
   fillModelData();
   this.renderNative(scene, modelsData);
@@ -142,5 +184,16 @@ _p.addModel = function(model) {
   models.push(model); 
 }
 _p.removeModel = function() {}
+
+// Camera
+_p = renderer.Camera.prototype;
+Object.defineProperty(_p, "cullingMask", {
+    get () {
+        return this.getCullingMask();
+    },
+    set (value) {
+        this.setCullingMask(value);
+    }
+});
 
 export default renderer;

@@ -21,6 +21,8 @@
  ****************************************************************************/
 
 "use strict";
+const RenderFlow = cc.RenderFlow;
+const BEFORE_RENDER = RenderFlow.EventType.BEFORE_RENDER;
 
 cc.js.mixin(renderer.MaskRenderHandle.prototype, {
     setNativeRenderHandle (handle) {
@@ -35,5 +37,21 @@ cc.js.mixin(renderer.MaskRenderHandle.prototype, {
     },
     useImageStencil (type) {
         this.setImageStencil(type);
-    }
+    },
+    destroy () {
+        RenderFlow.off(BEFORE_RENDER, this.updateRenderData, this);
+        this._comp = null;
+    },
+    delayUpdateRenderData () {
+        if (this._comp) {
+            RenderFlow.on(BEFORE_RENDER, this.updateRenderData, this);
+            this._delayed = true;
+        }
+    },
+    updateRenderData () {
+        if (this._comp && this._comp._assembler) {
+            this._comp._assembler.updateRenderData(this._comp);
+            this._delayed = false;
+        }
+    },
 });

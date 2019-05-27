@@ -60,7 +60,7 @@ cc.Label._assembler.bmfont = cc.js.addon({
             }
             renderHandle.updateMesh(0, vertices, indices);
         }
-        renderHandle.updateMaterial(0, comp.getMaterial());
+        renderHandle.updateMaterial(0, comp.getMaterial(0));
         _dataOffset = 0;
     },
 

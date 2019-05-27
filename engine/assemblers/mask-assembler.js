@@ -26,6 +26,7 @@ const spriteAssembler = cc.Sprite._assembler.simple;
 const graphicsAssembler = cc.Graphics._assembler;
 
 cc.Mask._assembler = {
+    delayUpdateRenderData: true,
     updateRenderData (mask) {
         if (!mask._renderData) {
             // Update clear graphics material
@@ -38,26 +39,21 @@ cc.Mask._assembler = {
         let renderData = mask._renderData;
         if (mask._type === Mask.Type.IMAGE_STENCIL) {
             if (mask.spriteFrame) {
-                if (!mask._material) {
-                    mask._activateMaterial();
-                }
+                renderData.dataLength = 4;
                 spriteAssembler.updateRenderData(mask);
-                renderData._material = mask._material;
+                renderData._material = mask.sharedMaterials[0];
             }
             else {
-                mask._material = null;
+                mask.setMaterial(0, null);
             }
             mask._renderHandle.useImageStencil(true);
         }
         else {
-            if (!mask._material) {
-                mask._activateMaterial();
-            }
-            mask._graphics._material = mask._material;
+            mask._graphics.setMaterial(0, mask.sharedMaterials[0]);
             graphicsAssembler.updateRenderData(mask._graphics);
             mask._renderHandle.useImageStencil(false);
         }
-        mask._renderHandle.updateMaterial(0, mask._material);
+        mask._renderHandle.updateMaterial(0, mask.sharedMaterials[0]);
         mask._renderHandle.setMaskInverted(mask.inverted);
         mask._renderHandle.setUseModel(mask._type !== Mask.Type.IMAGE_STENCIL);
         mask._clearGraphics._renderHandle.setUseModel(false);
