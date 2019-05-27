@@ -316,7 +316,7 @@
             let material = this.sharedMaterials[0];
             if (!material) {
                 material = cc.Material.getInstantiatedBuiltinMaterial('spine', this);
-                material.define('_USE_MODEL', true);
+                material.define('CC_USE_MODEL', true);
             }
             else {
                 material = cc.Material.getInstantiatedMaterial(material, this);

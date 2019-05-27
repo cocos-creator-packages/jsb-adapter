@@ -491,7 +491,7 @@
         let material = this.sharedMaterials[0];
         if (!material) {
             material = cc.Material.getInstantiatedBuiltinMaterial('sprite', this);
-            material.define('_USE_MODEL', true);
+            material.define('CC_USE_MODEL', true);
             material.define('USE_TEXTURE', true);
         } else {
             material = cc.Material.getInstantiatedMaterial(material, this);
