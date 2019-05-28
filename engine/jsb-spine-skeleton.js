@@ -39,9 +39,27 @@
     });
 
     let skeletonDataProto = sp.SkeletonData.prototype;
+    let _gTextureIdx = 1;
+    let _textureKeyMap = {};
+    let _textureMap = new WeakMap();
+
     skeletonDataProto.destroy = function () {
-        this._jsbTextures = null;
-        spine.disposeSkeletonData(this._uuid);
+        if (this._jsbTextures) {
+            this._jsbTextures = null;
+            spine.disposeSkeletonData(this._uuid);
+            let textures = this.textures;
+            for (let i = 0; i < textures.length; ++i) {
+                let texture = textures[i];
+                let index = texture && texture.__textureIndex__; 
+                if (index) {
+                    let texKey = _textureKeyMap[index];
+                    if (texKey && _textureMap.has(texKey)) {
+                        _textureMap.delete(texKey);
+                        delete _textureKeyMap[index];
+                    }
+                }
+            }
+        }
         cc.Asset.prototype.destroy.call(this);
     };
 
@@ -58,28 +76,47 @@
             cc.errorID(7508, this.name);
             return;
         }
-        let texValues = this.textures;
-        let texKeys = this.textureNames;
-        if (!(texValues && texValues.length > 0 && texKeys && texKeys.length > 0)) {
+        let textures = this.textures;
+        let textureNames = this.textureNames;
+        if (!(textures && textures.length > 0 && textureNames && textureNames.length > 0)) {
             cc.errorID(7507, this.name);
             return;
         }
+
         let jsbTextures = {};
-        for (let i = 0; i < texValues.length; ++i) {
+        for (let i = 0; i < textures.length; ++i) {
+            let texture = textures[i];
+            let textureIdx = this.recordTexture(texture);
             let spTex = new middleware.Texture2D();
-            spTex.setRealTextureIndex(i);
-            spTex.setPixelsWide(texValues[i].width);
-            spTex.setPixelsHigh(texValues[i].height);
+            spTex.setRealTextureIndex(textureIdx);
+            spTex.setPixelsWide(texture.width);
+            spTex.setPixelsHigh(texture.height);
             spTex.setTexParamCallback(function(texIdx,minFilter,magFilter,wrapS,warpT){
-                texValues[texIdx].setFilters(minFilter, magFilter);
-                texValues[texIdx].setWrapMode(wrapS, warpT);
+                let tex = this.getTextureByIndex(texIdx);
+                tex.setFilters(minFilter, magFilter);
+                tex.setWrapMode(wrapS, warpT);
             }.bind(this));
-            jsbTextures[texKeys[i]] = spTex;
+            jsbTextures[textureNames[i]] = spTex;
         }
         this._jsbTextures = jsbTextures;
         spine.initSkeletonData(uuid, this.skeletonJsonStr, atlasText, jsbTextures, this.scale);
 
         this._inited = true;
+    };
+
+    skeletonDataProto.recordTexture = function (texture) {
+        let index = _gTextureIdx;
+        let texKey = _textureKeyMap[index] = {key:index};
+        texture.__textureIndex__ = index;
+        _textureMap.set(texKey, texture);
+        _gTextureIdx++;
+        return index;
+    };
+
+    skeletonDataProto.getTextureByIndex = function (textureIdx) {
+        let texKey = _textureKeyMap[textureIdx];
+        if (!texKey) return;
+        return _textureMap.get(texKey);
     };
 
     let RenderFlow = cc.RenderFlow;
@@ -275,6 +312,7 @@
         this._skeleton.setTimeScale(this.timeScale);
 
         this._renderInfoOffset = this._skeleton.getRenderInfoOffset();
+        this._renderInfoOffset[0] = 0;
 
         // init skeleton listener
         this._startListener && this.setStartListener(this._startListener);
@@ -298,7 +336,7 @@
             this.disableRender();
             return;
         }
-
+        
         this.skeletonData.ensureTexturesLoaded(function (result) {
             if (!result) {
                 this.disableRender();
@@ -307,13 +345,12 @@
 
             let material = this.sharedMaterials[0];
             if (!material) {
-                material = cc.Material.getInstantiatedBuiltinMaterial('spine', this);
-                material.define('_USE_MODEL', true);
-            }
-            else {
+                material = cc.Material.getInstantiatedBuiltinMaterial('2d-spine', this);
+            } else {
                 material = cc.Material.getInstantiatedMaterial(material, this);
             }
 
+            material.define('_USE_MODEL', true);
             this.setMaterial(0, material);
             this.markForUpdateRenderData(false);
             this.markForRender(false);
@@ -327,6 +364,9 @@
             this._skeleton.onEnable();
         }
         this._activateMaterial();
+        if (this._renderInfoOffset) {
+            this._renderInfoOffset[0] = 0;
+        }
     };
 
     skeleton.onDisable = function () {
