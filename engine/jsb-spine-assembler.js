@@ -100,6 +100,8 @@
         let poolIdx = 0;
 
         let infoOffset = renderInfoOffset[0];
+        renderInfoOffset[0] = 0;
+        
         let renderInfoMgr = middleware.renderInfoMgr;
         let renderInfo = renderInfoMgr.renderInfo;
 
@@ -115,7 +117,7 @@
 
         for (let index = 0; index < matLen; index++) {
             realTextureIndex = renderInfo[infoOffset + materialIdx++];
-            realTexture = comp.skeletonData.textures[realTextureIndex];
+            realTexture = comp.skeletonData.getTextureByIndex(realTextureIndex);
             if (!realTexture) return;
 
             let material = _getSlotMaterial(comp, realTexture,
