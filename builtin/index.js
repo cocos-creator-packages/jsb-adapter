@@ -210,5 +210,46 @@ if (window.SocketIO) {
 
 window.gameTick = tick;
 
+// generate get set function
+jsb.generateGetSet = function (moduleObj) {
+    for (let classKey in moduleObj) {
+        let classProto = moduleObj[classKey] && moduleObj[classKey].prototype;
+        if (!classProto) continue;
+        for (let getName in classProto) {
+            let getPos = getName.search(/^get/);
+            if (getPos == -1) continue;
+            let propName = getName.replace(/^get/, '');
+            let nameArr = propName.split('');
+            let lowerFirst = nameArr[0].toLowerCase();
+            let upperFirst = nameArr[0].toUpperCase();
+            nameArr.splice(0, 1);
+            let left = nameArr.join('');
+            propName = lowerFirst + left;
+            let setName = 'set' + upperFirst + left;
+            if (classProto.hasOwnProperty(propName)) continue;
+            let setFunc = classProto[setName];
+            let hasSetFunc = typeof setFunc === 'function';
+            if (hasSetFunc) {
+                Object.defineProperty(classProto, propName, {
+                    get () {
+                        return this[getName]();
+                    },
+                    set (val) {
+                        this[setName](val);
+                    },
+                    configurable: true,
+                });
+            } else {
+                Object.defineProperty(classProto, propName, {
+                    get () {
+                        return this[getName]();
+                    },
+                    configurable: true,
+                });
+            }
+        }
+    }
+};
+
 // promise polyfill relies on setTimeout implementation
 require('./promise.min');

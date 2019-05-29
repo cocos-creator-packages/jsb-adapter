@@ -26,6 +26,9 @@
 (function(){
     if (window.sp === undefined || window.spine === undefined || window.middleware === undefined) return;
 
+    sp.VertexEffectDelegate = spine.VertexEffectDelegate;
+    jsb.generateGetSet(spine);
+
     // spine global time scale
     Object.defineProperty(sp, 'timeScale', {
         get () {
@@ -33,20 +36,38 @@
         },
         set (value) {
             this._timeScale = value;
-            spine.SpineAnimation.setGlobalTimeScale(value);
+            spine.SkeletonAnimation.setGlobalTimeScale(value);
         },
         configurable: true,
     });
 
     let skeletonDataProto = sp.SkeletonData.prototype;
+    let _gTextureIdx = 1;
+    let _textureKeyMap = {};
+    let _textureMap = new WeakMap();
+
     skeletonDataProto.destroy = function () {
-        this._jsbTextures = null;
-        spine.disposeSkeletonData(this._uuid);
+        if (this._jsbTextures) {
+            this._jsbTextures = null;
+            spine.disposeSkeletonData(this._uuid);
+            let textures = this.textures;
+            for (let i = 0; i < textures.length; ++i) {
+                let texture = textures[i];
+                let index = texture && texture.__textureIndex__; 
+                if (index) {
+                    let texKey = _textureKeyMap[index];
+                    if (texKey && _textureMap.has(texKey)) {
+                        _textureMap.delete(texKey);
+                        delete _textureKeyMap[index];
+                    }
+                }
+            }
+        }
         cc.Asset.prototype.destroy.call(this);
     };
 
     skeletonDataProto.init = function () {
-        if (this._inited) return;
+        if (this._skeletonCache) return;
 
         let uuid = this._uuid;
         if (!uuid) {
@@ -58,36 +79,50 @@
             cc.errorID(7508, this.name);
             return;
         }
-        let texValues = this.textures;
-        let texKeys = this.textureNames;
-        if (!(texValues && texValues.length > 0 && texKeys && texKeys.length > 0)) {
+        let textures = this.textures;
+        let textureNames = this.textureNames;
+        if (!(textures && textures.length > 0 && textureNames && textureNames.length > 0)) {
             cc.errorID(7507, this.name);
             return;
         }
+
         let jsbTextures = {};
-        for (let i = 0; i < texValues.length; ++i) {
+        for (let i = 0; i < textures.length; ++i) {
+            let texture = textures[i];
+            let textureIdx = this.recordTexture(texture);
             let spTex = new middleware.Texture2D();
-            spTex.setRealTextureIndex(i);
-            spTex.setPixelsWide(texValues[i].width);
-            spTex.setPixelsHigh(texValues[i].height);
+            spTex.setRealTextureIndex(textureIdx);
+            spTex.setPixelsWide(texture.width);
+            spTex.setPixelsHigh(texture.height);
             spTex.setTexParamCallback(function(texIdx,minFilter,magFilter,wrapS,warpT){
-                texValues[texIdx].setFilters(minFilter, magFilter);
-                texValues[texIdx].setWrapMode(wrapS, warpT);
+                let tex = this.getTextureByIndex(texIdx);
+                tex.setFilters(minFilter, magFilter);
+                tex.setWrapMode(wrapS, warpT);
             }.bind(this));
-            jsbTextures[texKeys[i]] = spTex;
+            jsbTextures[textureNames[i]] = spTex;
         }
         this._jsbTextures = jsbTextures;
-        spine.initSkeletonData(uuid, this.skeletonJsonStr, atlasText, jsbTextures, this.scale);
-
-        this._inited = true;
+        this._skeletonCache = spine.initSkeletonData(uuid, this.skeletonJsonStr, atlasText, jsbTextures, this.scale);
     };
 
-    let RenderFlow = cc.RenderFlow;
-    let renderer = cc.renderer;
-    let renderEngine = renderer.renderEngine;
+    skeletonDataProto.recordTexture = function (texture) {
+        let index = _gTextureIdx;
+        let texKey = _textureKeyMap[index] = {key:index};
+        texture.__textureIndex__ = index;
+        _textureMap.set(texKey, texture);
+        _gTextureIdx++;
+        return index;
+    };
+
+    skeletonDataProto.getTextureByIndex = function (textureIdx) {
+        let texKey = _textureKeyMap[textureIdx];
+        if (!texKey) return;
+        return _textureMap.get(texKey);
+    };
+
     let renderCompProto = cc.RenderComponent.prototype;
 
-    let animation = spine.SpineAnimation.prototype;
+    let animation = spine.SkeletonAnimation.prototype;
     // The methods are added to be compatibility with old versions.
     animation.setCompleteListener = function (listener) {
         this._compeleteListener = listener;
@@ -146,8 +181,8 @@
         },
         set (value) {
             this._paused = value;
-            if (this._skeleton) {
-                this._skeleton.paused(value);
+            if (this._nativeSkeleton) {
+                this._nativeSkeleton.paused(value);
             }
         }
     });
@@ -159,8 +194,8 @@
         set (value) {
             this._debugSlots = value;
             this._updateDebugDraw();
-            if (this._skeleton) {
-                this._skeleton.setDebugSlotsEnabled(this._debugSlots);
+            if (this._nativeSkeleton) {
+                this._nativeSkeleton.setDebugSlotsEnabled(this._debugSlots);
             }
         }
     });
@@ -172,8 +207,21 @@
         set (value) {
             this._debugBones = value;
             this._updateDebugDraw();
-            if (this._skeleton) {
-                this._skeleton.setDebugBonesEnabled(this._debugBones);
+            if (this._nativeSkeleton) {
+                this._nativeSkeleton.setDebugBonesEnabled(this._debugBones);
+            }
+        }
+    });
+
+    Object.defineProperty(skeleton, 'debugMesh', {
+        get () {
+            return this._debugMesh || false;
+        },
+        set (value) {
+            this._debugMesh = value;
+            this._updateDebugDraw();
+            if (this._nativeSkeleton) {
+                this._nativeSkeleton.setDebugMeshEnabled(this._debugMesh);
             }
         }
     });
@@ -187,8 +235,8 @@
         },
         set (value) {
             this._premultipliedAlpha = value;
-            if (this._skeleton) {
-                this._skeleton.setOpacityModifyRGB(this._premultipliedAlpha);
+            if (this._nativeSkeleton) {
+                this._nativeSkeleton.setOpacityModifyRGB(this._premultipliedAlpha);
             }
         }
     });
@@ -200,8 +248,8 @@
         },
         set (value) {
             this._timeScale = value;
-            if (this._skeleton) {
-                this._skeleton.setTimeScale(this._timeScale);
+            if (this._nativeSkeleton) {
+                this._nativeSkeleton.setTimeScale(this._timeScale);
             }
         }
     });
@@ -223,8 +271,8 @@
                     material.define('USE_TINT', this._useTint);
                 }
             }
-            if (this._skeleton) {
-                this._skeleton.setUseTint(this._useTint);
+            if (this._nativeSkeleton) {
+                this._nativeSkeleton.setUseTint(this._useTint);
             }
         }
     });
@@ -252,29 +300,31 @@
             return;
         }
 
-        if (this._skeleton) {
-            this._skeleton.stopSchedule();
-            this._skeleton._comp = null;
-            this._skeleton = null;
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.stopSchedule();
+            this._nativeSkeleton._comp = null;
+            this._nativeSkeleton = null;
         }
 
-        let skeletonAni = new spine.SpineAnimation();
+        let nativeSkeleton = new spine.SkeletonAnimation();
         try {
-            spine.initSkeletonRenderer(skeletonAni, uuid);
+            spine.initSkeletonRenderer(nativeSkeleton, uuid);
         } catch (e) {
             cc._throw(e);
             return;
         }
-        this._skeleton = skeletonAni;
-        this._skeleton._comp = this;
+        this._nativeSkeleton = nativeSkeleton;
+        this._nativeSkeleton._comp = this;
 
-        this._skeleton.setOpacityModifyRGB(this.premultipliedAlpha);
-        this._skeleton.setDebugSlotsEnabled(this.debugSlots);
-        this._skeleton.setDebugBonesEnabled(this.debugBones);
-        this._skeleton.setUseTint(this.useTint);
-        this._skeleton.setTimeScale(this.timeScale);
+        this._nativeSkeleton.setOpacityModifyRGB(this.premultipliedAlpha);
+        this._nativeSkeleton.setDebugSlotsEnabled(this.debugSlots);
+        this._nativeSkeleton.setDebugBonesEnabled(this.debugBones);this._nativeSkeleton.setDebugMeshEnabled(this._debugMesh);
+        this._nativeSkeleton.setUseTint(this.useTint);
+        this._nativeSkeleton.setTimeScale(this.timeScale);
+        this._skeleton = this._nativeSkeleton.getSkeleton();
 
-        this._renderInfoOffset = this._skeleton.getRenderInfoOffset();
+        this._renderInfoOffset = this._nativeSkeleton.getRenderInfoOffset();
+        this._renderInfoOffset[0] = 0;
 
         // init skeleton listener
         this._startListener && this.setStartListener(this._startListener);
@@ -288,8 +338,9 @@
     };
 
     skeleton.setAnimationStateData = function (stateData) {
-        if (this._skeleton) {
-            return this._skeleton.setAnimationStateData(stateData);
+        if (this._nativeSkeleton) {
+            this._stateData = stateData;
+            return this._nativeSkeleton.setAnimationStateData(stateData);
         }
     };
 
@@ -298,7 +349,7 @@
             this.disableRender();
             return;
         }
-
+        
         this.skeletonData.ensureTexturesLoaded(function (result) {
             if (!result) {
                 this.disableRender();
@@ -307,14 +358,13 @@
 
             let material = this.sharedMaterials[0];
             if (!material) {
-                material = cc.Material.getInstantiatedBuiltinMaterial('spine', this);
-                material.define('_USE_MODEL', true);
-            }
-            else {
+                material = cc.Material.getInstantiatedBuiltinMaterial('2d-spine', this);
+            } else {
                 material = cc.Material.getInstantiatedMaterial(material, this);
             }
 
-            this.setMaterial(0, material);
+            material.define('_USE_MODEL', true);
+            this.sharedMaterials[0] = material;
             this.markForUpdateRenderData(false);
             this.markForRender(false);
             this.markForCustomIARender(true);
@@ -323,63 +373,70 @@
 
     skeleton.onEnable = function () {
         renderCompProto.onEnable.call(this);
-        if (this._skeleton) {
-            this._skeleton.onEnable();
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.onEnable();
         }
         this._activateMaterial();
+        if (this._renderInfoOffset) {
+            this._renderInfoOffset[0] = 0;
+        }
     };
 
     skeleton.onDisable = function () {
         renderCompProto.onDisable.call(this);
-        if (this._skeleton) {
-            this._skeleton.onDisable();
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.onDisable();
         }
     };
 
     skeleton.update = undefined;
 
+    skeleton.setVertexEffectDelegate = function (effectDelegate) {
+        this._nativeSkeleton && this._nativeSkeleton.setVertexEffectDelegate(effectDelegate);
+    };
+
     skeleton.updateWorldTransform = function () {
-        this._skeleton && this._skeleton.updateWorldTransform();
+        this._nativeSkeleton && this._nativeSkeleton.updateWorldTransform();
     };
 
     skeleton.setToSetupPose = function () {
-        this._skeleton && this._skeleton.setToSetupPose();
+        this._nativeSkeleton && this._nativeSkeleton.setToSetupPose();
     };
 
     skeleton.setBonesToSetupPose = function () {
-        this._skeleton && this._skeleton.setBonesToSetupPose();
+        this._nativeSkeleton && this._nativeSkeleton.setBonesToSetupPose();
     };
 
     skeleton.setSlotsToSetupPose = function () {
-        this._skeleton && this._skeleton.setSlotsToSetupPose();
+        this._nativeSkeleton && this._nativeSkeleton.setSlotsToSetupPose();
     };
 
     skeleton.setSlotsRange = function (startSlotIndex, endSlotIndex) {
-        this._skeleton && this._skeleton.setSlotsRange(startSlotIndex, endSlotIndex);
+        this._nativeSkeleton && this._nativeSkeleton.setSlotsRange(startSlotIndex, endSlotIndex);
     };
 
     skeleton.findBone = function (boneName) {
-        if (this._skeleton) return this._skeleton.findBone(boneName);
+        if (this._nativeSkeleton) return this._nativeSkeleton.findBone(boneName);
         return null;
     };
 
     skeleton.findSlot = function (slotName) {
-        if (this._skeleton) return this._skeleton.findSlot(slotName);
+        if (this._nativeSkeleton) return this._nativeSkeleton.findSlot(slotName);
         return null;
     };
 
     skeleton.setSkin = function (skinName) {
-        if (this._skeleton) return this._skeleton.setSkin(skinName);
+        if (this._nativeSkeleton) return this._nativeSkeleton.setSkin(skinName);
         return null;
     };
 
     skeleton.getAttachment = function (slotName, attachmentName) {
-        if (this._skeleton) return this._skeleton.getAttachment(slotName, attachmentName);
+        if (this._nativeSkeleton) return this._nativeSkeleton.getAttachment(slotName, attachmentName);
         return null;
     };
 
     skeleton.setAttachment = function (slotName, attachmentName) {
-        this._skeleton && this._skeleton.setAttachment(slotName, attachmentName);
+        this._nativeSkeleton && this._nativeSkeleton.setAttachment(slotName, attachmentName);
     };
 
     skeleton.getTextureAtlas = function (regionAttachment) {
@@ -388,131 +445,131 @@
     };
 
     skeleton.setMix = function (fromAnimation, toAnimation, duration) {
-        if (this._skeleton) {
-            this._skeleton.setMix(fromAnimation, toAnimation, duration);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setMix(fromAnimation, toAnimation, duration);
         }
     };
 
     skeleton.setAnimation = function (trackIndex, name, loop) {
-        if (this._skeleton) {
-            return this._skeleton.setAnimation(trackIndex, name, loop);
+        if (this._nativeSkeleton) {
+            return this._nativeSkeleton.setAnimation(trackIndex, name, loop);
         }
         return null;
     };
 
     skeleton.addAnimation = function (trackIndex, name, loop, delay) {
-        if (this._skeleton) {
+        if (this._nativeSkeleton) {
             delay = delay || 0;
-            return this._skeleton.addAnimation(trackIndex, name, loop, delay);
+            return this._nativeSkeleton.addAnimation(trackIndex, name, loop, delay);
         }
         return null;
     };
 
     skeleton.findAnimation = function (name) {
-        if (this._skeleton) return this._skeleton.findAnimation(name);
+        if (this._nativeSkeleton) return this._nativeSkeleton.findAnimation(name);
         return null;
     };
 
     skeleton.getCurrent = function (trackIndex) {
-        if (this._skeleton) {
-            return this._skeleton.getCurrent(trackIndex);
+        if (this._nativeSkeleton) {
+            return this._nativeSkeleton.getCurrent(trackIndex);
         }
         return null;
     };
 
     skeleton.clearTracks = function () {
-        if (this._skeleton) {
-            this._skeleton.clearTracks();
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.clearTracks();
         }
     };
 
     skeleton.clearTrack = function (trackIndex) {
-        if (this._skeleton) {
-            this._skeleton.clearTrack(trackIndex);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.clearTrack(trackIndex);
         }
     };
 
     skeleton.setStartListener = function (listener) {
         this._startListener = listener;
-        if (this._skeleton) {
-            this._skeleton.setStartListener(listener);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setStartListener(listener);
         }
     };
 
     skeleton.setInterruptListener = function (listener) {
         this._interruptListener = listener;
-        if (this._skeleton) {
-            this._skeleton.setInterruptListener(listener);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setInterruptListener(listener);
         }
     };
 
     skeleton.setEndListener = function (listener) {
         this._endListener = listener;
-        if (this._skeleton) {
-            this._skeleton.setEndListener(listener);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setEndListener(listener);
         }
     };
 
     skeleton.setDisposeListener = function (listener) {
         this._disposeListener = listener;
-        if (this._skeleton) {
-            this._skeleton.setDisposeListener(listener);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setDisposeListener(listener);
         }
     };
 
     skeleton.setCompleteListener = function (listener) {
         this._completeListener = listener;
-        if (this._skeleton) {
-            this._skeleton.setCompleteListener(listener);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setCompleteListener(listener);
         }
     };
 
     skeleton.setEventListener = function (listener) {
         this._eventListener = listener;
-        if (this._skeleton) {
-            this._skeleton.setEventListener(listener);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setEventListener(listener);
         }
     };
 
     skeleton.setTrackStartListener = function (entry, listener) {
-        if (this._skeleton) {
-            this._skeleton.setTrackStartListener(entry, listener);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setTrackStartListener(entry, listener);
         }
     };
 
     skeleton.setTrackInterruptListener = function (entry, listener) {
-        if (this._skeleton) {
-            this._skeleton.setTrackInterruptListener(entry, listener);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setTrackInterruptListener(entry, listener);
         }
     };
 
     skeleton.setTrackEndListener = function (entry, listener) {
-        if (this._skeleton) {
-            this._skeleton.setTrackEndListener(entry, listener);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setTrackEndListener(entry, listener);
         }
     };
 
     skeleton.setTrackDisposeListener = function (entry, listener) {
-        if (this._skeleton) {
-            this._skeleton.setTrackDisposeListener(entry, listener);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setTrackDisposeListener(entry, listener);
         }
     };
 
     skeleton.setTrackCompleteListener = function (entry, listener) {
-        if (this._skeleton) {
-            this._skeleton.setTrackCompleteListener(entry, listener);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setTrackCompleteListener(entry, listener);
         }
     };
 
     skeleton.setTrackEventListener = function (entry, listener) {
-        if (this._skeleton) {
-            this._skeleton.setTrackEventListener(entry, listener);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setTrackEventListener(entry, listener);
         }
     };
 
     skeleton.getState = function () {
-        if (this._skeleton) {
-            return this._skeleton.getState();
+        if (this._nativeSkeleton) {
+            return this._nativeSkeleton.getState();
         }
     };
 
@@ -524,7 +581,7 @@
         if (this.skeletonData) {
             this.skeletonData.init();
             this.setSkeletonData(this.skeletonData);
-            this.defaultSkin && this._skeleton.setSkin(this.defaultSkin);
+            this.defaultSkin && this._nativeSkeleton.setSkin(this.defaultSkin);
             this.animation = this.defaultAnimation;
         }
     };
@@ -532,11 +589,12 @@
     let _onDestroy = skeleton.onDestroy;
     skeleton.onDestroy = function(){
         _onDestroy.call(this);
-        if (this._skeleton) {
-            this._skeleton.stopSchedule();
-            this._skeleton._comp = null;
-            this._skeleton = null;
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.stopSchedule();
+            this._nativeSkeleton._comp = null;
+            this._nativeSkeleton = null;
         }
+        this._stateData = null;
         this._materialCache = null;
     };
 

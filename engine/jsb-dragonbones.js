@@ -39,6 +39,8 @@
         configurable: true,
     });
 
+    jsb.generateGetSet(dragonBones);
+    
     ////////////////////////////////////////////////////////////
     // override dragonBones library by native dragonBones
     ////////////////////////////////////////////////////////////
@@ -83,26 +85,20 @@
     };
 
     //-------------------
+    // native animation state
+    //-------------------
+    let animationStateProto = dragonBones.AnimationState.prototype;
+    let _isPlaying = animationStateProto.isPlaying;
+    Object.defineProperty(animationStateProto, 'isPlaying', {
+        get () {
+            return _isPlaying.call(this);
+        }
+    });
+
+    //-------------------
     // native armature
     //-------------------
     let armatureProto = dragonBones.Armature.prototype;
-    Object.defineProperty(armatureProto, 'animation', {
-        get () {
-            return this.getAnimation();
-        }
-    });
-
-    Object.defineProperty(armatureProto, 'display', {
-        get () {
-            return this.getDisplay();
-        }
-    });
-
-    Object.defineProperty(armatureProto, 'name', {
-        get () {
-            return this.getName();
-        }
-    });
 
     armatureProto.addEventListener = function (eventType, listener, target) {
         if (!this.__persistentDisplay__) {
@@ -170,81 +166,48 @@
         this.addDBEventListener(type, listener);
     };
 
-    //-------------------
-    // native slot
-    //-------------------
-    let slotProto = dragonBones.Slot.prototype;
-    Object.defineProperty(slotProto, 'childArmature', {
-        get () {
-            return this.getChildArmature();
-        },
-        set (val) {
-            this.setChildArmature(val);
-        }
-    });
-
-    Object.defineProperty(slotProto, 'display', {
-        get () {
-            return this.getDisplay();
-        }
-    });
-
-    Object.defineProperty(slotProto, 'name', {
-        get () {
-            return this.getName();
-        }
-    });
-
-    //------------------------
-    // native TransformObject
-    //------------------------
-    let transformObjectProto = dragonBones.TransformObject.prototype;
-    Object.defineProperty(transformObjectProto, 'global', {
-        get () {
-            return this.getGlobal();
-        }
-    });
-
-    Object.defineProperty(transformObjectProto, 'origin', {
-        get () {
-            return this.getOrigin();
-        }
-    });
-
-    Object.defineProperty(transformObjectProto, 'offset', {
-        get () {
-            return this.getOffset();
-        }
-    });
-
     ////////////////////////////////////////////////////////////
     // override DragonBonesAtlasAsset
     ////////////////////////////////////////////////////////////
     let dbAtlas = dragonBones.DragonBonesAtlasAsset.prototype;
-    let gTextureIdx = 0;
-    let textureKeyMap = {};
-    let textureMap = new WeakMap();
-    let textureIdx2Name = {};
+    let _gTextureIdx = 1;
+    let _textureKeyMap = {};
+    let _textureMap = new WeakMap();
+    let _textureIdx2Name = {};
+
+    dbAtlas.removeRecordTexture = function (texture) {
+        if (!texture) return;
+        delete _textureIdx2Name[texture.url];
+        let index = texture.__textureIndex__;
+        if (index) {
+            let texKey = _textureKeyMap[index];
+            if (texKey && _textureMap.has(texKey)) {
+                _textureMap.delete(texKey);
+                delete _textureKeyMap[index];
+            }
+        }
+    };
 
     dbAtlas.recordTexture = function () {
         if (this._texture && this._oldTexture !== this._texture) {
-            let texKey = textureKeyMap[gTextureIdx] = {key:gTextureIdx};
-            textureMap.set(texKey, this._texture);
+            this.removeRecordTexture(this._oldTexture);
+            let texKey = _textureKeyMap[_gTextureIdx] = {key:_gTextureIdx};
+            _textureMap.set(texKey, this._texture);
             this._oldTexture = this._texture;
-            this._texture.__textureIndex__ = gTextureIdx;
-            gTextureIdx++;
+            this._texture.__textureIndex__ = _gTextureIdx;
+            _gTextureIdx++;
         }
     };
 
     dbAtlas.getTextureByIndex = function (textureIdx) {
-        let texKey = textureKeyMap[textureIdx];
+        let texKey = _textureKeyMap[textureIdx];
         if (!texKey) return;
-        return textureMap.get(texKey);
+        return _textureMap.get(texKey);
     };
 
     dbAtlas.updateTextureAtlasData = function (factory) {
         let url = this._texture.url;
-        let preAtlasInfo = textureIdx2Name[url];
+        let preAtlasInfo = _textureIdx2Name[url];
         let index;
 
         // If the texture has store the atlas info before,then get native atlas object,and 
@@ -252,8 +215,8 @@
         if (preAtlasInfo) {
             index = preAtlasInfo.index;
             this._textureAtlasData = factory.getTextureAtlasDataByIndex(preAtlasInfo.name,index);
-            let texKey = textureKeyMap[preAtlasInfo.index];
-            textureMap.set(texKey, this._texture);
+            let texKey = _textureKeyMap[preAtlasInfo.index];
+            _textureMap.set(texKey, this._texture);
             this._texture.__textureIndex__ = index;
             // If script has store the atlas info,but native has no atlas object,then
             // still new native texture2d object,but no call recordTexture to increase
@@ -272,7 +235,7 @@
         this.jsbTexture.setPixelsHigh(this._texture.height);
         this._textureAtlasData = factory.parseTextureAtlasData(this.atlasJson, this.jsbTexture, this._uuid);
 
-        textureIdx2Name[url] = {name:this._textureAtlasData.name,index:index};
+        _textureIdx2Name[url] = {name:this._textureAtlasData.name, index:index};
     };
 
     dbAtlas.init = function (factory) {
@@ -292,13 +255,21 @@
         }
     };
 
-    dbAtlas._clear = function () {
+    dbAtlas._clear = function (dontRecordTexture) {
         if (this._factory) {
             this._factory.removeTextureAtlasData(this._uuid, true);
             this._factory.removeDragonBonesDataByUUID(this._uuid, true);
         }
         this._textureAtlasData = null;
-        this.recordTexture();
+        if (!dontRecordTexture) {
+            this.recordTexture();
+        }
+    };
+
+    dbAtlas.destroy = function () {
+        this.removeRecordTexture(this._texture);
+        this._clear(true);
+        cc.Asset.prototype.destroy.call(this);
     };
 
     ////////////////////////////////////////////////////////////
@@ -454,6 +425,7 @@
         this._armature.animation.timeScale = this.timeScale;
         
         this._renderInfoOffset = this._nativeDisplay.getRenderInfoOffset();
+        this._renderInfoOffset[0] = 0;
 
         if (this.animationName) {
             this.playAnimation(this.animationName, this.playTimes);
@@ -476,13 +448,13 @@
         // Get material
         let material = this.sharedMaterials[0];
         if (!material) {
-            material = cc.Material.getInstantiatedBuiltinMaterial('sprite', this);
-            material.define('_USE_MODEL', true);
-            material.define('USE_TEXTURE', true);
+            material = cc.Material.getInstantiatedBuiltinMaterial('2d-sprite', this);
         } else {
             material = cc.Material.getInstantiatedMaterial(material, this);
         }
 
+        material.define('_USE_MODEL', true);
+        material.define('USE_TEXTURE', true);
         material.setProperty('texture', texture);
         this.setMaterial(0, material);
 
@@ -497,6 +469,9 @@
             this._factory.add(this._armature);
         }
         this._activateMaterial();
+        if (this._renderInfoOffset) {
+            this._renderInfoOffset[0] = 0;
+        }
     };
 
     armatureDisplayProto.onDisable = function () {
@@ -624,6 +599,8 @@
         }
 
         let infoOffset = renderInfoOffset[0];
+        renderInfoOffset[0] = 0;
+
         let renderInfoMgr = middleware.renderInfoMgr;
         let renderInfo = renderInfoMgr.renderInfo;
 
