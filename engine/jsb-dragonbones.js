@@ -206,6 +206,12 @@
         }
     });
 
+    Object.defineProperty(slotProto, 'parent', {
+        get () {
+            return this.getParent();
+        }
+    });
+
     //------------------------
     // native TransformObject
     //------------------------
@@ -511,12 +517,12 @@
         let material = this.sharedMaterials[0];
         if (!material) {
             material = cc.Material.getInstantiatedBuiltinMaterial('2d-sprite', this);
-            material.define('_USE_MODEL', true);
-            material.define('USE_TEXTURE', true);
         } else {
             material = cc.Material.getInstantiatedMaterial(material, this);
         }
 
+        material.define('_USE_MODEL', true);
+        material.define('USE_TEXTURE', true);
         material.setProperty('texture', texture);
         this.setMaterial(0, material);
 

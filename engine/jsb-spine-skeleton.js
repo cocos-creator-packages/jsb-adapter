@@ -351,7 +351,7 @@
             }
 
             material.define('_USE_MODEL', true);
-            this.setMaterial(0, material);
+            this.sharedMaterials[0] = material;
             this.markForUpdateRenderData(false);
             this.markForRender(false);
             this.markForCustomIARender(true);
