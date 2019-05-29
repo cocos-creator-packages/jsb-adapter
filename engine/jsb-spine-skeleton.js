@@ -333,12 +333,12 @@
         let material = this.sharedMaterials[0];
         if (!material) {
             material = cc.Material.getInstantiatedBuiltinMaterial('2d-spine', this);
-            material.define('_USE_MODEL', true);
         }
         else {
             material = cc.Material.getInstantiatedMaterial(material, this);
         }
 
+        material.define('_USE_MODEL', true);
         this.sharedMaterials[0] = material;
 
         this.markForUpdateRenderData(false);
