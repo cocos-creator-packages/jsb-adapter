@@ -27,45 +27,7 @@
     if (window.sp === undefined || window.spine === undefined || window.middleware === undefined) return;
 
     sp.VertexEffectDelegate = spine.VertexEffectDelegate;
-
-    // generate get set function
-    for (let classKey in spine) {
-        let spineProto = spine[classKey] && spine[classKey].prototype;
-        if (!spineProto) continue;
-        for (let getName in spineProto) {
-            let getPos = getName.search(/^get/);
-            if (getPos == -1) continue;
-            let propName = getName.replace(/^get/, '');
-            let nameArr = propName.split('');
-            let lowerFirst = nameArr[0].toLowerCase();
-            let upperFirst = nameArr[0].toUpperCase();
-            nameArr.splice(0, 1);
-            let left = nameArr.join('');
-            propName = lowerFirst + left;
-            let setName = 'set' + upperFirst + left;
-            if (spineProto.hasOwnProperty(propName)) continue;
-            let setFunc = spineProto[setName];
-            let hasSetFunc = typeof setFunc === 'function';
-            if (hasSetFunc) {
-                Object.defineProperty(spineProto, propName, {
-                    get () {
-                        return this[getName]();
-                    },
-                    set (val) {
-                        this[setName](val);
-                    },
-                    configurable: true,
-                });
-            } else {
-                Object.defineProperty(spineProto, propName, {
-                    get () {
-                        return this[getName]();
-                    },
-                    configurable: true,
-                });
-            }
-        }
-    }
+    jsb.generateGetSet(spine);
 
     // spine global time scale
     Object.defineProperty(sp, 'timeScale', {

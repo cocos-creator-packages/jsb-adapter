@@ -39,6 +39,8 @@
         configurable: true,
     });
 
+    jsb.generateGetSet(dragonBones);
+    
     ////////////////////////////////////////////////////////////
     // override dragonBones library by native dragonBones
     ////////////////////////////////////////////////////////////
@@ -97,23 +99,6 @@
     // native armature
     //-------------------
     let armatureProto = dragonBones.Armature.prototype;
-    Object.defineProperty(armatureProto, 'animation', {
-        get () {
-            return this.getAnimation();
-        }
-    });
-
-    Object.defineProperty(armatureProto, 'display', {
-        get () {
-            return this.getDisplay();
-        }
-    });
-
-    Object.defineProperty(armatureProto, 'name', {
-        get () {
-            return this.getName();
-        }
-    });
 
     armatureProto.addEventListener = function (eventType, listener, target) {
         if (!this.__persistentDisplay__) {
@@ -180,59 +165,6 @@
         this._eventTarget.once(type, listener, target);
         this.addDBEventListener(type, listener);
     };
-
-    //-------------------
-    // native slot
-    //-------------------
-    let slotProto = dragonBones.Slot.prototype;
-    Object.defineProperty(slotProto, 'childArmature', {
-        get () {
-            return this.getChildArmature();
-        },
-        set (val) {
-            this.setChildArmature(val);
-        }
-    });
-
-    Object.defineProperty(slotProto, 'display', {
-        get () {
-            return this.getDisplay();
-        }
-    });
-
-    Object.defineProperty(slotProto, 'name', {
-        get () {
-            return this.getName();
-        }
-    });
-
-    Object.defineProperty(slotProto, 'parent', {
-        get () {
-            return this.getParent();
-        }
-    });
-
-    //------------------------
-    // native TransformObject
-    //------------------------
-    let transformObjectProto = dragonBones.TransformObject.prototype;
-    Object.defineProperty(transformObjectProto, 'global', {
-        get () {
-            return this.getGlobal();
-        }
-    });
-
-    Object.defineProperty(transformObjectProto, 'origin', {
-        get () {
-            return this.getOrigin();
-        }
-    });
-
-    Object.defineProperty(transformObjectProto, 'offset', {
-        get () {
-            return this.getOffset();
-        }
-    });
 
     ////////////////////////////////////////////////////////////
     // override DragonBonesAtlasAsset
