@@ -141,4 +141,4 @@ cc.Label._assembler.bmfont = cc.js.addon({
             }
         }
     },
-}, cc.textUtils.bmfont);
+}, cc.assemblers.utils.bmfont);

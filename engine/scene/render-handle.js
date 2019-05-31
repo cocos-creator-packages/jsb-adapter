@@ -23,7 +23,7 @@
 const RenderFlow = cc.RenderFlow;
 const BEFORE_RENDER = RenderFlow.EventType.BEFORE_RENDER;
 
-cc.js.mixin(renderer.RenderHandle.prototype, {
+cc.js.mixin(renderer.RenderHandle.prototype, cc.RenderHandle.prototype, {
     _ctor () {
         this.vDatas = [];
         this.uintVDatas = [];

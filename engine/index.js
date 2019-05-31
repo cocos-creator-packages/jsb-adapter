@@ -52,11 +52,6 @@ if (CC_NATIVERENDERER) {
         require('./assemblers/flex-buffer.js');
         // Assemblers
         require('./assemblers/sprite/index.js');
-        require('./assemblers/sprite/simple.js');
-        require('./assemblers/sprite/sliced.js');
-        require('./assemblers/sprite/tiled.js');
-        require('./assemblers/sprite/bar-filled.js');
-        require('./assemblers/sprite/radial-filled.js');
         require('./assemblers/label/index.js');
         require('./assemblers/label/ttf.js');
         require('./assemblers/label/bmfont.js');

@@ -75,4 +75,4 @@ cc.Label._assembler.ttf = cc.js.addon({
         verts[15] = width - appx;
         verts[16] = height - appy;
     }
-}, cc.textUtils.ttf);
+}, cc.assemblers.utils.ttf);
