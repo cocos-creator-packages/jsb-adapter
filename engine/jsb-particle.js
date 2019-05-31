@@ -203,7 +203,7 @@
     PSProto.update = undefined;
     PSProto.lateUpdate = undefined;
 
-    PSProto.initNativeHandle = function () {
+    PSProto._initNativeHandle = function () {
         this._assembler = undefined;
         this._renderHandle = new middleware.MiddlewareRenderHandle();
         this._renderHandle.bind(this);

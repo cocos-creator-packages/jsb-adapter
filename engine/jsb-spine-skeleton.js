@@ -238,7 +238,7 @@
     // Shield use batch in native
     skeleton._updateBatch = function () {};
 
-    skeleton.initNativeHandle = function () {
+    skeleton._initNativeHandle = function () {
         this._assembler = null;
         this._renderHandle = new middleware.MiddlewareRenderHandle();
         this._renderHandle.bind(this);

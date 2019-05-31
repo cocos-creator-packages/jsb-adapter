@@ -21,6 +21,7 @@
  ****************************************************************************/
 
 Object.assign(cc.Sprite._assembler.sliced, {
+    delayUpdateRenderData: true,
     updateWorldVerts (sprite) {
         let renderHandle = sprite._renderHandle;
         let local = renderHandle._local;

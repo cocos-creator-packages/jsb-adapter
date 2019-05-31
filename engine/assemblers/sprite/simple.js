@@ -21,45 +21,25 @@
  ****************************************************************************/
 
 Object.assign(cc.Sprite._assembler.simple, {
-    createData (sprite) {
-        if (sprite._renderHandle.meshCount > 0) return;
-        sprite._renderHandle.createQuadData(0, 20, 6);
-    },
-
-    updateColor (sprite) {
-        let uintVerts = sprite._renderHandle.uintVDatas[0];
-        if (uintVerts) {
-            let color = sprite.node._color._val;
-            // Keep alpha channel for cpp to update
-            color = ((uintVerts[4] & 0xff000000) >>> 0 | (color & 0x00ffffff)) >>> 0;
-            uintVerts[4] = color;
-            uintVerts[9] = color;
-            uintVerts[14] = color;
-            uintVerts[19] = color;
-        }
-    },
-
-    setVerts (sprite, l, b, r, t) {
+    delayUpdateRenderData: true,
+    updateWorldVerts (sprite) {
+        let local = sprite._renderHandle._local;
         let verts = sprite._renderHandle.vDatas[0];
-        let uv = sprite._spriteFrame.uv;
-        
-        verts[0] = l;
-        verts[1] = b;
-        verts[2] = uv[0];
-        verts[3] = uv[1];
-        verts[5] = r;
-        verts[6] = b;
-        verts[7] = uv[2];
-        verts[8] = uv[3];
-        verts[10] = l;
-        verts[11] = t;
-        verts[12] = uv[4];
-        verts[13] = uv[5];
-        verts[15] = r;
-        verts[16] = t;
-        verts[17] = uv[6];
-        verts[18] = uv[7];
-        
-        this.updateColor(sprite);
+
+        let vl = local[0], vr = local[2],
+            vb = local[1], vt = local[3];
+
+        // left bottom
+        verts[0] = vl;
+        verts[1] = vb;
+        // right bottom
+        verts[5] = vr;
+        verts[6] = vb;
+        // left top
+        verts[10] = vl;
+        verts[11] = vt;
+        // right top
+        verts[15] = vr;
+        verts[16] = vt;
     }
 });

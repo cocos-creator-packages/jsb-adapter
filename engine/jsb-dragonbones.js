@@ -411,7 +411,7 @@
     // Shield use batch in native
     armatureDisplayProto._updateBatch = function () {}
 
-    armatureDisplayProto.initNativeHandle = function () {
+    armatureDisplayProto._initNativeHandle = function () {
         this._assembler = null;
         this._renderHandle = new middleware.MiddlewareRenderHandle();
         this._renderHandle.bind(this);

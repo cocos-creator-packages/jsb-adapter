@@ -21,6 +21,7 @@
  ****************************************************************************/
 
 Object.assign(cc.Sprite._assembler.barFilled, {
+    delayUpdateRenderData: true,
     createData (sprite) {
         if (sprite._renderHandle.meshCount > 0) return;
         sprite._renderHandle.createQuadData(0, this.verticesFloats, this.indicesCount);

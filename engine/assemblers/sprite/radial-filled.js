@@ -21,21 +21,14 @@
  ****************************************************************************/
 
 Object.assign(cc.Sprite._assembler.radialFilled, {
+    delayUpdateRenderData: true,
     updateWorldVerts (sprite) {
-        let node = sprite.node;
-
-        let matrix = node._worldMatrix,
-            a = matrix.m00, b = matrix.m01, c = matrix.m04, d = matrix.m05,
-            tx = matrix.m12, ty = matrix.m13;
-
         let local = sprite._renderHandle._local;
         let world = sprite._renderHandle.vDatas[0];
         let floatsPerVert = this.floatsPerVert;
         for (let offset = 0; offset < world.length; offset += floatsPerVert) {
-            let x = local[offset];
-            let y = local[offset + 1];
-            world[offset] = x * a + y * c + tx;
-            world[offset+1] = x * b + y * d + ty;
+            world[offset] = local[offset];
+            world[offset+1] = local[offset + 1];
         }
     },
 });
