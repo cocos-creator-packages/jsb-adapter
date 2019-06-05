@@ -39,15 +39,14 @@ if (CC_NATIVERENDERER) {
     require('./scene/render-flow.js');
     // must be required after render flow
     require('./scene/node.js');
-    require('./scene/render-handle.js');
-
-    require('./scene/custom-render-handle.js');
+    require('./scene/render-component.js');
+    require('./scene/native-assembler.js');
+    require('./scene/native-mask-assembler.js');
+    
     require('./jsb-dragonbones.js');
     require('./jsb-spine-skeleton.js');
     require('./jsb-particle.js');
-    require('./scene/graphics-render-handle.js');
-    require('./scene/mask-render-handle.js');
-
+    
     cc.game.on(cc.game.EVENT_ENGINE_INITED, function () {
         require('./assemblers/flex-buffer.js');
         // Assemblers

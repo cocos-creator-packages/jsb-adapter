@@ -200,13 +200,12 @@
     };
 
     // shield in native
-    PSProto.update = undefined;
-    PSProto.lateUpdate = undefined;
+    PSProto.update = null;
+    PSProto.lateUpdate = null;
 
     PSProto.initNativeHandle = function () {
-        this._assembler = undefined;
-        this._renderHandle = new middleware.MiddlewareRenderHandle();
-        this._renderHandle.bind(this);
+        this._assembler = null;
+        this._renderHandle = new middleware.CustomAssembler();
     };
 
     let _onEnable = PSProto.onEnable;

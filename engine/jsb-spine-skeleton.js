@@ -240,8 +240,7 @@
 
     skeleton.initNativeHandle = function () {
         this._assembler = null;
-        this._renderHandle = new middleware.MiddlewareRenderHandle();
-        this._renderHandle.bind(this);
+        this._renderHandle = new middleware.CustomAssembler();
     };
 
     let _setMaterial = skeleton.setMaterial;

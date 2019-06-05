@@ -413,8 +413,7 @@
 
     armatureDisplayProto.initNativeHandle = function () {
         this._assembler = null;
-        this._renderHandle = new middleware.MiddlewareRenderHandle();
-        this._renderHandle.bind(this);
+        this._renderHandle = new renderer.CustomAssembler();
     };
 
     let _setMaterial = armatureDisplayProto.setMaterial;
