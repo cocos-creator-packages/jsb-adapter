@@ -28,18 +28,25 @@ const OPACITY = 1 << 1;
 const COLOR = 1 << 2;
 const CHILDREN = 1 << 3;
 
+const RenderFlow = cc.RenderFlow;
+const BEFORE_RENDER = RenderFlow.EventType.BEFORE_RENDER;
+
 let NativeAssembler = {
     _ctor () {
         this.vDatas = [];
         this.uintVDatas = [];
         this.iDatas = [];
         this.meshCount = 0;
+        this._delayed = false;
+        this._comp = null;
 
         this._renderDataList = new renderer.RenderDataList();
         this.setRenderDataList(this._renderDataList);
     },
 
     destroy () {
+        RenderFlow.off(BEFORE_RENDER, this.updateRenderData, this);
+        this._comp = null;
     },
 
     clear () {
@@ -50,16 +57,32 @@ let NativeAssembler = {
         this._renderDataList.reset();
     },
 
-    init (renderComponent) {
-        if (renderComponent._assembler) {
-            this.setUseModel(!!renderComponent._assembler.useModel);
+    init (component) {
+        if (this._comp !== component && component instanceof cc.RenderComponent) {
+            this._comp = component;
+            if (component._assembler) {
+                this.setUseModel(!!component._assembler.useModel);
+            }
+            if (component._vertexFormat) {
+                this.setVertexFormat(component._vertexFormat._nativeObj);
+            }
         }
-        if (renderComponent._vertexFormat) {
-            this.setVertexFormat(renderComponent._vertexFormat._nativeObj);
-        }
-        renderComponent.node._proxy.addAssembler("render", this);
     },
 
+    delayUpdateRenderData () {
+        if (this._comp) {
+            RenderFlow.on(BEFORE_RENDER, this.updateRenderData, this);
+            this._delayed = true;
+        }
+    },
+
+    updateRenderData () {
+        if (this._comp && this._comp._assembler) {
+            this._comp._assembler.updateRenderData(this._comp);
+            this._delayed = false;
+        }
+    },
+    
     updateIAData (index, start, count) {
         this._renderDataList.updateIndicesRange(index, start, count);
     },
@@ -81,5 +104,4 @@ let NativeAssembler = {
 };
 
 cc.js.mixin(renderer.Assembler.prototype, NativeAssembler);
-
 module.exports = NativeAssembler;

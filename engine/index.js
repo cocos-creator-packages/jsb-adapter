@@ -39,7 +39,6 @@ if (CC_NATIVERENDERER) {
     require('./scene/render-flow.js');
     // must be required after render flow
     require('./scene/node.js');
-    require('./scene/render-component.js');
     require('./scene/native-assembler.js');
     require('./scene/native-mask-assembler.js');
     

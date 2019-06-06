@@ -203,9 +203,10 @@
     PSProto.update = null;
     PSProto.lateUpdate = null;
 
-    PSProto.initNativeHandle = function () {
+    PSProto.initNativeAssembler = function () {
         this._assembler = null;
-        this._renderHandle = new middleware.CustomAssembler();
+        this._renderHandle = new renderer.CustomAssembler();
+        this._renderHandle.setUseModel(true);
     };
 
     let _onEnable = PSProto.onEnable;

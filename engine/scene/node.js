@@ -44,7 +44,7 @@ cc.js.getset(cc.Node.prototype, "_renderFlag", function () {
 
     if (((flag & UPDATE_RENDER_DATA) || (flag & CUSTOM_IA_RENDER)) && assembler) {
         if (assembler.delayUpdateRenderData) {
-            comp.delayUpdateRenderData();
+            comp._renderHandle.delayUpdateRenderData();
         }
         else {
             assembler.updateRenderData(comp);
