@@ -25,11 +25,10 @@ const BEFORE_RENDER = RenderFlow.EventType.BEFORE_RENDER;
 
 cc.js.mixin(renderer.RenderHandle.prototype, cc.RenderHandle.prototype, {
     _ctor () {
-        this.vDatas = [];
-        this.uintVDatas = [];
-        this.iDatas = [];
+        cc.RenderHandle.call(this);
+
         this.effects = [];
-        this.meshCount = 0;
+
         this._material = null;
         this._delayed = false;
         this._comp = null;

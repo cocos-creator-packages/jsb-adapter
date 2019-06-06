@@ -53,8 +53,6 @@ if (CC_NATIVERENDERER) {
         // Assemblers
         require('./assemblers/sprite/index.js');
         require('./assemblers/label/index.js');
-        require('./assemblers/label/ttf.js');
-        require('./assemblers/label/bmfont.js');
         if (cc.Graphics) {
             require('./assemblers/graphics/impl.js');
             require('./assemblers/graphics/index.js');
