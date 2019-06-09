@@ -36,10 +36,6 @@ const COLOR = 1 << 3;
 const CHILDREN = 1 << 4;
 const POST_UPDATE_RENDER_DATA = 1 << 5;
 const FINAL = 1 << 6;
-const INV_LOCAL_TRANSFORM = ~LOCAL_TRANSFORM;
-const INV_UPDATE_RENDER_DATA = ~UPDATE_RENDER_DATA;
-const INV_OPACITY = ~OPACITY;
-const INV_COLOR = ~COLOR;
 
 let RenderFlow = cc.RenderFlow;
 RenderFlow.EventType = {

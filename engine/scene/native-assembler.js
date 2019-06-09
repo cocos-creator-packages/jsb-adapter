@@ -54,7 +54,7 @@ let NativeAssembler = {
         this.uintVDatas.length = 0;
         this.iDatas.length = 0;
         this.meshCount = 0;
-        this._renderDataList.reset();
+        this._renderDataList.clear();
     },
 
     init (component) {
@@ -82,26 +82,22 @@ let NativeAssembler = {
             this._delayed = false;
         }
     },
-    
-    updateIAData (index, start, count) {
-        this._renderDataList.updateIndicesRange(index, start, count);
-    },
 
-    updateMesh (index, vertices, indices) {
-        this.vDatas[index] = vertices;
-        this.uintVDatas[index] = new Uint32Array(vertices.buffer, 0, vertices.length);
-        this.iDatas[index] = indices;
+    updateMesh (meshIndex, vertices, indices, uintVData) {
+        this.vDatas[meshIndex] = vertices;
+        this.uintVDatas[meshIndex] = uintVData || new Uint32Array(vertices.buffer, 0, vertices.length);
+        this.iDatas[meshIndex] = indices;
+
         this.meshCount = this.vDatas.length;
-
-        this._renderDataList.updateNativeMesh(index, vertices, indices);
+        this._renderDataList.updateMesh(meshIndex, vertices, indices);
         this.notifyDirty(OPACITY);
     },
 
-    updateMaterial (index, material) {
+    updateMaterial (iaIndex, material) {
         let effect = material && material.effect;
-        this.updateNativeEffect(index, effect ? effect._nativeObj : null);
+        this.updateEffect(iaIndex, effect ? effect._nativeObj : null);
     }
 };
 
 cc.js.mixin(renderer.Assembler.prototype, NativeAssembler);
-module.exports = NativeAssembler;
+cc.NativeAssembler = module.exports = NativeAssembler;

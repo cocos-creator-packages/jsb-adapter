@@ -24,9 +24,8 @@
  ****************************************************************************/
 
 "use strict";
-let NativeAssembler = require('./native-assembler');
 
-cc.js.mixin(renderer.MaskAssembler.prototype, NativeAssembler, {
+cc.js.mixin(renderer.MaskAssembler.prototype, cc.NativeAssembler, {
     setNativeRenderHandle (handle) {
         if(handle) {
             this.setRenderSubHandle(handle);

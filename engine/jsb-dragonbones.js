@@ -420,10 +420,10 @@
     let _setMaterial = armatureDisplayProto.setMaterial;
     armatureDisplayProto.setMaterial = function(index, material) {
         _setMaterial.call(this, index, material);
-        this._renderHandle.clearNativeEffect();
+        this._renderHandle.clearEffect();
         if (this._nativeDisplay) {
             let nativeEffect = material.effect._nativeObj;
-            this._nativeDisplay.setNativeEffect(nativeEffect);
+            this._nativeDisplay.setEffect(nativeEffect);
         }
     };
 

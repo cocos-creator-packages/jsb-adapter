@@ -253,7 +253,7 @@
         }
 
         material.setProperty('texture', this._texture);
-        this._simulator.setNativeEffect(material.effect._nativeObj);
+        this._simulator.setEffect(material.effect._nativeObj);
         this.setMaterial(0, material);
         this._simulator.onEnable();
         this.markForRender(true);

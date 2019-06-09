@@ -248,7 +248,7 @@ cc.Graphics._assembler = {
 
             renderData.indiceStart = indicesOffset;
         }
-        renderHandle.updateIAData(renderData.index, 0, renderData.indiceStart);
+        renderHandle.updateIndicesRange(renderData.index, 0, renderData.indiceStart);
         _renderData = null;
         _impl = null;
     },
@@ -321,7 +321,7 @@ cc.Graphics._assembler = {
             renderData.indiceStart = indicesOffset;
         }
 
-        renderHandle.updateIAData(renderData.index, 0, renderData.indiceStart);
+        renderHandle.updateIndicesRange(renderData.index, 0, renderData.indiceStart);
         _renderData = null;
         _impl = null;
     },

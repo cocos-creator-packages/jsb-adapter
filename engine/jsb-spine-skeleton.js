@@ -248,8 +248,8 @@
     skeleton.setMaterial = function(index, material) {
         _setMaterial.call(this, index, material);
         let nativeEffect = material.effect._nativeObj;
-        this._skeleton.setNativeEffect(nativeEffect);
-        this._renderHandle.clearNativeEffect();
+        this._skeleton.setEffect(nativeEffect);
+        this._renderHandle.clearEffect();
     };
 
     skeleton.setSkeletonData = function (skeletonData) {
