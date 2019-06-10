@@ -200,13 +200,13 @@
     };
 
     // shield in native
-    PSProto.update = undefined;
-    PSProto.lateUpdate = undefined;
+    PSProto.update = null;
+    PSProto.lateUpdate = null;
 
-    PSProto.initNativeHandle = function () {
-        this._assembler = undefined;
-        this._renderHandle = new middleware.MiddlewareRenderHandle();
-        this._renderHandle.bind(this);
+    PSProto.initNativeAssembler = function () {
+        this._assembler = null;
+        this._renderHandle = new renderer.CustomAssembler();
+        this._renderHandle.setUseModel(true);
     };
 
     let _onEnable = PSProto.onEnable;
@@ -253,7 +253,7 @@
         }
 
         material.setProperty('texture', this._texture);
-        this._simulator.setNativeEffect(material.effect._nativeObj);
+        this._simulator.setEffect(material.effect._nativeObj);
         this.setMaterial(0, material);
         this._simulator.onEnable();
         this.markForRender(true);
