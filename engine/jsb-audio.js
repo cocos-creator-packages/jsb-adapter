@@ -253,9 +253,9 @@ let handleVolume  = function (volume) {
         }
     };
 
-    // incompatible implementation for game pause & resume
-    audioEngine._break = audioEngine.pauseAll;
-    audioEngine._restore = audioEngine.resumeAll;
+    // Unnecessary on native platform
+    audioEngine._break = function () {};
+    audioEngine._restore = function () {};
 
     // deprecated
 
