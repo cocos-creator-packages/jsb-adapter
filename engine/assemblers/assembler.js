@@ -85,10 +85,21 @@ let Assembler = {
         let effect = material && material.effect;
         this.updateEffect(iaIndex, effect ? effect._nativeObj : null);
     },
+
+    updateColor(comp, color) {
+        this.notifyDirty(cc.Assembler.NativeDirtyFlag.OPACITY);
+    }
 };
 
 Object.setPrototypeOf(cc.Assembler.prototype, renderer.Assembler.prototype);
 
 cc.js.mixin(cc.Assembler.prototype, Assembler);
+
+cc.Assembler.NativeDirtyFlag = {
+    TRANSFORM: 1 << 0,
+    OPACITY: 1 << 1,
+    COLOR: 1 << 2,
+    CHILDREN: 1 << 3
+};
 
 module.exports = Assembler;

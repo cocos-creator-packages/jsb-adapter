@@ -22,11 +22,17 @@ cc.Assembler2D.prototype.updateWorldVerts = function(comp) {
     verts[16] = vt;
 };
 
-let originPackToDynamicAtlas = cc.Assembler2D.prototype.packToDynamicAtlas;
+let _packToDynamicAtlas = cc.Assembler2D.prototype.packToDynamicAtlas;
 cc.Assembler2D.prototype.packToDynamicAtlas = function(comp, frame) {
-    originPackToDynamicAtlas.call(this, comp, frame);
+    _packToDynamicAtlas.call(this, comp, frame);
 
     if (frame) {
         comp._assembler.updateMaterial(0, comp.sharedMaterials[0]);
     }
+};
+
+let _updateColor = cc.Assembler2D.prototype.updateColor;
+cc.Assembler2D.prototype.updateColor = function(comp, color) {
+    this.notifyDirty(cc.Assembler.NativeDirtyFlag.OPACITY);
+    _updateColor.call(this, comp, color);
 };

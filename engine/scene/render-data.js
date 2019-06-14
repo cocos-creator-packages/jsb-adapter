@@ -15,5 +15,4 @@ let originUpdateMesh = proto.updateMesh;
 proto.updateMesh = function (meshIndex, vertices, indices) {
     originUpdateMesh.call(this, meshIndex, vertices, indices);
     this._renderDataList.updateMesh(meshIndex, vertices, indices);
-    // this.notifyDirty(OPACITY);
 }
