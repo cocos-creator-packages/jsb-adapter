@@ -25,41 +25,41 @@
 
 const Mask = cc.Mask;
 const RenderFlow = cc.RenderFlow;
-const spriteAssembler = cc.Sprite._assembler.simple;
-const graphicsAssembler = cc.Graphics._assembler;
+const spriteAssembler = cc.Sprite.__assembler__.Simple.prototype;
+const graphicsAssembler = cc.Graphics.__assembler__.prototype;
 
-cc.Mask._assembler = {
-    delayUpdateRenderData: true,
-    updateRenderData (mask) {
-        if (!mask._renderData) {
-            // Update clear graphics material
-            graphicsAssembler.updateRenderData(mask._clearGraphics);
 
-            if (mask._type === Mask.Type.IMAGE_STENCIL) {
-                mask._renderData = spriteAssembler.createData(mask);
-            }
-        }
-        let renderData = mask._renderData;
-        if (mask._type === Mask.Type.IMAGE_STENCIL) {
-            if (mask.spriteFrame) {
-                renderData.dataLength = 4;
-                spriteAssembler.updateRenderData(mask);
-                renderData._material = mask.sharedMaterials[0];
-            }
-            else {
-                mask.setMaterial(0, null);
-            }
-            mask._renderHandle.useImageStencil(true);
-        }
-        else {
-            mask._graphics.setMaterial(0, mask.sharedMaterials[0]);
-            graphicsAssembler.updateRenderData(mask._graphics);
-            mask._renderHandle.useImageStencil(false);
-        }
-        mask._renderHandle.updateMaterial(0, mask.sharedMaterials[0]);
-        mask._renderHandle.setMaskInverted(mask.inverted);
-        mask._renderHandle.setUseModel(mask._type !== Mask.Type.IMAGE_STENCIL);
+let proto = cc.Mask.__assembler__.prototype;
+let _updateRenderData = proto.updateRenderData;
+cc.js.mixin(proto, {
+    _extendNative () {
+        renderer.MaskAssembler.prototype.ctor.call(this);
     },
 
-    updateColor () {}
-};
+    updateRenderData (mask) {
+        _updateRenderData.call(this, mask);
+    
+        this.updateMaterial(0, mask.sharedMaterials[0]);
+        mask._clearGraphics._assembler.updateMaterial(0, mask._clearMaterial);
+        
+        this.setMaskInverted(mask.inverted);
+        this.setUseModel(mask._type !== Mask.Type.IMAGE_STENCIL);
+        this.setImageStencil(mask._type === Mask.Type.IMAGE_STENCIL);
+    }
+}, renderer.MaskAssembler.prototype);
+
+let originCreateGraphics = cc.Mask.prototype._createGraphics;
+cc.js.mixin(cc.Mask.prototype, {
+    _createGraphics () {
+        originCreateGraphics.call(this);
+        if (this._graphics) {
+            this._assembler.setRenderSubHandle(this._graphics._assembler);
+        }
+
+        if (this._clearGraphics) {
+            this._clearGraphics._assembler.ignoreWorldMatrix();
+            this._assembler.setClearSubHandle(this._clearGraphics._assembler);
+        }
+    }
+})
+

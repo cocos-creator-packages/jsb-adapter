@@ -23,20 +23,5 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-cc.Label._assembler = {
-    getAssembler (comp) {
-        if (comp.font instanceof cc.BitmapFont) {
-            return cc.Label._assembler.bmfont;
-        }
-        else {
-            return cc.Label._assembler.ttf;
-        }
-    },
-
-    // Skip invalid labels (without own _assembler)
-    updateRenderData (label) {
-        return label.__allocedDatas;
-    },
-
-    updateColor () {}
-};
+require('./ttf.js');
+require('./bmfont.js');

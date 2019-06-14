@@ -293,10 +293,10 @@
     // Shield use batch in native
     skeleton._updateBatch = function () {};
 
-    skeleton.initNativeAssembler = function () {
-        this._assembler = null;
-        this._renderHandle = new renderer.CustomAssembler();
-        this._renderHandle.setUseModel(true);
+    skeleton._resetAssembler = function () {
+        this._assembler = new renderer.CustomAssembler();
+        this._assembler.setUseModel(true);
+        this.node._proxy.addAssembler("render", this._assembler);
     };
 
     let _setMaterial = skeleton.setMaterial;
@@ -304,7 +304,7 @@
         _setMaterial.call(this, index, material);
         let nativeEffect = material.effect._nativeObj;
         this._nativeSkeleton.setEffect(nativeEffect);
-        this._renderHandle.clearEffect();
+        this._assembler.clearEffect();
     };
 
     skeleton.setSkeletonData = function (skeletonData) {
@@ -392,7 +392,6 @@
             this.setMaterial(0, material);
 
             this.markForUpdateRenderData(false);
-            this.markForCustomIARender(false);
             this.markForRender(true);
         }, this);
     };
