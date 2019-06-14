@@ -275,7 +275,8 @@
         this._skeleton.setTimeScale(this.timeScale);
 
         this._renderInfoOffset = this._skeleton.getRenderInfoOffset();
-
+        this._renderInfoOffset[0] = 0;
+        
         // init skeleton listener
         this._startListener && this.setStartListener(this._startListener);
         this._endListener && this.setEndListener(this._endListener);
@@ -294,15 +295,13 @@
     skeleton._activateMaterial = function () {
         let material = this.sharedMaterials[0];
         if (!material) {
-            material = cc.Material.getInstantiatedBuiltinMaterial('spine', this);
-            material.define('_USE_MODEL', true);
-        }
-        else {
+            material = cc.Material.getInstantiatedBuiltinMaterial('2d-spine', this);
+        } else {
             material = cc.Material.getInstantiatedMaterial(material, this);
         }
 
-        this.sharedMaterials[0] = material;
-
+        material.define('_USE_MODEL', true);
+        this.setMaterial(0, material);
         this.markForUpdateRenderData(false);
         this.markForRender(false);
         this.markForCustomIARender(true);
@@ -314,6 +313,9 @@
             this._skeleton.onEnable();
         }
         this._activateMaterial();
+        if (this._renderInfoOffset) {
+            this._renderInfoOffset[0] = 0;
+        }
     };
 
     skeleton.onDisable = function () {
