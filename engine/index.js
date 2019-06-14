@@ -34,29 +34,27 @@ require('./jsb-reflection.js');
 require('./jsb-assets-manager.js');
 
 if (CC_NATIVERENDERER) {
-    require('./scene/camera.js')
+    require('./scene/mesh-buffer.js');
+    require('./scene/quad-buffer.js');
+    require('./scene/camera.js');
     require('./scene/node-proxy.js');
     require('./scene/render-flow.js');
+    require('./scene/render-data.js');
     // must be required after render flow
     require('./scene/node.js');
-    require('./scene/render-handle.js');
-
-    require('./scene/custom-render-handle.js');
-    require('./jsb-dragonbones.js');
-    require('./jsb-spine-skeleton.js');
-    require('./jsb-particle.js');
-    require('./scene/graphics-render-handle.js');
-    require('./scene/mask-render-handle.js');
 
     cc.game.on(cc.game.EVENT_ENGINE_INITED, function () {
-        require('./assemblers/flex-buffer.js');
-        // Assemblers
+        require('./assemblers/assembler.js');
+        require('./assemblers/assembler-2d.js');
+
         require('./assemblers/sprite/index.js');
         require('./assemblers/label/index.js');
-        if (cc.Graphics) {
-            require('./assemblers/graphics/impl.js');
-            require('./assemblers/graphics/index.js');
-            require('./assemblers/mask-assembler.js');
-        }
+        require('./assemblers/mask-assembler.js');
+        require('./assemblers/graphics-assembler.js');
+
+        require('./jsb-dragonbones.js');
+        require('./jsb-spine-skeleton.js');
+        require('./jsb-particle.js');
+        require('./jsb-tiledmap.js');
     });
 }

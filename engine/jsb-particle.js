@@ -28,7 +28,6 @@
     let ParticleSystem = cc.ParticleSystem;
     if (ParticleSystem === undefined) return;
     let PSProto = ParticleSystem.prototype;
-    ParticleSystem._assembler = undefined;
 
     PSProto.initProperties = function () {
 
@@ -200,13 +199,13 @@
     };
 
     // shield in native
-    PSProto.update = undefined;
-    PSProto.lateUpdate = undefined;
+    PSProto.update = null;
+    PSProto.lateUpdate = null;
 
-    PSProto._initNativeHandle = function () {
-        this._assembler = undefined;
-        this._renderHandle = new middleware.MiddlewareRenderHandle();
-        this._renderHandle.bind(this);
+    PSProto._resetAssembler = function () {
+        this._assembler = new renderer.CustomAssembler();
+        this._assembler.setUseModel(true);
+        this.node._proxy.addAssembler("render", this._assembler);
     };
 
     let _onEnable = PSProto.onEnable;
@@ -253,7 +252,7 @@
         }
 
         material.setProperty('texture', this._texture);
-        this._simulator.setNativeEffect(material.effect._nativeObj);
+        this._simulator.setEffect(material.effect._nativeObj);
         this.setMaterial(0, material);
         this._simulator.onEnable();
         this.markForRender(true);
