@@ -100,6 +100,8 @@
         let poolIdx = 0;
 
         let infoOffset = renderInfoOffset[0];
+        renderInfoOffset[0] = 0;
+        
         let renderInfoMgr = middleware.renderInfoMgr;
         let renderInfo = renderInfoMgr.renderInfo;
 
