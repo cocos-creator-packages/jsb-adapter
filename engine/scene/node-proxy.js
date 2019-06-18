@@ -23,64 +23,76 @@
  THE SOFTWARE.
  ****************************************************************************/
 
+const RenderFlow = cc.RenderFlow;
+
 cc.js.mixin(renderer.NodeProxy.prototype, {
     _ctor () {
         this._owner = null;
     },
 
-    bind (owner) {
-        if (this._owner) {
-            this.unbind();
-        }
+    init (owner) {
         this._owner = owner;
         
-        if (owner)
-        {
-            owner._proxy = this;
-            this.update3DNode();
-            this.updateZOrder();
-            this.updateCullingMask();
-            this.updateJSTRS(owner._trs);
-            if (owner._parent && owner._parent._proxy) {
-                this.updateParent(owner._parent._proxy);
-            }
+        let spaceInfo = owner._spaceInfo;
+        this._dirtyPtr = spaceInfo.dirty;
+        this._dirtyPtr[0] |= RenderFlow.FLAG_TRANSFORM;
+        this._parentPtr = spaceInfo.parent;
+        this._zOrderPtr = spaceInfo.zOrder;
+        this._cullingMaskPtr = spaceInfo.cullingMask;
+        this._opacityPtr = spaceInfo.opacity;
+        this._is3DPtr = spaceInfo.is3D;
 
-            owner.on(cc.Node.EventType.SIBLING_ORDER_CHANGED, this.updateZOrder, this);
-            owner.on(cc.Node.EventType.GROUP_CHANGED, this.updateCullingMask, this);
-        }
+        owner._proxy = this;
+        this.update3DNode();
+        this.updateZOrder();
+        this.updateCullingMask();
+        this.updateOpacity();
+        this.updateParent();
+
+        owner.on(cc.Node.EventType.SIBLING_ORDER_CHANGED, this.updateZOrder, this);
+        owner.on(cc.Node.EventType.GROUP_CHANGED, this.updateCullingMask, this);
     },
 
-    unbind () {
+    destroy () {
+        this.destroyImmediately();
+
         this._owner.off(cc.Node.EventType.SIBLING_ORDER_CHANGED, this.updateZOrder, this);
         this._owner.off(cc.Node.EventType.GROUP_CHANGED, this.updateCullingMask, this);
         this._owner._proxy = null;
         this._owner = null;
-        this.reset();
     },
 
-    updateParent (parentProxy) {
-        // detach from old parent
-        let oldParent = this.getParent();
-        if (oldParent) {
-            oldParent.removeChild(this);
+    updateParent () {
+        let parent = this._owner._parent;
+        if (parent) {
+            let parentSpaceInfo = parent._spaceInfo;
+            this._parentPtr[0] = parentSpaceInfo.unitID;
+            this._parentPtr[1] = parentSpaceInfo.index;
+        } else {
+            this._parentPtr[0] = 0xffffffff;
+            this._parentPtr[1] = 0xffffffff;
         }
-        // attach to new parent
-        parentProxy.addChild(this);
+        this.notifyUpdateParent();
     },
 
     updateZOrder () {
-        this.setLocalZOrder(this._owner._localZOrder);
+        this._zOrderPtr[0] = this._owner._localZOrder;
+        let parent = this._owner._parent;
+        if (parent && parent._proxy) {
+            parent._proxy._dirtyPtr[0] |= RenderFlow.FLAG_REORDER_CHILDREN;
+        }
     },
 
     updateCullingMask () {
-        this.setCullingMask(this._owner._cullingMask);
+        this._cullingMaskPtr[0] = this._owner._cullingMask;
     },
 
     updateOpacity () {
-        this.setOpacity(this._owner.opacity);
+        this._opacityPtr[0] = this._owner.opacity;
+        this._dirtyPtr[0] |= RenderFlow.FLAG_OPACITY;
     },
 
     update3DNode () {
-        this.set3DNode(this._owner.is3DNode);
-    }
+        this._is3DPtr[0] = this._owner.is3DNode ? 0x1 : 0x0;
+    },
 });

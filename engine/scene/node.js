@@ -34,38 +34,46 @@ const CUSTOM_IA_RENDER = RenderFlow.FLAG_CUSTOM_IA_RENDER;
 
 const POSITION_ON = 1 << 0;
 
-cc.js.getset(cc.Node.prototype, "_renderFlag", function () {
-    return 0;
-}, function (flag) {
-    if (flag === 0) return;
-
-    let comp = this._renderComponent;
-    let assembler = comp && comp._assembler;
-
-    if (((flag & UPDATE_RENDER_DATA) || (flag & CUSTOM_IA_RENDER)) && assembler) {
-        if (assembler.delayUpdateRenderData) {
-            comp._renderHandle.delayUpdateRenderData();
+cc.js.getset(cc.Node.prototype, "_renderFlag", 
+    function () {
+        return this.__renderFlag;
+    }, 
+    function (flag) {
+        this.__renderFlag = flag;
+        if (this._proxy) {
+            this._proxy._dirtyPtr[0] = flag;
         }
-        else {
-            assembler.updateRenderData(comp);
+
+        if (flag === 0) return;
+
+        let comp = this._renderComponent;
+        let assembler = comp && comp._assembler;
+
+        if (((flag & UPDATE_RENDER_DATA) || (flag & CUSTOM_IA_RENDER)) && assembler) {
+            if (assembler.delayUpdateRenderData) {
+                comp._renderHandle.delayUpdateRenderData();
+            }
+            else {
+                assembler.updateRenderData(comp);
+            }
+        }
+        if (flag & COLOR) {
+            // Update uniform
+            comp && comp._updateColor();
+            if (assembler) {
+                // Update vertex
+                assembler.updateColor(comp, this._color._val);
+            }
         }
     }
-    if (flag & COLOR) {
-        // Update uniform
-        comp && comp._updateColor();
-        if (assembler) {
-            // Update vertex
-            assembler.updateColor(comp, this._color._val);
-        }
-    }
-});
+);
 
 cc.PrivateNode.prototype._posDirty = function (sendEvent) {
     let parent = this.parent;
     if (parent) {
         // Position correction for transform calculation
-        this._trs[1] = this._originPos.x - (parent._anchorPoint.x - 0.5) * parent._contentSize.width;
-        this._trs[2] = this._originPos.y - (parent._anchorPoint.y - 0.5) * parent._contentSize.height;
+        this._trs[0] = this._originPos.x - (parent._anchorPoint.x - 0.5) * parent._contentSize.width;
+        this._trs[1] = this._originPos.y - (parent._anchorPoint.y - 0.5) * parent._contentSize.height;
     }
 
     this.setLocalDirty(cc.Node._LocalDirtyFlag.POSITION);
