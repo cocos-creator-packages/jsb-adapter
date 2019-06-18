@@ -30,7 +30,6 @@ const LOCAL_TRANSFORM = RenderFlow.FLAG_LOCAL_TRANSFORM;
 const COLOR = RenderFlow.FLAG_COLOR;
 const OPACITY = RenderFlow.FLAG_OPACITY;
 const UPDATE_RENDER_DATA = RenderFlow.FLAG_UPDATE_RENDER_DATA;
-const CUSTOM_IA_RENDER = RenderFlow.FLAG_CUSTOM_IA_RENDER;
 
 const POSITION_ON = 1 << 0;
 
@@ -44,26 +43,23 @@ cc.js.getset(cc.Node.prototype, "_renderFlag",
             this._proxy._dirtyPtr[0] = flag;
         }
 
-        if (flag === 0) return;
-
         let comp = this._renderComponent;
         let assembler = comp && comp._assembler;
+        if (!assembler) return;
+        if (assembler instanceof renderer.CustomAssembler) return;
 
-        if (((flag & UPDATE_RENDER_DATA) || (flag & CUSTOM_IA_RENDER)) && assembler) {
-            if (assembler.delayUpdateRenderData) {
-                comp._renderHandle.delayUpdateRenderData();
-            }
-            else {
-                assembler.updateRenderData(comp);
-            }
+        if (flag & UPDATE_RENDER_DATA) {
+            // if (assembler.delayUpdateRenderData) {
+                comp._assembler.delayUpdateRenderData();
+            // }
+            // else {
+            //     assembler.updateRenderData(comp);
+            // }
         }
+
         if (flag & COLOR) {
             // Update uniform
             comp && comp._updateColor();
-            if (assembler) {
-                // Update vertex
-                assembler.updateColor(comp, this._color._val);
-            }
         }
     }
 );

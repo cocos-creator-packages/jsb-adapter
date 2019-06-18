@@ -28,7 +28,6 @@
     let ParticleSystem = cc.ParticleSystem;
     if (ParticleSystem === undefined) return;
     let PSProto = ParticleSystem.prototype;
-    ParticleSystem._assembler = undefined;
 
     PSProto.initProperties = function () {
 
@@ -203,10 +202,10 @@
     PSProto.update = null;
     PSProto.lateUpdate = null;
 
-    PSProto.initNativeAssembler = function () {
-        this._assembler = null;
-        this._renderHandle = new renderer.CustomAssembler();
-        this._renderHandle.setUseModel(true);
+    PSProto._resetAssembler = function () {
+        this._assembler = new renderer.CustomAssembler();
+        this._assembler.setUseModel(true);
+        this.node._proxy.addAssembler("render", this._assembler);
     };
 
     let _onEnable = PSProto.onEnable;

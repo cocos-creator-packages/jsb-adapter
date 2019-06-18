@@ -381,16 +381,16 @@
     // Shield use batch in native
     armatureDisplayProto._updateBatch = function () {}
 
-    armatureDisplayProto.initNativeAssembler = function () {
-        this._assembler = null;
-        this._renderHandle = new renderer.CustomAssembler();
-        this._renderHandle.setUseModel(true);
+    armatureDisplayProto._resetAssembler = function () {
+        this._assembler = new renderer.CustomAssembler();
+        this._assembler.setUseModel(true);
+        this.node._proxy.addAssembler("render", this._assembler);
     };
 
     let _setMaterial = armatureDisplayProto.setMaterial;
     armatureDisplayProto.setMaterial = function(index, material) {
         _setMaterial.call(this, index, material);
-        this._renderHandle.clearEffect();
+        this._assembler.clearEffect();
         if (this._nativeDisplay) {
             let nativeEffect = material.effect._nativeObj;
             this._nativeDisplay.setEffect(nativeEffect);
@@ -473,7 +473,6 @@
         this.setMaterial(0, material);
 
         this.markForUpdateRenderData(false);
-        this.markForCustomIARender(false);
         this.markForRender(true);
     };
 

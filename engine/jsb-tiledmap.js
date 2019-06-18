@@ -28,15 +28,8 @@
 
     const RenderFlow = cc.RenderFlow;
 
-    // tiled map assembler
-    cc.js.mixin(renderer.TiledMapAssembler.prototype, cc.NativeAssembler);
-
     // tiled layer
     let TiledLayer = cc.TiledLayer.prototype;
-
-    TiledLayer.initNativeAssembler = function () {
-        this._renderHandle = new renderer.TiledMapAssembler();
-    };
 
     let _addUserNode = TiledLayer.addUserNode;
     TiledLayer.addUserNode = function (node) {
@@ -114,10 +107,6 @@
         this._nativeAssembler.updateNodes(renderData.ia._index, nativeNodes);
     };
 
-    // tiledmap assembler
-    let assembler = cc.TiledLayer._assembler;
-    assembler.delayUpdateRenderData = true;
-
     let ModelBatcherDelegate = cc.Class({
         ctor () {
             this._nativeAssembler = null;
@@ -128,8 +117,7 @@
         setBuffer (buffer) {
             this._buffer = buffer;
         },
-        _flushIA (renderData) {
-            let ia = renderData.ia;
+        _flushIA (ia) {
             let iaIndex = ia._index;
             let meshIndex = ia._meshIndex;
             this._nativeAssembler.updateMeshIndex(iaIndex, meshIndex);
@@ -138,28 +126,36 @@
             let vertexCount = verticesOffset - verticesStart;
             this._nativeAssembler.updateVerticesRange(iaIndex, verticesStart, vertexCount);
             this._nativeAssembler.updateIndicesRange(iaIndex, ia._start, ia._count);
-            this._nativeAssembler.updateMaterial(iaIndex, renderData.material);
+            this._nativeAssembler.updateMaterial(iaIndex, this.material);
         },
         _flush () {}
     });
 
-    assembler.updateRenderData = function (comp) {
-        let nativeAssembler = comp._renderHandle;
 
-        if (!comp._renderDataList) {
-            comp._buffer = new cc.TiledMapBuffer(null, cc.gfx.VertexFormat.XY_UV_Color);
-            comp._renderDataList = new cc.TiledMapRenderDataList();
-            comp._modelBatcherDelegate = new ModelBatcherDelegate();
+    let TiledMapAssembler = cc.TiledLayer.__assembler__.prototype;
+    let _updateRenderData = TiledMapAssembler.updateRenderData;
+    let _fillBuffers = TiledMapAssembler.fillBuffers;
+    cc.js.mixin(TiledMapAssembler, {
+        _extendNative () {
+            renderer.TiledMapAssembler.prototype.ctor.call(this);
+        },
 
-            comp._buffer.setNativeAssembler(nativeAssembler);
-            comp._renderDataList.setNativeAssembler(nativeAssembler);
-            comp._modelBatcherDelegate.setBuffer(comp._buffer);
-            comp._modelBatcherDelegate.setNativeAssembler(nativeAssembler);
+        updateRenderData (comp) {
+            if (!comp._modelBatcherDelegate) {
+                comp._buffer = new cc.TiledMapBuffer(null, cc.gfx.VertexFormat.XY_UV_Color);
+                comp._renderDataList = new cc.TiledMapRenderDataList();
+                comp._modelBatcherDelegate = new ModelBatcherDelegate();
+    
+                comp._buffer.setNativeAssembler(this);
+                comp._renderDataList.setNativeAssembler(this);
+                comp._modelBatcherDelegate.setBuffer(comp._buffer);
+                comp._modelBatcherDelegate.setNativeAssembler(this);
+            }
+    
+            this.setLayerMoveXY(comp._leftDownToCenterX, comp._leftDownToCenterY);
+            
+            _fillBuffers.call(this, comp, comp._modelBatcherDelegate);
+            comp.node._renderFlag |= RenderFlow.FLAG_UPDATE_RENDER_DATA;
         }
-
-        nativeAssembler.setLayerMoveXY(comp._leftDownToCenterX, comp._leftDownToCenterY);
-        
-        this.renderIA (comp, comp._modelBatcherDelegate);
-        comp.node._renderFlag |= RenderFlow.FLAG_UPDATE_RENDER_DATA;
-    };
+    }, renderer.TiledMapAssembler.prototype);
 })();

@@ -53,30 +53,26 @@ MeshBuffer.init = function (batcher, vertexFormat) {
         indiceOffset : 0
     };
 
+    this._renderDataList = new renderer.RenderDataList();
     this._reallocBuffer();
 };
 
 MeshBuffer.setNativeAssembler = function(assembler) {
     this._nativeAssembler = assembler;
-
-    assembler.vDatas = this._vDatas;
-    assembler.uintVDatas = this._uintVDatas;
-    assembler.iDatas = this._iDatas;
-
     for (let i = 0; i < this._vDatas.length; i++) {
-        assembler.updateMesh(i, this._vDatas[i], this._iDatas[i], this._uintVDatas[i]);
+        this._renderDataList.updateMesh(i, this._vDatas[i], this._iDatas[i], this._uintVDatas[i]);
     }
+
+    assembler.setRenderDataList(this._renderDataList);
 };
 
 MeshBuffer._updateVIDatas = function() {
     let offset = this._arrOffset;
-    if (this._nativeAssembler) {
-        this._nativeAssembler.updateMesh(offset, this._vData, this._iData, this._uintVData);
-    } else {
-        this._vDatas[offset] = this._vData;
-        this._uintVDatas[offset] = this._uintVData;
-        this._iDatas[offset] = this._iData;
-    }
+    this._vDatas[offset] = this._vData;
+    this._uintVDatas[offset] = this._uintVData;
+    this._iDatas[offset] = this._iData;
+        
+    this._renderDataList.updateMesh(offset, this._vData, this._iData, this._uintVData);
 };
 
 MeshBuffer.getNativeAssembler = function() {
@@ -203,10 +199,6 @@ MeshBuffer.reset = function() {
     this.indiceOffset = 0;
     this.vertexStart = 0;
     this.vertexOffset = 0;
-
-    if (this._nativeAssembler) {
-        this._nativeAssembler.reset();
-    }
 };
 
 MeshBuffer.destroy = function() {
