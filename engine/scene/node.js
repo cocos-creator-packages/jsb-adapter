@@ -49,12 +49,7 @@ cc.js.getset(cc.Node.prototype, "_renderFlag",
         if (assembler instanceof renderer.CustomAssembler) return;
 
         if (flag & UPDATE_RENDER_DATA) {
-            // if (assembler.delayUpdateRenderData) {
-                comp._assembler.delayUpdateRenderData();
-            // }
-            // else {
-            //     assembler.updateRenderData(comp);
-            // }
+            comp._assembler.delayUpdateRenderData();
         }
 
         if (flag & COLOR) {

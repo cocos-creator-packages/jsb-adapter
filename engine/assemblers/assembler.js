@@ -30,8 +30,8 @@ let originInit = cc.Assembler.prototype.init;
 
 let Assembler = {
     destroy () {
-        RenderFlow.off(BEFORE_RENDER, this.updateRenderData, this);
         this._renderComp = null;
+        this._effect = null;
     },
 
     clear () {
@@ -42,33 +42,23 @@ let Assembler = {
         renderer.Assembler.prototype.ctor.call(this);
     },
 
-    // set useModel () {
-    //     this.setUseModel(!!this.useModel);
-    // },
-    // get useModel () {
-    //     return false;
-    // },
-
     init (renderComp) {
         this._extendNative();
 
+        this._effect = [];
         originInit.call(this, renderComp);
 
-        // if (renderComp._assembler) {
-        //     this.setUseModel(!!this.useModel);
-        // }
         if (renderComp._vertexFormat) {
             this.setVertexFormat(renderComp._vertexFormat._nativeObj);
         }
         if (renderComp.node && renderComp.node._proxy) {
             renderComp.node._proxy.addAssembler("render", this);
         }
-
     },
 
     delayUpdateRenderData () {
         if (this._renderComp) {
-            RenderFlow.on(BEFORE_RENDER, this._updateRenderData, this);
+            RenderFlow.once(BEFORE_RENDER, this._updateRenderData, this);
         }
     },
 
@@ -78,12 +68,15 @@ let Assembler = {
     },
 
     updateRenderData (comp) {
-        comp._assembler.updateMaterial(0, comp.sharedMaterials[0]);
+        
     },
 
     updateMaterial (iaIndex, material) {
         let effect = material && material.effect;
-        this.updateEffect(iaIndex, effect ? effect._nativeObj : null);
+        if (this._effect[iaIndex] !== effect) {
+            this._effect[iaIndex] = effect;
+            this.updateEffect(iaIndex, effect ? effect._nativeObj : null);
+        }
     },
 
     updateColor(comp, color) {

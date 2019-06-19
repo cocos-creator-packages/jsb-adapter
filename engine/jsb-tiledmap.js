@@ -131,9 +131,7 @@
         _flush () {}
     });
 
-
     let TiledMapAssembler = cc.TiledLayer.__assembler__.prototype;
-    let _updateRenderData = TiledMapAssembler.updateRenderData;
     let _fillBuffers = TiledMapAssembler.fillBuffers;
     cc.js.mixin(TiledMapAssembler, {
         _extendNative () {
