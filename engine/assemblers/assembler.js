@@ -68,7 +68,7 @@ let Assembler = {
     },
 
     updateRenderData (comp) {
-        
+        comp._assembler.updateMaterial(0, comp.sharedMaterials[0]);
     },
 
     updateMaterial (iaIndex, material) {

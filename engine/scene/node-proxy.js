@@ -35,12 +35,13 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         
         let spaceInfo = owner._spaceInfo;
         this._dirtyPtr = spaceInfo.dirty;
-        this._dirtyPtr[0] |= RenderFlow.FLAG_TRANSFORM;
         this._parentPtr = spaceInfo.parent;
         this._zOrderPtr = spaceInfo.zOrder;
         this._cullingMaskPtr = spaceInfo.cullingMask;
         this._opacityPtr = spaceInfo.opacity;
         this._is3DPtr = spaceInfo.is3D;
+
+        this._dirtyPtr[0] |= owner._renderFlag;
 
         owner._proxy = this;
         this.update3DNode();

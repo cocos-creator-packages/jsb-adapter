@@ -35,13 +35,15 @@ const POSITION_ON = 1 << 0;
 
 cc.js.getset(cc.Node.prototype, "_renderFlag", 
     function () {
-        return this.__renderFlag;
-    }, 
+        return this._tempRenderFlag;
+    },
     function (flag) {
-        this.__renderFlag = flag;
+        let dirtyPtr = null; 
         if (this._proxy) {
-            this._proxy._dirtyPtr[0] = flag;
+            dirtyPtr = this._proxy._dirtyPtr;
+            dirtyPtr[0] |= flag;
         }
+        this._tempRenderFlag = flag;
 
         let comp = this._renderComponent;
         let assembler = comp && comp._assembler;
@@ -50,11 +52,19 @@ cc.js.getset(cc.Node.prototype, "_renderFlag",
 
         if (flag & UPDATE_RENDER_DATA) {
             comp._assembler.delayUpdateRenderData();
+            if (dirtyPtr) {
+                dirtyPtr[0] &= ~UPDATE_RENDER_DATA;
+            }
+            this._tempRenderFlag &= ~UPDATE_RENDER_DATA;
         }
 
         if (flag & COLOR) {
             // Update uniform
             comp && comp._updateColor();
+            if (dirtyPtr) {
+                dirtyPtr[0] &= ~COLOR;
+            }
+            this._tempRenderFlag &= ~COLOR;
         }
     }
 );
