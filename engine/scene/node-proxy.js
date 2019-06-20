@@ -34,6 +34,8 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         this._owner = owner;
         
         let spaceInfo = owner._spaceInfo;
+        this._owner._dirtyPtr = spaceInfo.dirty;
+        
         this._dirtyPtr = spaceInfo.dirty;
         this._parentPtr = spaceInfo.parent;
         this._zOrderPtr = spaceInfo.zOrder;
