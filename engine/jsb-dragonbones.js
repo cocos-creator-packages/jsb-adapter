@@ -384,7 +384,7 @@
     armatureDisplayProto._resetAssembler = function () {
         this._assembler = new renderer.CustomAssembler();
         this._assembler.setUseModel(true);
-        this.node._proxy.addAssembler("render", this._assembler);
+        this.node._proxy.setAssembler(this._assembler);
     };
 
     let _setMaterial = armatureDisplayProto.setMaterial;
