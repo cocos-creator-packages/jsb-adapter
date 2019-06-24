@@ -63,7 +63,7 @@ let Assembler = {
     },
 
     _updateRenderData () {
-        if (!this._renderComp.isValid) return;
+        if (!this._renderComp || !this._renderComp.isValid) return;
         this.updateRenderData(this._renderComp);
 
         let materials = this._renderComp.sharedMaterials;
