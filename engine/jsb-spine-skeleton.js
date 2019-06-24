@@ -304,7 +304,7 @@
         _setMaterial.call(this, index, material);
         let nativeEffect = material.effect._nativeObj;
         this._nativeSkeleton.setEffect(nativeEffect);
-        this._assembler.clearEffect();
+        this._assembler && this._assembler.clearEffect();
     };
 
     skeleton.setSkeletonData = function (skeletonData) {
