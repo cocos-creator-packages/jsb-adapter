@@ -52,7 +52,7 @@ let Assembler = {
             this.setVertexFormat(renderComp._vertexFormat._nativeObj);
         }
         if (renderComp.node && renderComp.node._proxy) {
-            renderComp.node._proxy.addAssembler("render", this);
+            renderComp.node._proxy.setAssembler(this);
         }
     },
 

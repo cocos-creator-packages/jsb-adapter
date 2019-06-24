@@ -33,17 +33,19 @@ const UPDATE_RENDER_DATA = RenderFlow.FLAG_UPDATE_RENDER_DATA;
 
 const POSITION_ON = 1 << 0;
 
+cc.Node.prototype.setLocalDirty = function (flag) {
+    this._localMatDirty |= flag;
+    this._worldMatDirty = true;
+    this._dirtyPtr[0] |= RenderFlow.FLAG_TRANSFORM;
+};
+
 cc.js.getset(cc.Node.prototype, "_renderFlag", 
     function () {
-        return this._tempRenderFlag;
+        return this._dirtyPtr[0];
     },
     function (flag) {
-        let dirtyPtr = null; 
-        if (this._proxy) {
-            dirtyPtr = this._proxy._dirtyPtr;
-            dirtyPtr[0] |= flag;
-        }
-        this._tempRenderFlag = flag;
+        let dirtyPtr = this._dirtyPtr;
+        dirtyPtr[0] |= flag;
 
         let comp = this._renderComponent;
         let assembler = comp && comp._assembler;
@@ -52,19 +54,13 @@ cc.js.getset(cc.Node.prototype, "_renderFlag",
 
         if (flag & UPDATE_RENDER_DATA) {
             comp._assembler.delayUpdateRenderData();
-            if (dirtyPtr) {
-                dirtyPtr[0] &= ~UPDATE_RENDER_DATA;
-            }
-            this._tempRenderFlag &= ~UPDATE_RENDER_DATA;
+            dirtyPtr[0] &= ~UPDATE_RENDER_DATA;
         }
 
         if (flag & COLOR) {
             // Update uniform
             comp && comp._updateColor();
-            if (dirtyPtr) {
-                dirtyPtr[0] &= ~COLOR;
-            }
-            this._tempRenderFlag &= ~COLOR;
+            dirtyPtr[0] &= ~COLOR;
         }
     }
 );
