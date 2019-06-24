@@ -43,8 +43,6 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         this._opacityPtr = spaceInfo.opacity;
         this._is3DPtr = spaceInfo.is3D;
 
-        this._dirtyPtr[0] |= owner._renderFlag;
-
         owner._proxy = this;
         this.update3DNode();
         this.updateZOrder();
