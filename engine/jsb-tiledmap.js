@@ -101,10 +101,10 @@
             for (let idx = 0; idx < nodesList.length; idx++) {
                 let dataComp = nodesList[idx];
                 if (!dataComp) continue;
-                nativeNodes.push(dataComp.node.name);
+                nativeNodes.push(dataComp.node._id);
             }
         }
-        this._nativeAssembler.updateNodes(renderData.ia._meshIndex, nativeNodes);
+        this._nativeAssembler.updateNodes(renderData.ia._index, nativeNodes);
     };
 
     let ModelBatcherDelegate = cc.Class({
@@ -131,9 +131,7 @@
         _flush () {}
     });
 
-
     let TiledMapAssembler = cc.TiledLayer.__assembler__.prototype;
-    let _updateRenderData = TiledMapAssembler.updateRenderData;
     let _fillBuffers = TiledMapAssembler.fillBuffers;
     cc.js.mixin(TiledMapAssembler, {
         _extendNative () {

@@ -10,7 +10,7 @@ let originClear = proto.clear;
 proto.clear = function () {
     originClear.call(this);
     this._renderDataList.clear();
-}
+};
 
 let originUpdateMesh = proto.updateMesh;
 proto.updateMesh = function (meshIndex, vertices, indices) {

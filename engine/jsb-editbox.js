@@ -174,12 +174,12 @@
             scaleX /= dpr;
             scaleY /= dpr;
 
-            let finalScaleX = matrix.m00 * scaleX;
-            let finaleScaleY = matrix.m05 * scaleY;
+            let finalScaleX = matrix.m[0] * scaleX;
+            let finaleScaleY = matrix.m[5] * scaleY;
 
             return {
-                x: matrix.m12 * finalScaleX,
-                y: matrix.m13 * finaleScaleY,
+                x: matrix.m[12] * finalScaleX,
+                y: matrix.m[13] * finaleScaleY,
                 width: contentSize.width * finalScaleX,
                 height: contentSize.height * finaleScaleY
             };
