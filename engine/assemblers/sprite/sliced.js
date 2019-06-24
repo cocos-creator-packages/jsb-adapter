@@ -25,9 +25,8 @@
 
 Object.assign(cc.Sprite.__assembler__.Sliced.prototype, {
     updateWorldVerts (sprite) {
-        let renderData = this._renderData;
-        let local = renderData._local;
-        let world = renderData.vDatas[0];
+        let local = this._local;
+        let world = this._renderData.vDatas[0];
 
         let floatsPerVert = this.floatsPerVert;
         for (let row = 0; row < 4; ++row) {

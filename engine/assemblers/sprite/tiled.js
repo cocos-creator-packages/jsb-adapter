@@ -26,7 +26,7 @@
 Object.assign(cc.Sprite.__assembler__.Tiled.prototype, {
     updateWorldVerts (sprite) {
         let renderData = this._renderData;
-        let local = renderData._local;
+        let local = this._local;
         let localX = local.x, localY = local.y;
         let world = renderData.vDatas[0];
         let { row, col } = this;

@@ -26,7 +26,7 @@
 
 Object.assign(cc.Sprite.__assembler__.RadialFilled.prototype, {
     updateWorldVerts (sprite) {
-        let local = this._renderData._local;
+        let local = this._local;
         let world = this._renderData.vDatas[0];
         let floatsPerVert = this.floatsPerVert;
         for (let offset = 0; offset < world.length; offset += floatsPerVert) {

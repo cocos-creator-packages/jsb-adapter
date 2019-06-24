@@ -1,6 +1,6 @@
 
 cc.Assembler2D.prototype.updateWorldVerts = function(comp) {
-    let local = this._renderData._local;
+    let local = this._local;
     let verts = this._renderData.vDatas[0];
   
     let vl = local[0],
@@ -20,15 +20,6 @@ cc.Assembler2D.prototype.updateWorldVerts = function(comp) {
     // right top
     verts[15] = vr;
     verts[16] = vt;
-};
-
-let _packToDynamicAtlas = cc.Assembler2D.prototype.packToDynamicAtlas;
-cc.Assembler2D.prototype.packToDynamicAtlas = function(comp, frame) {
-    _packToDynamicAtlas.call(this, comp, frame);
-
-    if (frame) {
-        comp._assembler.updateMaterial(0, comp.sharedMaterials[0]);
-    }
 };
 
 let _updateColor = cc.Assembler2D.prototype.updateColor;

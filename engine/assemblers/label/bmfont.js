@@ -25,13 +25,8 @@
 
 let originReserveQuads = cc.Label.__assembler__.Bmfont.prototype._reserveQuads;
 Object.assign(cc.Label.__assembler__.Bmfont.prototype, {
-    _reserveQuads (comp, count) {
-        this.updateMaterial(0, comp.getMaterial(0));
-        originReserveQuads.call(this, comp, count);
-    },
-
     updateWorldVerts (comp) {
-        let local = this._renderData._local;
+        let local = this._local;
         let world = this._renderData.vDatas[0];
         let floatsPerVert = this.floatsPerVert;
         for (let offset = 0; offset < local.length; offset += floatsPerVert) {
