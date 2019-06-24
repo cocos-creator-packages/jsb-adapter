@@ -34,8 +34,7 @@ require('./jsb-reflection.js');
 require('./jsb-assets-manager.js');
 
 if (CC_NATIVERENDERER) {
-    require('./scene/mesh-buffer.js');
-    require('./scene/quad-buffer.js');
+    
     require('./scene/camera.js');
     require('./scene/node-proxy.js');
     require('./scene/render-flow.js');
@@ -44,6 +43,9 @@ if (CC_NATIVERENDERER) {
     require('./scene/node.js');
 
     cc.game.on(cc.game.EVENT_ENGINE_INITED, function () {
+        require('./scene/mesh-buffer.js');
+        require('./scene/quad-buffer.js');
+
         require('./assemblers/assembler.js');
         require('./assemblers/assembler-2d.js');
 
@@ -51,6 +53,7 @@ if (CC_NATIVERENDERER) {
         require('./assemblers/label/index.js');
         require('./assemblers/mask-assembler.js');
         require('./assemblers/graphics-assembler.js');
+        require('./assemblers/motion-streak.js');
 
         require('./jsb-dragonbones.js');
         require('./jsb-spine-skeleton.js');
