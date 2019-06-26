@@ -68,7 +68,9 @@ let Assembler = {
 
         let materials = this._renderComp.sharedMaterials;
         for (let i = 0; i < materials.length; i++) {
-            this.updateMaterial(i, materials[i]);
+            let m = materials[i];
+            m.getHash();
+            this.updateMaterial(i, m);
         }
     },
 
