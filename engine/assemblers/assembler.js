@@ -46,6 +46,9 @@ let Assembler = {
         this._extendNative();
 
         this._effect = [];
+        this._dirtyPtr = new Uint32Array(1);
+        this.setDirty(this._dirtyPtr);
+
         originInit.call(this, renderComp);
 
         if (renderComp._vertexFormat) {
@@ -87,19 +90,12 @@ let Assembler = {
     },
 
     updateColor(comp, color) {
-        this.notifyDirty(cc.Assembler.NativeDirtyFlag.OPACITY);
+        this._dirtyPtr[0] |= RenderFlow.FLAG_OPACITY_CHANGED;
     }
 };
 
 Object.setPrototypeOf(cc.Assembler.prototype, renderer.Assembler.prototype);
 
 cc.js.mixin(cc.Assembler.prototype, Assembler);
-
-cc.Assembler.NativeDirtyFlag = {
-    TRANSFORM: 1 << 0,
-    OPACITY: 1 << 1,
-    COLOR: 1 << 2,
-    CHILDREN: 1 << 3
-};
 
 module.exports = Assembler;

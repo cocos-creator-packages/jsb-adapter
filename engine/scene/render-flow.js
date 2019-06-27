@@ -24,6 +24,11 @@
  ****************************************************************************/
 
 let RenderFlow = cc.RenderFlow;
+
+RenderFlow.FLAG_REORDER_CHILDREN = 1 << 29;
+RenderFlow.FLAG_WORLD_TRANSFORM_CHANGED = 1 << 30;
+RenderFlow.FLAG_OPACITY_CHANGED = 1 << 31;
+
 RenderFlow.EventType = {
     BEFORE_RENDER: 'before-render'
 };
@@ -39,5 +44,3 @@ RenderFlow.init = function (nativeFlow) {
     cc.EventTarget.call(this);
     this._nativeFlow = nativeFlow;
 };
-
-RenderFlow.FLAG_REORDER_CHILDREN = RenderFlow.FLAG_FINAL << 1;
