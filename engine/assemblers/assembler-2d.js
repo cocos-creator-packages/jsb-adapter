@@ -1,4 +1,4 @@
-
+let RenderFlow = cc.RenderFlow;
 cc.Assembler2D.prototype.updateWorldVerts = function(comp) {
     let local = this._local;
     let verts = this._renderData.vDatas[0];
@@ -24,6 +24,6 @@ cc.Assembler2D.prototype.updateWorldVerts = function(comp) {
 
 let _updateColor = cc.Assembler2D.prototype.updateColor;
 cc.Assembler2D.prototype.updateColor = function(comp, color) {
-    this.notifyDirty(cc.Assembler.NativeDirtyFlag.OPACITY);
+    this._dirtyPtr[0] |= RenderFlow.FLAG_OPACITY_CHANGED;
     _updateColor.call(this, comp, color);
 };
