@@ -193,45 +193,6 @@
         }
     });
 
-    Object.defineProperty(skeleton, 'debugSlots', {
-        get () {
-            return this._debugSlots || false;
-        },
-        set (value) {
-            this._debugSlots = value;
-            this._updateDebugDraw();
-            if (this._nativeSkeleton) {
-                this._nativeSkeleton.setDebugSlotsEnabled(this._debugSlots);
-            }
-        }
-    });
-
-    Object.defineProperty(skeleton, 'debugBones', {
-        get () {
-            return this._debugBones || false;
-        },
-        set (value) {
-            this._debugBones = value;
-            this._updateDebugDraw();
-            if (this._nativeSkeleton) {
-                this._nativeSkeleton.setDebugBonesEnabled(this._debugBones);
-            }
-        }
-    });
-
-    Object.defineProperty(skeleton, 'debugMesh', {
-        get () {
-            return this._debugMesh || false;
-        },
-        set (value) {
-            this._debugMesh = value;
-            this._updateDebugDraw();
-            if (this._nativeSkeleton) {
-                this._nativeSkeleton.setDebugMeshEnabled(this._debugMesh);
-            }
-        }
-    });
-
     Object.defineProperty(skeleton, "premultipliedAlpha", {
         get () {
             if (this._premultipliedAlpha === undefined){
@@ -260,28 +221,33 @@
         }
     });
 
-    Object.defineProperty(skeleton, "useTint", {
-        get () {
-            return this._useTint || false;
-        },
-        set (value) {
-            this._useTint = value;
-            let baseMaterial = this.sharedMaterials[0];
-            if (!baseMaterial) return;
-            baseMaterial.define('USE_TINT', this._useTint);
-            // Update cache material useTint property
-            let cache = this._materialCache;
-            for (let mKey in cache) {
-                let material = cache[mKey];
-                if (material) {
-                    material.define('USE_TINT', this._useTint);
-                }
-            }
-            if (this._nativeSkeleton) {
-                this._nativeSkeleton.setUseTint(this._useTint);
-            }
+    let _updateDebugDraw = skeleton._updateDebugDraw;
+    skeleton._updateDebugDraw = function () {
+        _updateDebugDraw.call(this);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setDebugMeshEnabled(this.debugMesh);
+            this._nativeSkeleton.setDebugSlotsEnabled(this.debugSlots);
+            this._nativeSkeleton.setDebugBonesEnabled(this.debugBones);
         }
-    });
+    };
+
+    let _updateUseTint = skeleton._updateUseTint;
+    skeleton._updateUseTint = function () {
+        _updateUseTint.call(this);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setUseTint(this.useTint);
+        }
+        this._assembler && this._assembler.clearEffect();
+    };
+
+    let _updateBatch = skeleton._updateBatch;
+    skeleton._updateBatch = function () {
+        _updateBatch.call(this);
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setBatchEnabled(this.enableBatch);
+        }
+        this._assembler && this._assembler.clearEffect();
+    };
 
     let _onLoad = skeleton.onLoad;
     skeleton.onLoad = function () {
@@ -290,12 +256,8 @@
         }
     };
 
-    // Shield use batch in native
-    skeleton._updateBatch = function () {};
-
     skeleton._resetAssembler = function () {
         this._assembler = new renderer.CustomAssembler();
-        this._assembler.setUseModel(true);
         this.node._proxy.setAssembler(this._assembler);
     };
 
@@ -341,10 +303,11 @@
 
         this._nativeSkeleton.setOpacityModifyRGB(this.premultipliedAlpha);
         this._nativeSkeleton.setDebugSlotsEnabled(this.debugSlots);
-        this._nativeSkeleton.setDebugMeshEnabled(this._debugMesh);
+        this._nativeSkeleton.setDebugMeshEnabled(this.debugMesh);
         this._nativeSkeleton.setDebugBonesEnabled(this.debugBones);
         this._nativeSkeleton.setUseTint(this.useTint);
         this._nativeSkeleton.setTimeScale(this.timeScale);
+        this._nativeSkeleton.setBatchEnabled(this.enableBatch);
         this._nativeSkeleton.bindNodeProxy(this.node._proxy);
         this._skeleton = this._nativeSkeleton.getSkeleton();
 
@@ -366,34 +329,12 @@
         }
     };
 
-    skeleton._activateMaterial = function () {
-        if (!this.skeletonData) {
-            this.disableRender();
-            return;
-        }
-
-        this.skeletonData.ensureTexturesLoaded(function (result) {
-            if (!result) {
-                this.disableRender();
-                return;
-            }
-
-            let material = this.sharedMaterials[0];
-            if (!material) {
-                material = cc.Material.getInstantiatedBuiltinMaterial('spine', this);
-                
-            } else {
-                material = cc.Material.getInstantiatedMaterial(material, this);
-            }
-
-            material.define('CC_USE_MODEL', true);
-            let texValues = this.skeletonData.textures;
-            material.setProperty('texture', texValues[0]);
-            this.setMaterial(0, material);
-
-            this.markForUpdateRenderData(false);
-            this.markForRender(true);
-        }, this);
+    skeleton._prepareToRender = function (material) {
+        let texValues = this.skeletonData.textures;
+        material.setProperty('texture', texValues[0]);
+        this.setMaterial(0, material);
+        this.markForUpdateRenderData(false);
+        this.markForRender(true);
     };
 
     skeleton.onEnable = function () {

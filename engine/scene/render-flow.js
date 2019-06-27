@@ -29,12 +29,10 @@ RenderFlow.EventType = {
 };
 cc.js.mixin(RenderFlow, cc.EventTarget.prototype);
 
-var middlewareMgr = middleware.MiddlewareManager.getInstance();
 var director = cc.director;
 RenderFlow.render = function (scene) {
     this.emit(this.EventType.BEFORE_RENDER);
-    middlewareMgr && middlewareMgr.update(director._deltaTime);
-    this._nativeFlow.render(scene._proxy);
+    this._nativeFlow.render(scene._proxy, director._deltaTime);
 };
 
 RenderFlow.init = function (nativeFlow) {

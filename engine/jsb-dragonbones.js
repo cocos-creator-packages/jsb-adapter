@@ -346,19 +346,6 @@
         visible: false
     });
 
-    Object.defineProperty(armatureDisplayProto, 'debugBones', {
-        get () {
-            return this._debugBones || false;
-        },
-        set (value) {
-            this._debugBones = value;
-            this._initDebugDraw();
-            if (this._nativeDisplay) {
-                this._nativeDisplay.setDebugBonesEnabled(this._debugBones);
-            }
-        }
-    });
-
     Object.defineProperty(armatureDisplayProto, "premultipliedAlpha", {
         get () {
             if (this._premultipliedAlpha === undefined){
@@ -374,16 +361,29 @@
         }
     });
 
+    let _initDebugDraw = armatureDisplayProto._initDebugDraw;
+    armatureDisplayProto._initDebugDraw = function () {
+        _initDebugDraw.call(this);
+        if (this._nativeDisplay) {
+            this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
+        }
+    };
+
+    let _updateBatch = armatureDisplayProto._updateBatch;
+    armatureDisplayProto._updateBatch = function () {
+        _updateBatch.call(this);
+        if (this._nativeDisplay) {
+            this._nativeDisplay.setBatchEnabled(this.enableBatch);
+        }
+        this._assembler && this._assembler.clearEffect();
+    };
+
     armatureDisplayProto._clearRenderData = function () {
         this._nativeDisplay = null;
     };
 
-    // Shield use batch in native
-    armatureDisplayProto._updateBatch = function () {};
-
     armatureDisplayProto._resetAssembler = function () {
         this._assembler = new renderer.CustomAssembler();
-        this._assembler.setUseModel(true);
         this.node._proxy.setAssembler(this._assembler);
     };
 
@@ -446,32 +446,7 @@
         }
     };
 
-    armatureDisplayProto._activateMaterial = function () {
-        let texture = this.dragonAtlasAsset && this.dragonAtlasAsset.texture;
-        if (!texture) {
-            this.disableRender();
-            return;
-        }
-
-        if (!texture.loaded) {
-            this.disableRender();
-            texture.once('load', this._activateMaterial, this);
-            return;
-        }
-
-        // Get material
-        let material = this.sharedMaterials[0];
-        if (!material) {
-            material = cc.Material.getInstantiatedBuiltinMaterial('sprite', this);
-        } else {
-            material = cc.Material.getInstantiatedMaterial(material, this);
-        }
-
-        material.define('CC_USE_MODEL', true);
-        material.define('USE_TEXTURE', true);
-        material.setProperty('texture', texture);
-        this.setMaterial(0, material);
-
+    armatureDisplayProto._prepareToRender = function () {
         this.markForUpdateRenderData(false);
         this.markForRender(true);
     };
