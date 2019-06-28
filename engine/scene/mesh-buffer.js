@@ -25,11 +25,8 @@
 let MeshBuffer = cc.MeshBuffer.prototype;
 
 MeshBuffer.init = function (batcher, vertexFormat) {
-    this.byteStart = 0;
     this.byteOffset = 0;
-    this.indiceStart = 0;
     this.indiceOffset = 0;
-    this.vertexStart = 0;
     this.vertexOffset = 0;
 
     this._vertexFormat = vertexFormat;
@@ -85,11 +82,8 @@ MeshBuffer.uploadData = function() {};
 MeshBuffer.switchBuffer = function() {
     let offset = ++this._arrOffset;
 
-    this.byteStart = 0;
     this.byteOffset = 0;
-    this.vertexStart = 0;
     this.vertexOffset = 0;
-    this.indiceStart = 0;
     this.indiceOffset = 0;
 
     if (offset < this._vDatas.length) {
@@ -107,39 +101,10 @@ MeshBuffer.checkAndSwitchBuffer = function(vertexCount) {
     }
 };
 
-MeshBuffer.requestStatic = function(vertexCount, indiceCount) {
-
-    this.checkAndSwitchBuffer(vertexCount);
-
-    let byteOffset = this.byteOffset + vertexCount * this._vertexBytes;
-    let indiceOffset = this.indiceOffset + indiceCount;
-
-    let byteLength = this._vData.byteLength;
-    let indiceLength = this._iData.length;
-    if (byteOffset > byteLength || indiceOffset > indiceLength) {
-        while (byteLength < byteOffset || indiceLength < indiceOffset) {
-            this._initVDataCount *= 2;
-            this._initIDataCount *= 2;
-
-            byteLength = this._initVDataCount * 4;
-            indiceLength = this._initIDataCount;
-        }
-
-        this._reallocBuffer();
-    }
-    this._updateOffset(vertexCount, indiceCount, byteOffset);
-};
-
-MeshBuffer._updateOffset = function(vertexCount, indiceCount, byteOffset) {
-    let offsetInfo = this._offsetInfo;
-    offsetInfo.vertexOffset = this.vertexOffset;
-    this.vertexOffset += vertexCount;
-
-    offsetInfo.indiceOffset = this.indiceOffset;
-    this.indiceOffset += indiceCount;
-
-    offsetInfo.byteOffset = this.byteOffset;
-    this.byteOffset = byteOffset;
+MeshBuffer.used = function(vertexCount, indiceCount) {
+    if (!this._nativeAssembler) return;
+    this._nativeAssembler.updateVerticesRange(this._arrOffset, 0, vertexCount);
+    this._nativeAssembler.updateIndicesRange(this._arrOffset, 0, indiceCount);
 };
 
 MeshBuffer.request = function(vertexCount, indiceCount) {
@@ -190,12 +155,11 @@ MeshBuffer.reset = function() {
     this._uintVData = this._uintVDatas[0];
     this._iData = this._iDatas[0];
 
-    this.byteStart = 0;
     this.byteOffset = 0;
-    this.indiceStart = 0;
     this.indiceOffset = 0;
-    this.vertexStart = 0;
     this.vertexOffset = 0;
+
+    this.used(0, 0);
 };
 
 MeshBuffer.destroy = function() {
