@@ -24,5 +24,7 @@ cc.js.mixin(proto, {
             iData[indiceOffset++] = i + 2;
             iData[indiceOffset++] = i + 3;
         }
+
+        comp.node._renderFlag |= cc.RenderFlow.FLAG_UPDATE_RENDER_DATA;
     }
 })
