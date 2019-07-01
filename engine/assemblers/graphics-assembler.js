@@ -7,11 +7,23 @@ proto.init = function (renderComp) {
     this.enableOpacityAlwaysDirty();
 }
 
-let _genRenderData = proto.genRenderData;
-proto.genRenderData = function (graphics, cverts) {
-    let buffer = _genRenderData.call(this, graphics, cverts);
-
+let _genBuffer = proto.genBuffer;
+proto.genBuffer = function (graphics, cverts) {
+    let buffer = _genBuffer.call(this, graphics, cverts);
     buffer.meshbuffer.setNativeAssembler(this);
-
     return buffer;
+}
+
+let _stroke = proto.stroke;
+proto.stroke = function (graphics) {
+    _stroke.call(this, graphics);
+    let buffer = this._buffer;
+    buffer.meshbuffer.used(buffer.vertexStart, buffer.indiceStart);
+}
+
+let _fill = proto.fill;
+proto.fill = function (graphics) {
+    _fill.call(this, graphics);
+    let buffer = this._buffer;
+    buffer.meshbuffer.used(buffer.vertexStart, buffer.indiceStart);
 }
