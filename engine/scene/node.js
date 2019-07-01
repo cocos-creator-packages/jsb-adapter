@@ -45,7 +45,7 @@ cc.js.getset(cc.Node.prototype, "_renderFlag",
     },
     function (flag) {
         let dirtyPtr = this._dirtyPtr;
-        dirtyPtr[0] |= flag;
+        dirtyPtr[0] = flag;
 
         let comp = this._renderComponent;
         let assembler = comp && comp._assembler;
