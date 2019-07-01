@@ -39,12 +39,13 @@ cc.js.mixin(proto, {
     updateRenderData (mask) {
         _updateRenderData.call(this, mask);
     
-        this.updateMaterial(0, mask.sharedMaterials[0]);
         mask._clearGraphics._assembler.updateMaterial(0, mask._clearMaterial);
         
         this.setMaskInverted(mask.inverted);
         this.setUseModel(mask._type !== Mask.Type.IMAGE_STENCIL);
         this.setImageStencil(mask._type === Mask.Type.IMAGE_STENCIL);
+
+        comp.node._renderFlag |= cc.RenderFlow.FLAG_UPDATE_RENDER_DATA;
     }
 }, renderer.MaskAssembler.prototype);
 
