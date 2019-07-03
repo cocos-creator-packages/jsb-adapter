@@ -61,11 +61,15 @@ _p._ctor = function(device, options) {
 
 _p = gfx.VertexBuffer.prototype;
 _p._ctor = function(device, format, usage, data, numVertices) {
+    this._attr2el = format._attr2el;
     if (device && format) {
         this.init(device, format._nativeObj, usage, data, numVertices);
     }
     this._nativePtr = this.self();
 };
+_p.getFormat = function(name) {
+    return this._attr2el[name];
+}
 _tmpGetSetDesc.get = _p.getCount;
 _tmpGetSetDesc.set = undefined;
 Object.defineProperty(_p, "count", _tmpGetSetDesc);
