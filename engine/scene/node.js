@@ -27,7 +27,6 @@
 
 let RenderFlow = cc.RenderFlow;
 const LOCAL_TRANSFORM = RenderFlow.FLAG_LOCAL_TRANSFORM;
-const COLOR = RenderFlow.FLAG_COLOR;
 const OPACITY = RenderFlow.FLAG_OPACITY;
 const UPDATE_RENDER_DATA = RenderFlow.FLAG_UPDATE_RENDER_DATA;
 
@@ -44,23 +43,9 @@ cc.js.getset(cc.Node.prototype, "_renderFlag",
         return this._dirtyPtr[0];
     },
     function (flag) {
-        let dirtyPtr = this._dirtyPtr;
-        dirtyPtr[0] = flag;
-
-        let comp = this._renderComponent;
-        let assembler = comp && comp._assembler;
-        if (!assembler) return;
-        if (assembler instanceof renderer.CustomAssembler) return;
-
-        if (flag & UPDATE_RENDER_DATA) {
-            comp._assembler.delayUpdateRenderData();
-            dirtyPtr[0] &= ~UPDATE_RENDER_DATA;
-        }
-
-        if (flag & COLOR) {
-            // Update uniform
-            comp && comp._updateColor();
-            dirtyPtr[0] &= ~COLOR;
+        this._dirtyPtr[0] = flag;
+        if (flag & UPDATE_RENDER_DATA || flag & OPACITY) {
+            cc.RenderFlow.register(this);
         }
     }
 );

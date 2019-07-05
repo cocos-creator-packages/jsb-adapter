@@ -24,7 +24,6 @@
  ****************************************************************************/
 
 const RenderFlow = cc.RenderFlow;
-const BEFORE_RENDER = RenderFlow.EventType.BEFORE_RENDER;
 
 let originInit = cc.Assembler.prototype.init;
 
@@ -62,11 +61,6 @@ let Assembler = {
         }
     },
 
-    delayUpdateRenderData () {
-        if (this._renderComp) {
-            RenderFlow.once(BEFORE_RENDER, this._updateRenderData, this);
-        }
-    },
 
     _updateRenderData () {
         if (!this._renderComp || !this._renderComp.isValid) return;

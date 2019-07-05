@@ -29,18 +29,46 @@ RenderFlow.FLAG_REORDER_CHILDREN = 1 << 29;
 RenderFlow.FLAG_WORLD_TRANSFORM_CHANGED = 1 << 30;
 RenderFlow.FLAG_OPACITY_CHANGED = 1 << 31;
 
-RenderFlow.EventType = {
-    BEFORE_RENDER: 'before-render'
-};
-cc.js.mixin(RenderFlow, cc.EventTarget.prototype);
+let _dirtyTargets = [];
+let _rendering = false;
 
 var director = cc.director;
 RenderFlow.render = function (scene) {
-    this.emit(this.EventType.BEFORE_RENDER);
+    _rendering = true;
+    
+    for (let i = 0, l = _dirtyTargets.length; i < l; i++) {
+        let node = _dirtyTargets[i];
+        node._inRenderDataLIst = false;
+
+        let comp = node._renderComponent;
+        if (!comp) continue;
+        let assembler = comp._assembler;
+        if (!assembler) continue;
+
+        let flag = node._dirtyPtr[0];
+
+        if (flag & RenderFlow.FLAG_UPDATE_RENDER_DATA) {
+            assembler._updateRenderData && assembler._updateRenderData();
+            node._dirtyPtr[0] &= ~RenderFlow.FLAG_UPDATE_RENDER_DATA;
+        }
+    }
+
+    _dirtyTargets.length = 0;
+
     this._nativeFlow.render(scene._proxy, director._deltaTime);
+
+    _rendering = false;
 };
 
 RenderFlow.init = function (nativeFlow) {
     cc.EventTarget.call(this);
     this._nativeFlow = nativeFlow;
 };
+
+RenderFlow.register = function (target) {
+    if (_rendering) return;
+    if (target._inRenderDataLIst) return;
+    
+    _dirtyTargets.push(target);
+    target._inRenderDataLIst = true;
+}
