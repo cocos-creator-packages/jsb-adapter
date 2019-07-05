@@ -24,7 +24,6 @@
  ****************************************************************************/
 
 const RenderFlow = cc.RenderFlow;
-const BEFORE_RENDER = RenderFlow.EventType.BEFORE_RENDER;
 
 let originInit = cc.Assembler.prototype.init;
 
@@ -42,6 +41,10 @@ let Assembler = {
         renderer.Assembler.prototype.ctor.call(this);
     },
 
+    initVertexFormat () {
+        this.setVertexFormat(cc.gfx.VertexFormat.XY_UV_Color._nativeObj);
+    },
+
     init (renderComp) {
         this._extendNative();
 
@@ -51,19 +54,13 @@ let Assembler = {
 
         originInit.call(this, renderComp);
 
-        if (renderComp._vertexFormat) {
-            this.setVertexFormat(renderComp._vertexFormat._nativeObj);
-        }
+        this.initVertexFormat();
+
         if (renderComp.node && renderComp.node._proxy) {
             renderComp.node._proxy.setAssembler(this);
         }
     },
 
-    delayUpdateRenderData () {
-        if (this._renderComp) {
-            RenderFlow.once(BEFORE_RENDER, this._updateRenderData, this);
-        }
-    },
 
     _updateRenderData () {
         if (!this._renderComp || !this._renderComp.isValid) return;
