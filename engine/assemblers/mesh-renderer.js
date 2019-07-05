@@ -5,7 +5,7 @@
     let _init = proto.init;
     cc.js.mixin(proto, {
         _extendNative () {
-            renderer.MeshAssembler.prototype.ctor.call(this);
+            renderer.Assembler.prototype.ctor.call(this);
         },
 
         init (comp) {
@@ -18,9 +18,14 @@
             if (!mesh) return;
 
             let subdatas = comp.mesh.subDatas;
-            for(let i = 0, len = subdatas.length; i < len; i++) {
-                let data = subdatas[i];
-                this._renderData.updateMesh(i, data.vData, data.iData);
+            let len = subdatas.length
+            if (len > 0) {
+                for(let i = 0; i < len; i++) {
+                    let data = subdatas[i];
+                    this._renderData.updateMesh(i, data.vData, data.iData);
+                }
+    
+                this.setVertexFormat(subdatas[0].vfm._nativeObj);
             }
         },
 
@@ -41,5 +46,5 @@
             this.setCustomProperties(comp._customProperties._nativeObj);
             this.setVertexFormat(subdatas[0].vfm._nativeObj);
         }
-    }, renderer.MeshAssembler.prototype);
+    });
 })();
