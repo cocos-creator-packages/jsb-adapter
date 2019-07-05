@@ -10,20 +10,36 @@
 
         init (comp) {
             _init.call(this, comp);
-        
+            this._renderData = new cc.RenderData();
+            this._renderData.init(this);
             this.setUseModel(true);
             this.setCustomProperties(comp._customProperties._nativeObj);
+            let mesh = comp.mesh;
+            if (!mesh) return;
+
+            let subdatas = comp.mesh.subDatas;
+            for(let i = 0, len = subdatas.length; i < len; i++) {
+                let data = subdatas[i];
+                this._renderData.updateMesh(i, data.vData, data.iData);
+            }
         },
 
-        updateRenderData (comp) {
-            if (!comp.mesh) return;
-            this.setMesh(comp.mesh._nativeObj);
-            let materials = comp.sharedMaterials;
-            for (let i = 0; i < materials.length; i++) {
-                let m = materials[i];
-                m.getHash();
-                this.updateMaterial(i, m);
+        updateRenderData (comp) {   
+        },
+
+        updateMeshData (comp) {
+            let mesh = comp.mesh;
+            if (!mesh) return;
+
+            let subdatas = comp.mesh.subDatas;
+            for(let i = 0, len = subdatas.length; i < len; i++) {
+                let data = subdatas[i];
+                if (data.vDirty || data.iDirty) {
+                    this._renderData.updateMesh(i, data.vData, data.iData);
+                }
             }
+            this.setCustomProperties(comp._customProperties._nativeObj);
+            this.setVertexFormat(subdatas[0].vfm._nativeObj);
         }
     }, renderer.MeshAssembler.prototype);
 })();

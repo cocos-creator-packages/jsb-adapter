@@ -35,7 +35,6 @@ require('./jsb-assets-manager.js');
 
 if (CC_NATIVERENDERER) {
     require('./jsb-effect.js');
-    require('./jsb-mesh.js');
     require('./jsb-custom-properties.js');
     require('./scene/camera.js');
     require('./scene/node-proxy.js');
