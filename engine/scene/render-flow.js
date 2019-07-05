@@ -38,7 +38,7 @@ RenderFlow.render = function (scene) {
     
     for (let i = 0, l = _dirtyTargets.length; i < l; i++) {
         let node = _dirtyTargets[i];
-        node._inRenderDataLIst = false;
+        node._inRenderList = false;
 
         let comp = node._renderComponent;
         if (!comp) continue;
@@ -67,8 +67,8 @@ RenderFlow.init = function (nativeFlow) {
 
 RenderFlow.register = function (target) {
     if (_rendering) return;
-    if (target._inRenderDataLIst) return;
+    if (target._inRenderList) return;
     
     _dirtyTargets.push(target);
-    target._inRenderDataLIst = true;
+    target._inRenderList = true;
 }

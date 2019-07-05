@@ -44,7 +44,7 @@ cc.js.getset(cc.Node.prototype, "_renderFlag",
     },
     function (flag) {
         this._dirtyPtr[0] = flag;
-        if (flag & UPDATE_RENDER_DATA || flag & OPACITY) {
+        if (flag & UPDATE_RENDER_DATA) {
             cc.RenderFlow.register(this);
         }
     }
