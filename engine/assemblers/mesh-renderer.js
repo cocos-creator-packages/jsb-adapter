@@ -13,20 +13,7 @@
             this._renderData = new cc.RenderData();
             this._renderData.init(this);
             this.setUseModel(true);
-            this.setCustomProperties(comp._customProperties._nativeObj);
-            let mesh = comp.mesh;
-            if (!mesh) return;
-
-            let subdatas = comp.mesh.subDatas;
-            let len = subdatas.length
-            if (len > 0) {
-                for(let i = 0; i < len; i++) {
-                    let data = subdatas[i];
-                    this._renderData.updateMesh(i, data.vData, data.iData);
-                }
-    
-                this.setVertexFormat(subdatas[0].vfm._nativeObj);
-            }
+            this.updateMeshData(comp);
         },
 
         updateRenderData (comp) {   
