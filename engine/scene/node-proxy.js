@@ -69,6 +69,10 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
             let parentSpaceInfo = parent._spaceInfo;
             this._parentPtr[0] = parentSpaceInfo.unitID;
             this._parentPtr[1] = parentSpaceInfo.index;
+
+            let parentDirtyPtr = parentSpaceInfo.dirty;
+            parentDirtyPtr[0] |= RenderFlow.FLAG_REORDER_CHILDREN;
+            this._dirtyPtr[0] |= RenderFlow.FLAG_OPACITY;
         } else {
             this._parentPtr[0] = 0xffffffff;
             this._parentPtr[1] = 0xffffffff;

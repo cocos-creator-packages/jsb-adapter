@@ -22,9 +22,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-
-let proto = cc.Sprite.__assembler__.Sliced.prototype;
-let nativeProto = renderer.SlicedSprite2D.prototype;
+let proto = cc.Sprite.__assembler__.Simple.prototype;
+let nativeProto = renderer.SimpleSprite2D.prototype;
 
 proto.updateWorldVerts = function(comp) {
     this._dirtyPtr[0] |= cc.Assembler.FLAG_VERTICES_DIRTY;
@@ -35,6 +34,6 @@ proto._extendNative = function () {
 };
 
 proto.initLocal = function () {
-    this._local = new Float32Array(8);
+    this._local = new Float32Array(4);
     nativeProto.setLocalData.call(this, this._local);
 };
