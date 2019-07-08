@@ -432,32 +432,7 @@
         }
     };
 
-    armatureDisplayProto._activateMaterial = function () {
-        let texture = this.dragonAtlasAsset && this.dragonAtlasAsset.texture;
-        if (!texture) {
-            this.disableRender();
-            return;
-        }
-
-        if (!texture.loaded) {
-            this.disableRender();
-            texture.once('load', this._activateMaterial, this);
-            return;
-        }
-
-        // Get material
-        let material = this.sharedMaterials[0];
-        if (!material) {
-            material = cc.Material.getInstantiatedBuiltinMaterial('2d-sprite', this);
-        } else {
-            material = cc.Material.getInstantiatedMaterial(material, this);
-        }
-
-        material.define('_USE_MODEL', true);
-        material.define('USE_TEXTURE', true);
-        material.setProperty('texture', texture);
-        this.setMaterial(0, material);
-
+    armatureDisplayProto._prepareToRender = function () {
         this.markForUpdateRenderData(false);
         this.markForRender(false);
         this.markForCustomIARender(true);

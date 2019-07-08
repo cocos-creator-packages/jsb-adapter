@@ -344,31 +344,11 @@
         }
     };
 
-    skeleton._activateMaterial = function () {
-        if (!this.skeletonData) {
-            this.disableRender();
-            return;
-        }
-        
-        this.skeletonData.ensureTexturesLoaded(function (result) {
-            if (!result) {
-                this.disableRender();
-                return;
-            }
-
-            let material = this.sharedMaterials[0];
-            if (!material) {
-                material = cc.Material.getInstantiatedBuiltinMaterial('2d-spine', this);
-            } else {
-                material = cc.Material.getInstantiatedMaterial(material, this);
-            }
-
-            material.define('_USE_MODEL', true);
-            this.setMaterial(0, material);
-            this.markForUpdateRenderData(false);
-            this.markForRender(false);
-            this.markForCustomIARender(true);
-        }, this);
+    skeleton._prepareToRender = function (material) {
+        this.setMaterial(0, material);
+        this.markForUpdateRenderData(false);
+        this.markForRender(false);
+        this.markForCustomIARender(true);
     };
 
     skeleton.onEnable = function () {
