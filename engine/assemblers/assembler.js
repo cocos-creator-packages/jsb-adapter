@@ -27,6 +27,9 @@ const RenderFlow = cc.RenderFlow;
 
 let originInit = cc.Assembler.prototype.init;
 
+let FLAG_VERTICES_OPACITY_CHANGED = 1 << 0;
+let FLAG_VERTICES_DIRTY = 1 << 1;
+
 let Assembler = {
     destroy () {
         this._renderComp = null;
@@ -87,9 +90,12 @@ let Assembler = {
     },
 
     updateColor(comp, color) {
-        this._dirtyPtr[0] |= RenderFlow.FLAG_OPACITY_CHANGED;
+        this._dirtyPtr[0] |= FLAG_VERTICES_OPACITY_CHANGED;
     }
 };
+
+cc.Assembler.FLAG_VERTICES_OPACITY_CHANGED = FLAG_VERTICES_OPACITY_CHANGED;
+cc.Assembler.FLAG_VERTICES_DIRTY = FLAG_VERTICES_DIRTY;
 
 Object.setPrototypeOf(cc.Assembler.prototype, renderer.Assembler.prototype);
 

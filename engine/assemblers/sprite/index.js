@@ -26,3 +26,4 @@
 require('./sliced.js');
 require('./tiled.js');
 require('./radial-filled.js');
+require('./simple.js');

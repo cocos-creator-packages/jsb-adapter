@@ -36,6 +36,11 @@ cc.js.mixin(proto, {
         renderer.MaskAssembler.prototype.ctor.call(this);
     },
 
+    initLocal () {
+        this._local = new Float32Array(4);
+        renderer.MaskAssembler.prototype.setLocalData.call(this, this._local);
+    },
+
     updateRenderData (mask) {
         _updateRenderData.call(this, mask);
     
