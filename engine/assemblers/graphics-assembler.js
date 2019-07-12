@@ -4,7 +4,7 @@ let proto = cc.Graphics.__assembler__.prototype;
 let _init = proto.init;
 proto.init = function (renderComp) {
     _init.call(this, renderComp);
-    this.enableOpacityAlwaysDirty();
+    this.ignoreOpacityFlag();
 }
 
 let _genBuffer = proto.genBuffer;
