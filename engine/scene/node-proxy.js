@@ -44,8 +44,19 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         this._is3DPtr = spaceInfo.is3D;
 
         owner._proxy = this;
+        this.updateOpacity();
+        this.updateCullingMask();
         owner.on(cc.Node.EventType.SIBLING_ORDER_CHANGED, this.updateZOrder, this);
         owner.on(cc.Node.EventType.GROUP_CHANGED, this.updateCullingMask, this);
+    },
+
+    initNative () {
+        this.setName(this._owner._name);
+        this.updateParent();
+        this.updateOpacity();
+        this.update3DNode();
+        this.updateZOrder();
+        this.updateCullingMask();
     },
 
     destroy () {
