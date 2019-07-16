@@ -243,7 +243,7 @@
 
         let material = this.sharedMaterials[0];
         if (!material) {
-            material = cc.Material.getInstantiatedBuiltinMaterial('sprite', this);
+            material = cc.Material.getInstantiatedBuiltinMaterial('2d-sprite', this);
             material.define('USE_TEXTURE', true);
             material.define('CC_USE_MODEL', true);
         }
