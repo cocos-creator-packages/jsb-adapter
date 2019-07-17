@@ -22,32 +22,34 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
+(function(){
+    if (!cc.QuadBuffer) return;
+    let QuadBuffer = cc.QuadBuffer.prototype;
 
-let QuadBuffer = cc.QuadBuffer.prototype;
+    QuadBuffer._fillQuadBuffer = function () {
+        let count = this._initIDataCount / 6;
+        let buffer = this._iData;
+        for (let i = 0, idx = 0; i < count; i++) {
+            let vertextID = i * 4;
+            buffer[idx++] = vertextID;
+            buffer[idx++] = vertextID+1;
+            buffer[idx++] = vertextID+2;
+            buffer[idx++] = vertextID+1;
+            buffer[idx++] = vertextID+3;
+            buffer[idx++] = vertextID+2;
+        }
+    };
 
-QuadBuffer._fillQuadBuffer = function () {
-    let count = this._initIDataCount / 6;
-    let buffer = this._iData;
-    for (let i = 0, idx = 0; i < count; i++) {
-        let vertextID = i * 4;
-        buffer[idx++] = vertextID;
-        buffer[idx++] = vertextID+1;
-        buffer[idx++] = vertextID+2;
-        buffer[idx++] = vertextID+1;
-        buffer[idx++] = vertextID+3;
-        buffer[idx++] = vertextID+2;
-    }
-};
+    QuadBuffer._reallocBuffer = function () {
+        this._reallocVData(true);
+        this._reallocIData();
+        this._fillQuadBuffer();
+        this._updateVIDatas();
+    };
 
-QuadBuffer._reallocBuffer = function () {
-    this._reallocVData(true);
-    this._reallocIData();
-    this._fillQuadBuffer();
-    this._updateVIDatas();
-};
+    QuadBuffer.uploadData = function () {};
 
-QuadBuffer.uploadData = function () {};
-
-QuadBuffer.switchBuffer = function () {
-    cc.MeshBuffer.prototype.switchBuffer.call(this);
-};
+    QuadBuffer.switchBuffer = function () {
+        cc.MeshBuffer.prototype.switchBuffer.call(this);
+    };
+})();

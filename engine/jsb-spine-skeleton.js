@@ -51,22 +51,22 @@
     let _textureKeyMap = {};
     let _textureMap = new WeakMap();
 
+    let skeletonDataMgr = spine.SkeletonDataMgr.getInstance();
+    spine.skeletonDataMgr = skeletonDataMgr;
+    skeletonDataMgr.setDestroyCallback(function (textureIndex) { 
+        if (!textureIndex) return;
+        let texKey = _textureKeyMap[textureIndex];
+        if (texKey && _textureMap.has(texKey)) {
+            _textureMap.delete(texKey);
+            delete _textureKeyMap[textureIndex];
+        }
+    });
+
     skeletonDataProto.destroy = function () {
-        if (this._jsbTextures) {
-            this._jsbTextures = null;
+        if (this._skeletonCache) {
             spine.disposeSkeletonData(this._uuid);
-            let textures = this.textures;
-            for (let i = 0; i < textures.length; ++i) {
-                let texture = textures[i];
-                let index = texture && texture.__textureIndex__; 
-                if (index) {
-                    let texKey = _textureKeyMap[index];
-                    if (texKey && _textureMap.has(texKey)) {
-                        _textureMap.delete(texKey);
-                        delete _textureKeyMap[index];
-                    }
-                }
-            }
+            this._jsbTextures = null;
+            this._skeletonCache = null;
         }
         cc.Asset.prototype.destroy.call(this);
     };
@@ -79,17 +79,26 @@
             cc.errorID(7504);
             return;
         }
+
+        let skeletonCache = spine.retainSkeletonData(uuid);
+        if (skeletonCache) {
+            this._skeletonCache = skeletonCache;
+            return;
+        }
+
         let atlasText = this.atlasText;
         if (!atlasText) {
             cc.errorID(7508, this.name);
             return;
         }
+
         let textures = this.textures;
         let textureNames = this.textureNames;
         if (!(textures && textures.length > 0 && textureNames && textureNames.length > 0)) {
             cc.errorID(7507, this.name);
             return;
         }
+
         let jsbTextures = {};
         for (let i = 0; i < textures.length; ++i) {
             let texture = textures[i];
@@ -113,7 +122,6 @@
     skeletonDataProto.recordTexture = function (texture) {
         let index = _gTextureIdx;
         let texKey = _textureKeyMap[index] = {key:index};
-        texture.__textureIndex__ = index;
         _textureMap.set(texKey, texture);
         _gTextureIdx++;
         return index;
@@ -264,9 +272,11 @@
     let _setMaterial = skeleton.setMaterial;
     skeleton.setMaterial = function(index, material) {
         _setMaterial.call(this, index, material);
-        let nativeEffect = material.effect._nativeObj;
-        this._nativeSkeleton.setEffect(nativeEffect);
         this._assembler && this._assembler.clearEffect();
+        if (this._nativeSkeleton) {
+            let nativeEffect = material.effect._nativeObj;
+            this._nativeSkeleton.setEffect(nativeEffect);
+        }
     };
 
     skeleton.setSkeletonData = function (skeletonData) {
