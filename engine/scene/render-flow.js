@@ -29,15 +29,22 @@ RenderFlow.FLAG_REORDER_CHILDREN = 1 << 29;
 RenderFlow.FLAG_WORLD_TRANSFORM_CHANGED = 1 << 30;
 RenderFlow.FLAG_OPACITY_CHANGED = 1 << 31;
 
-let _dirtyTargets = [];
-let _rendering = false;
+let _list1 = [];
+let _list2 = [];
+let _pushingList = _list1;
+let _traversingList = null;
 
 var director = cc.director;
 RenderFlow.render = function (scene) {
-    _rendering = true;
-    
-    for (let i = 0, l = _dirtyTargets.length; i < l; i++) {
-        let node = _dirtyTargets[i];
+    _traversingList = _pushingList;
+    if (_pushingList == _list1) {
+        _pushingList = _list2;
+    } else {
+        _pushingList = _list1;
+    }
+
+    for (let i = 0, l = _traversingList.length; i < l; i++) {
+        let node = _traversingList[i];
         node._inRenderList = false;
 
         let comp = node._renderComponent;
@@ -48,16 +55,13 @@ RenderFlow.render = function (scene) {
         let flag = node._dirtyPtr[0];
 
         if (flag & RenderFlow.FLAG_UPDATE_RENDER_DATA) {
-            assembler._updateRenderData && assembler._updateRenderData();
             node._dirtyPtr[0] &= ~RenderFlow.FLAG_UPDATE_RENDER_DATA;
+            assembler._updateRenderData && assembler._updateRenderData();
         }
     }
 
-    _dirtyTargets.length = 0;
-
+    _traversingList.length = 0;
     this._nativeFlow.render(scene._proxy, director._deltaTime);
-
-    _rendering = false;
 };
 
 RenderFlow.init = function (nativeFlow) {
@@ -66,9 +70,7 @@ RenderFlow.init = function (nativeFlow) {
 };
 
 RenderFlow.register = function (target) {
-    if (_rendering) return;
     if (target._inRenderList) return;
-    
-    _dirtyTargets.push(target);
+    _pushingList.push(target);
     target._inRenderList = true;
-}
+};
