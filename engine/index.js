@@ -61,5 +61,6 @@ if (CC_NATIVERENDERER) {
         require('./jsb-spine-skeleton.js');
         require('./jsb-particle.js');
         require('./jsb-tiledmap.js');
+        require('./jsb-skin-mesh.js');
     });
 }

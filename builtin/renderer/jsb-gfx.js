@@ -109,7 +109,7 @@ function convertImages(images) {
     }
 }
 
-function convertOptions(options) {
+function convertOptions(texture, options) {
     let gl = window.__gl;
     if (options.images && options.images[0] instanceof HTMLImageElement) {
         var image = options.images[0];
@@ -127,7 +127,8 @@ function convertOptions(options) {
         options.compressed = false;
     }
     else {
-        var gltf = glTextureFmt(options.format);
+        let format = options.format || texture._format;
+        var gltf = glTextureFmt(format);
         options.glInternalFormat = gltf.internalFormat;
         options.glFormat = gltf.format;
         options.glType = gltf.pixelType;
@@ -136,6 +137,9 @@ function convertOptions(options) {
                              options.glFormat <= enums.TEXTURE_FMT_RGBA_PVRTC_4BPPV1;
     }
 
+    options.width = options.width || texture._width;
+    options.height = options.height || texture._height;
+
     convertImages(options.images);
 }
 
@@ -143,7 +147,7 @@ _p = gfx.Texture2D.prototype;
 let _textureID = 0;
 _p._ctor = function(device, options) {
     if (device) {
-        convertOptions(options);
+        convertOptions(this, options);
         this.init(device, options);
     }
     this._id = _textureID++;
@@ -151,7 +155,7 @@ _p._ctor = function(device, options) {
 _p.destroy = function() { 
 };
 _p.update = function(options) {
-    convertOptions(options);
+    convertOptions(this, options);
     this.updateNative(options);
 };
 _p.updateSubImage = function(option) {
@@ -178,6 +182,7 @@ _tmpGetSetDesc.set = undefined;
 Object.defineProperty(_p, "_width", _tmpGetSetDesc);
 _tmpGetSetDesc.get = _p.getHeight;
 Object.defineProperty(_p, "_height", _tmpGetSetDesc);
+
 
 _p = gfx.FrameBuffer.prototype;
 _p._ctor = function(device, width, height, options) {
