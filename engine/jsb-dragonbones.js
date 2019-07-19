@@ -87,6 +87,18 @@
         return display;
     };
 
+    let _replaceSkin = factoryProto.replaceSkin;
+    factoryProto.replaceSkin = function (armatrue, skinData, isOverride, exclude) {
+        if (isOverride == undefined) isOverride = false;
+        exclude = exclude || [];
+        _replaceSkin.call(this, armatrue, skinData, isOverride, exclude);
+    };
+
+    let _changeSkin = factoryProto.changeSkin;
+    factoryProto.changeSkin = function (armatrue, skinData, exclude) {
+        _changeSkin.call(this, armatrue, skinData, exclude);
+    };
+
     //-------------------
     // native animation state
     //-------------------
