@@ -40,7 +40,10 @@
     });
 
     jsb.generateGetSet(dragonBones);
-    
+    let _slotColor = cc.color(0, 0, 255, 255);
+    let _boneColor = cc.color(255, 0, 0, 255);
+    let _originColor = cc.color(0, 255, 0, 255);
+
     ////////////////////////////////////////////////////////////
     // override dragonBones library by native dragonBones
     ////////////////////////////////////////////////////////////
@@ -82,6 +85,18 @@
         display._init();
 
         return display;
+    };
+
+    let _replaceSkin = factoryProto.replaceSkin;
+    factoryProto.replaceSkin = function (armatrue, skinData, isOverride, exclude) {
+        if (isOverride == undefined) isOverride = false;
+        exclude = exclude || [];
+        _replaceSkin.call(this, armatrue, skinData, isOverride, exclude);
+    };
+
+    let _changeSkin = factoryProto.changeSkin;
+    factoryProto.changeSkin = function (armatrue, skinData, exclude) {
+        _changeSkin.call(this, armatrue, skinData, exclude);
     };
 
     //-------------------
@@ -234,6 +249,7 @@
         this.jsbTexture.setPixelsWide(this._texture.width);
         this.jsbTexture.setPixelsHigh(this._texture.height);
         this._textureAtlasData = factory.parseTextureAtlasData(this.atlasJson, this.jsbTexture, this._uuid);
+        this.jsbTexture.setNativeTexture(this._texture.getImpl());
 
         _textureIdx2Name[url] = {name:this._textureAtlasData.name, index:index};
     };
@@ -310,11 +326,10 @@
     ////////////////////////////////////////////////////////////
     // override ArmatureDisplay
     ////////////////////////////////////////////////////////////
+    dragonBones.ArmatureDisplay._assembler = null;
     let armatureDisplayProto = dragonBones.ArmatureDisplay.prototype;
-    let assembler = dragonBones.ArmatureDisplay._assembler;
     let renderCompProto = cc.RenderComponent.prototype;
-    let gfx = cc.gfx;
-    let VertexFormat = gfx.VertexFormat;
+    let RenderFlow = cc.RenderFlow;
 
     Object.defineProperty(armatureDisplayProto, 'armatureName', {
         get () {
@@ -343,19 +358,6 @@
         visible: false
     });
 
-    Object.defineProperty(armatureDisplayProto, 'debugBones', {
-        get () {
-            return this._debugBones || false;
-        },
-        set (value) {
-            this._debugBones = value;
-            this._initDebugDraw();
-            if (this._nativeDisplay) {
-                this._nativeDisplay.setDebugBonesEnabled(this._debugBones);
-            }
-        }
-    });
-
     Object.defineProperty(armatureDisplayProto, "premultipliedAlpha", {
         get () {
             if (this._premultipliedAlpha === undefined){
@@ -371,15 +373,41 @@
         }
     });
 
+    let _initDebugDraw = armatureDisplayProto._initDebugDraw;
+    armatureDisplayProto._initDebugDraw = function () {
+        _initDebugDraw.call(this);
+        if (this._nativeDisplay) {
+            this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
+        }
+    };
+
+    let _updateBatch = armatureDisplayProto._updateBatch;
+    armatureDisplayProto._updateBatch = function () {
+        _updateBatch.call(this);
+        if (this._nativeDisplay) {
+            this._nativeDisplay.setBatchEnabled(this.enableBatch);
+        }
+        this._assembler && this._assembler.clearEffect();
+    };
+
     armatureDisplayProto._clearRenderData = function () {
-        this._renderInfoOffset = null;
         this._nativeDisplay = null;
     };
 
-    armatureDisplayProto.update = null;
+    armatureDisplayProto._resetAssembler = function () {
+        this._assembler = new renderer.CustomAssembler();
+        this.node._proxy.setAssembler(this._assembler);
+    };
 
-    // Shield use batch in native
-    armatureDisplayProto._updateBatch = function () {}
+    let _setMaterial = armatureDisplayProto.setMaterial;
+    armatureDisplayProto.setMaterial = function(index, material) {
+        _setMaterial.call(this, index, material);
+        this._assembler && this._assembler.clearEffect();
+        if (this._nativeDisplay) {
+            let nativeEffect = material.effect._nativeObj;
+            this._nativeDisplay.setEffect(nativeEffect);
+        }
+    };
 
     armatureDisplayProto._buildArmature = function () {
         if (!this.dragonAsset || !this.dragonAtlasAsset || !this.armatureName) {
@@ -404,12 +432,13 @@
         this._nativeDisplay._ccNode = this.node;
         this._nativeDisplay._comp = this;
         this._nativeDisplay._eventTarget = this._eventTarget;
-
+        this._nativeDisplay.bindNodeProxy(this.node._proxy);
         this._nativeDisplay.setOpacityModifyRGB(this.premultipliedAlpha);
         this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
         this._nativeDisplay.setDBEventCallback(function(eventObject) {
             this._eventTarget.emit(eventObject.type, eventObject);
         });
+        this._activateMaterial();
 
         // add all event into native display
         let callbackTable = this._eventTarget._callbackTable;
@@ -423,9 +452,6 @@
 
         this._armature = this._nativeDisplay.armature();
         this._armature.animation.timeScale = this.timeScale;
-        
-        this._renderInfoOffset = this._nativeDisplay.getRenderInfoOffset();
-        this._renderInfoOffset[0] = 0;
 
         if (this.animationName) {
             this.playAnimation(this.animationName, this.playTimes);
@@ -434,19 +460,15 @@
 
     armatureDisplayProto._prepareToRender = function () {
         this.markForUpdateRenderData(false);
-        this.markForRender(false);
-        this.markForCustomIARender(true);
+        this.markForRender(true);
     };
-    
+
     armatureDisplayProto.onEnable = function () {
         renderCompProto.onEnable.call(this);
         if (this._armature) {
             this._factory.add(this._armature);
         }
         this._activateMaterial();
-        if (this._renderInfoOffset) {
-            this._renderInfoOffset[0] = 0;
-        }
     };
 
     armatureDisplayProto.onDisable = function () {
@@ -461,10 +483,6 @@
         if (_onLoad) {
             _onLoad.call(this);
         }
-
-        this._iaPool = [];
-        this._iaPool.push(new middleware.MiddlewareIA());
-        this._iaRenderData = new cc.IARenderData();
     };
 
     armatureDisplayProto.once = function (eventType, listener, target) {
@@ -498,135 +516,18 @@
         }
         this._materialCache = null;
     };
-
-    ////////////////////////////////////////////////////////////
-    // override webgl-assembler
-    ////////////////////////////////////////////////////////////
-    let _slotColor = cc.color(0, 0, 255, 255);
-    let _boneColor = cc.color(255, 0, 0, 255);
-    let _originColor = cc.color(0, 255, 0, 255);
-
-    let _getSlotMaterial = function (comp, tex, src, dst) {
-        let key = tex.url + src + dst;
-        let baseMaterial = comp.sharedMaterials[0];
-        if (!baseMaterial) return null;
-
-        let materialCache = comp._materialCache;
-        let material = materialCache[key];
-        
-        if (!material) {
-            material = new cc.Material();
-            material.copy(baseMaterial);
-
-            material.define('_USE_MODEL', true);
-            material.setProperty('texture', tex);
     
-            // update blend function
-            let pass = material.effect.getDefaultTechnique().passes[0];
+    armatureDisplayProto.update = function() {
+        if (this._debugDraw && this.debugBones) {
 
-            pass.setBlend(
-                true,
-                gfx.BLEND_FUNC_ADD,
-                src, dst,
-                gfx.BLEND_FUNC_ADD,
-                src, dst
-            );
-            material.updateHash(key);
-            materialCache[key] = material;
-        }
-        else if (material.getProperty('texture') !== tex) {
-            material.setProperty('texture', tex);
-            material.updateHash(key);
-            materialCache[key] = material;
-        }
-        return material;
-    };
+            let nativeDisplay = this._nativeDisplay;
+            this._debugData = this._debugData || nativeDisplay.getDebugData();
+            if (!this._debugData) return;
 
-    // native enable useModel
-    assembler.useModel = true;
-
-    // native no need implement
-    assembler.genRenderDatas = function (comp, batchData) {
-    };
-
-    // native no need implement
-    assembler.updateRenderData = function (comp, batchData) {
-    };
-
-    assembler.renderIA = function (comp, renderer) {
-
-        let nativeDisplay = comp._nativeDisplay;
-        if (!nativeDisplay) {
-            return;
-        }
-
-        let renderInfoOffset = comp._renderInfoOffset;
-        if (!renderInfoOffset) return;
-
-        let node = comp.node;
-        let iaPool = comp._iaPool;
-        let poolIdx = 0;
-
-        if (comp.__preColor__ === undefined || 
-        !node.color.equals(comp.__preColor__)) {
-            nativeDisplay.setColor(node.color);
-            comp.__preColor__ = node.color;
-        }
-
-        let infoOffset = renderInfoOffset[0];
-        renderInfoOffset[0] = 0;
-
-        let renderInfoMgr = middleware.renderInfoMgr;
-        let renderInfo = renderInfoMgr.renderInfo;
-
-        let materialIdx = 0,realTextureIndex,realTexture;
-        // verify render border
-        let border = renderInfo[infoOffset + materialIdx++];
-        if (border !== 0xffffffff) return;
-
-        let matLen = renderInfo[infoOffset + materialIdx++];
-        if (matLen == 0) return;
-
-        for (let index = 0; index < matLen; index++) {
-            realTextureIndex = renderInfo[infoOffset + materialIdx++];
-            realTexture = comp.dragonAtlasAsset.getTextureByIndex(realTextureIndex);
-            if (!realTexture) return;
-
-            let material = _getSlotMaterial(comp, realTexture,
-                renderInfo[infoOffset + materialIdx++],
-                renderInfo[infoOffset + materialIdx++]);
-
-            let glIB = renderInfo[infoOffset + materialIdx++];
-            let glVB = renderInfo[infoOffset + materialIdx++];
-            let indiceOffset = renderInfo[infoOffset + materialIdx++];
-            let segmentCount = renderInfo[infoOffset + materialIdx++];
-
-            let ia = iaPool[poolIdx];
-            if (!ia) {
-                ia = new middleware.MiddlewareIA();
-                iaPool[poolIdx] = ia;
-            }
-            ia._start = indiceOffset;
-
-            ia.count = segmentCount;
-            ia.setVertexFormat(VertexFormat.XY_UV_Color);
-            ia.setGLIBID(glIB);
-            ia.setGLVBID(glVB);
-
-            poolIdx++;
-
-            comp._iaRenderData.ia = ia;
-            comp._iaRenderData.material = material;
-            renderer._flushIA(comp._iaRenderData);
-        }
-
-        if (comp.debugBones && comp._debugDraw) {
-
-            let graphics = comp._debugDraw;
+            let graphics = this._debugDraw;
             graphics.clear();
 
-            comp._debugData = comp._debugData || nativeDisplay.getDebugData();
-            let debugData = comp._debugData;
+            let debugData = this._debugData;
             let debugIdx = 0;
 
             graphics.lineWidth = 5;

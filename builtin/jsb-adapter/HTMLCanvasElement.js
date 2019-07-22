@@ -135,7 +135,40 @@ ctx2DProto.createImageData = function (args1, args2) {
 // void ctx.putImageData(imagedata, dx, dy);
 // void ctx.putImageData(imagedata, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
 ctx2DProto.putImageData = function (imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight) {
-    this._canvas._data = imageData;
+    if (typeof loadRuntime === "function") {
+        var height = imageData.height;
+        var width = imageData.width;
+        var canvasWidth = this._canvas._width;
+        var canvasHeight = this._canvas._height;
+        dirtyX = dirtyX || 0;
+        dirtyY = dirtyY || 0;
+        dirtyWidth = dirtyWidth !== undefined ? dirtyWidth : width;
+        dirtyHeight = dirtyHeight !== undefined ? dirtyHeight : height;
+        var limitBottom = dirtyY + dirtyHeight;
+        var limitRight = dirtyX + dirtyWidth;
+        // shrink dirty rect if next image rect bigger than canvas rect
+        dirtyHeight = limitBottom < canvasHeight ? dirtyHeight : (dirtyHeight - (limitBottom - canvasHeight))
+        dirtyWidth = limitRight < canvasWidth ? dirtyWidth : (dirtyWidth - (limitRight - canvasWidth))
+        // collect data needed to put
+        dirtyWidth = Math.floor(dirtyWidth);
+        dirtyHeight = Math.floor(dirtyHeight);
+        var imageToFill = new ImageData(dirtyWidth, dirtyHeight);
+        for (var y = dirtyY; y < limitBottom; y++) {
+            for (var x = dirtyX; x < limitRight; x++) {
+                var imgPos = y * width + x;
+                var toPos = (y - dirtyY) * dirtyWidth + (x - dirtyX);
+                imageToFill.data[toPos * 4 + 0] = imageData.data[imgPos * 4 + 0];
+                imageToFill.data[toPos * 4 + 1] = imageData.data[imgPos * 4 + 1];
+                imageToFill.data[toPos * 4 + 2] = imageData.data[imgPos * 4 + 2];
+                imageToFill.data[toPos * 4 + 3] = imageData.data[imgPos * 4 + 3];
+            }
+        }
+        // do image data write operation at Native (only impl on Android)
+        this._fillImageData(imageToFill.data, dirtyWidth, dirtyHeight, dx, dy);
+    }
+    else {
+        this._canvas._data = imageData;
+    }
 }
 
 // ImageData ctx.getImageData(sx, sy, sw, sh);

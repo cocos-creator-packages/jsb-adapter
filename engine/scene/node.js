@@ -23,44 +23,43 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-require('./jsb-sys.js');
-require('./jsb-game.js');
-require('./jsb-videoplayer.js');
-require('./jsb-webview.js');
-require('./jsb-audio.js');
-require('./jsb-loader.js');
-require('./jsb-editbox.js');
-require('./jsb-reflection.js');
-require('./jsb-assets-manager.js');
+'use strict';
 
-if (CC_NATIVERENDERER) {
-    require('./jsb-effect.js');
-    require('./jsb-custom-properties.js');
-    require('./scene/camera.js');
-    require('./scene/node-proxy.js');
-    require('./scene/render-flow.js');
-    require('./scene/render-data.js');
-    // must be required after render flow
-    require('./scene/node.js');
+let RenderFlow = cc.RenderFlow;
+const LOCAL_TRANSFORM = RenderFlow.FLAG_LOCAL_TRANSFORM;
+const OPACITY = RenderFlow.FLAG_OPACITY;
+const UPDATE_RENDER_DATA = RenderFlow.FLAG_UPDATE_RENDER_DATA;
 
-    cc.game.on(cc.game.EVENT_ENGINE_INITED, function () {
-        require('./scene/mesh-buffer.js');
-        require('./scene/quad-buffer.js');
+const POSITION_ON = 1 << 0;
 
-        require('./assemblers/assembler.js');
-        require('./assemblers/assembler-2d.js');
+cc.Node.prototype.setLocalDirty = function (flag) {
+    this._localMatDirty |= flag;
+    this._worldMatDirty = true;
+    this._dirtyPtr[0] |= RenderFlow.FLAG_TRANSFORM;
+};
 
-        require('./assemblers/sprite/index.js');
-        require('./assemblers/label/index.js');
-        require('./assemblers/mask-assembler.js');
-        require('./assemblers/graphics-assembler.js');
-        require('./assemblers/motion-streak.js');
-        require('./assemblers/mesh-renderer.js');
+cc.js.getset(cc.Node.prototype, "_renderFlag", 
+    function () {
+        return this._dirtyPtr[0];
+    },
+    function (flag) {
+        this._dirtyPtr[0] = flag;
+        if (flag & UPDATE_RENDER_DATA) {
+            cc.RenderFlow.register(this);
+        }
+    }
+);
 
-        require('./jsb-dragonbones.js');
-        require('./jsb-spine-skeleton.js');
-        require('./jsb-particle.js');
-        require('./jsb-tiledmap.js');
-        require('./jsb-skin-mesh.js');
-    });
+cc.PrivateNode.prototype._posDirty = function (sendEvent) {
+    let parent = this.parent;
+    if (parent) {
+        // Position correction for transform calculation
+        this._trs[0] = this._originPos.x - (parent._anchorPoint.x - 0.5) * parent._contentSize.width;
+        this._trs[1] = this._originPos.y - (parent._anchorPoint.y - 0.5) * parent._contentSize.height;
+    }
+
+    this.setLocalDirty(cc.Node._LocalDirtyFlag.POSITION);
+    if (sendEvent === true && (this._eventMask & POSITION_ON)) {
+        this.emit(cc.Node.EventType.POSITION_CHANGED);
+    }
 }

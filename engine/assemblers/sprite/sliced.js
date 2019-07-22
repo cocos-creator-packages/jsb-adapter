@@ -23,44 +23,18 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-require('./jsb-sys.js');
-require('./jsb-game.js');
-require('./jsb-videoplayer.js');
-require('./jsb-webview.js');
-require('./jsb-audio.js');
-require('./jsb-loader.js');
-require('./jsb-editbox.js');
-require('./jsb-reflection.js');
-require('./jsb-assets-manager.js');
+let proto = cc.Sprite.__assembler__.Sliced.prototype;
+let nativeProto = renderer.SlicedSprite2D.prototype;
 
-if (CC_NATIVERENDERER) {
-    require('./jsb-effect.js');
-    require('./jsb-custom-properties.js');
-    require('./scene/camera.js');
-    require('./scene/node-proxy.js');
-    require('./scene/render-flow.js');
-    require('./scene/render-data.js');
-    // must be required after render flow
-    require('./scene/node.js');
+proto.updateWorldVerts = function(comp) {
+    this._dirtyPtr[0] |= cc.Assembler.FLAG_VERTICES_DIRTY;
+};
 
-    cc.game.on(cc.game.EVENT_ENGINE_INITED, function () {
-        require('./scene/mesh-buffer.js');
-        require('./scene/quad-buffer.js');
+proto._extendNative = function () {
+    nativeProto.ctor.call(this);
+};
 
-        require('./assemblers/assembler.js');
-        require('./assemblers/assembler-2d.js');
-
-        require('./assemblers/sprite/index.js');
-        require('./assemblers/label/index.js');
-        require('./assemblers/mask-assembler.js');
-        require('./assemblers/graphics-assembler.js');
-        require('./assemblers/motion-streak.js');
-        require('./assemblers/mesh-renderer.js');
-
-        require('./jsb-dragonbones.js');
-        require('./jsb-spine-skeleton.js');
-        require('./jsb-particle.js');
-        require('./jsb-tiledmap.js');
-        require('./jsb-skin-mesh.js');
-    });
-}
+proto.initLocal = function () {
+    this._local = new Float32Array(8);
+    nativeProto.setLocalData.call(this, this._local);
+};

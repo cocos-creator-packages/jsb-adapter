@@ -43,7 +43,8 @@ let handleVolume  = function (volume) {
 };
 
 (function (proto, audioEngine) {
-
+    if (!audioEngine) return;
+    
     // Using the new audioEngine
     cc.audioEngine = audioEngine;
     audioEngine.setMaxWebAudioSize = function () { };
