@@ -240,6 +240,12 @@
         this._iaRenderData = new cc.IARenderData();
     };
 
+    let _setMaterial = skeleton.setMaterial;
+    skeleton.setMaterial = function (index, material) {
+        _setMaterial.call(this, index, material);
+        material.define('_USE_MODEL', true);
+    };
+
     // Shield use batch in native
     skeleton._updateBatch = function () {};
 
@@ -325,7 +331,23 @@
         }
     };
 
-    skeleton.update = undefined;
+    skeleton.update = null;
+
+    skeleton.lateUpdate = function () {
+        if (!this._skeleton) return;
+        let nodeColor = this.node._color;
+        let opacity = this.node._opacity;
+        this.__preColor__ = this.__preColor__ || new cc.Color(255, 255, 255, 255);
+        let preColor = this.__preColor__;
+
+        let colorVal = nodeColor._val;
+        nodeColor._fastSetA(opacity);
+        if (!preColor || !nodeColor.equals(preColor)) {
+            this._skeleton.setColor(nodeColor);
+            preColor.set(nodeColor);
+        }
+        nodeColor._val = colorVal;
+    };
 
     skeleton.updateWorldTransform = function () {
         this._skeleton && this._skeleton.updateWorldTransform();
@@ -515,6 +537,12 @@
             this.setSkeletonData(this.skeletonData);
             this.defaultSkin && this._skeleton.setSkin(this.defaultSkin);
             this.animation = this.defaultAnimation;
+        } else {
+            if (this._skeleton) {
+                this._skeleton.stopSchedule();
+                this._skeleton._comp = null;
+                this._skeleton = null;
+            }
         }
     };
 

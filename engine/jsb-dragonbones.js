@@ -504,6 +504,22 @@
         }
     };
 
+    armatureDisplayProto.lateUpdate = function () {
+        if (!this._nativeDisplay) return;
+        let nodeColor = this.node._color;
+        let opacity = this.node._opacity;
+        this.__preColor__ = this.__preColor__ || new cc.Color(255, 255, 255, 255);
+        let preColor = this.__preColor__;
+
+        let colorVal = nodeColor._val;
+        nodeColor._fastSetA(opacity);
+        if (!preColor || !nodeColor.equals(preColor)) {
+            this._nativeDisplay.setColor(nodeColor);
+            preColor.set(nodeColor);
+        }
+        nodeColor._val = colorVal;
+    };
+
     let _onLoad = armatureDisplayProto.onLoad;
     armatureDisplayProto.onLoad = function () {
         if (_onLoad) {
@@ -513,6 +529,12 @@
         this._iaPool = [];
         this._iaPool.push(new middleware.MiddlewareIA());
         this._iaRenderData = new cc.IARenderData();
+    };
+
+    let _setMaterial = armatureDisplayProto.setMaterial;
+    armatureDisplayProto.setMaterial = function (index, material) {
+        _setMaterial.call(this, index, material);
+        material.define('_USE_MODEL', true);
     };
 
     armatureDisplayProto.once = function (eventType, listener, target) {
@@ -563,8 +585,13 @@
         let material = materialCache[key];
         
         if (!material) {
-            material = new cc.Material();
-            material.copy(baseMaterial);
+            let baseKey = baseMaterial._hash;
+            if (!materialCache[baseKey]) {
+                material = baseMaterial;
+            } else {
+                material = new cc.Material();
+                material.copy(baseMaterial);
+            }
 
             material.define('_USE_MODEL', true);
             material.setProperty('texture', tex);
@@ -611,15 +638,8 @@
         let renderInfoOffset = comp._renderInfoOffset;
         if (!renderInfoOffset) return;
 
-        let node = comp.node;
         let iaPool = comp._iaPool;
         let poolIdx = 0;
-
-        if (comp.__preColor__ === undefined || 
-        !node.color.equals(comp.__preColor__)) {
-            nativeDisplay.setColor(node.color);
-            comp.__preColor__ = node.color;
-        }
 
         let infoOffset = renderInfoOffset[0];
         renderInfoOffset[0] = 0;
