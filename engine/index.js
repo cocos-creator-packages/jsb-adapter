@@ -40,13 +40,13 @@ if (CC_NATIVERENDERER) {
     require('./scene/light.js');
     require('./scene/node-proxy.js');
     require('./scene/render-flow.js');
-    require('./scene/render-data.js');
     // must be required after render flow
     require('./scene/node.js');
 
     cc.game.on(cc.game.EVENT_ENGINE_INITED, function () {
         require('./scene/mesh-buffer.js');
         require('./scene/quad-buffer.js');
+        require('./scene/render-data.js');
 
         require('./assemblers/assembler.js');
         require('./assemblers/assembler-2d.js');
