@@ -133,6 +133,9 @@
             jsb.inputBox.onConfirm(onConfirm);
             jsb.inputBox.onComplete(onComplete);
 
+            if (!cc.sys.isMobile) {
+                this._delegate._hideLabels();
+            }
             jsb.inputBox.show({
                 defaultValue: delegate._string,
                 maxLength: delegate.maxLength,
@@ -151,6 +154,9 @@
 
         endEditing () {
             this._editing = false;
+            if (!cc.sys.isMobile) {
+                this._delegate._showLabels();
+            }
             jsb.inputBox.hide();
             this._delegate.editBoxEditingDidEnded();
         },
