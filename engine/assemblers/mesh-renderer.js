@@ -10,8 +10,10 @@
 
         init (comp) {
             _init.call(this, comp);
-            this._renderData = new cc.RenderData();
-            this._renderData.init(this);
+
+            this._renderDataList = new renderer.RenderDataList();
+            this.setRenderDataList(this._renderDataList);
+
             this.setUseModel(true);
             this.updateMeshData(comp);
         },
@@ -27,7 +29,7 @@
             for(let i = 0, len = subdatas.length; i < len; i++) {
                 let data = subdatas[i];
                 if (data.vDirty || data.iDirty) {
-                    this._renderData.updateMesh(i, data.vData, data.iData);
+                    this._renderDataList.updateMesh(i, data.vData, data.iData);
                 }
             }
             this.setCustomProperties(comp._customProperties._nativeObj);
