@@ -244,13 +244,13 @@
         let material = this.sharedMaterials[0];
         if (!material) {
             material = cc.Material.getInstantiatedBuiltinMaterial('2d-sprite', this);
-            material.define('USE_TEXTURE', true);
-            material.define('CC_USE_MODEL', true);
         }
         else {
             material = cc.Material.getInstantiatedMaterial(material, this);
         }
 
+        material.define('USE_TEXTURE', true);
+        material.define('CC_USE_MODEL', true);
         material.setProperty('texture', this._texture);
         this._simulator.setEffect(material.effect._nativeObj);
         this.setMaterial(0, material);
