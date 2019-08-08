@@ -149,8 +149,6 @@
                 comp._modelBatcherDelegate.setBuffer(comp._buffer);
                 comp._modelBatcherDelegate.setNativeAssembler(this);
             }
-    
-            this.setLayerMoveXY(comp._leftDownToCenterX, comp._leftDownToCenterY);
             
             _fillBuffers.call(this, comp, comp._modelBatcherDelegate);
             comp.node._renderFlag |= RenderFlow.FLAG_UPDATE_RENDER_DATA;
