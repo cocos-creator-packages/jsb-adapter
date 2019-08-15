@@ -71,6 +71,13 @@
         cc.Asset.prototype.destroy.call(this);
     };
 
+    skeletonDataProto.getRuntimeData = function () {
+        if (!this._skeletonCache) {
+            this.init();
+        }
+        return this._skeletonCache;
+    };
+
     skeletonDataProto.init = function () {
         if (this._skeletonCache) return;
 
