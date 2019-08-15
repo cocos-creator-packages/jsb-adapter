@@ -72,6 +72,8 @@ let Assembler = {
         let materials = this._renderComp.sharedMaterials;
         for (let i = 0; i < materials.length; i++) {
             let m = materials[i];
+            // TODO: find why material can be null
+            if (!m) continue;
             m.getHash();
             this.updateMaterial(i, m);
         }
