@@ -148,7 +148,7 @@
         this._compeleteListener = listener;
         this.setCompleteListenerNative(function (trackEntry) {
             let loopCount = Math.floor(trackEntry.trackTime / trackEntry.animationEnd);
-            this._compeleteListener(trackEntry, loopCount);
+            this._compeleteListener && this._compeleteListener(trackEntry, loopCount);
         });
     };
 
