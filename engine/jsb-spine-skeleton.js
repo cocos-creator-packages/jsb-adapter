@@ -71,6 +71,13 @@
         cc.Asset.prototype.destroy.call(this);
     };
 
+    skeletonDataProto.getRuntimeData = function () {
+        if (!this._skeletonCache) {
+            this.init();
+        }
+        return this._skeletonCache;
+    };
+
     skeletonDataProto.init = function () {
         if (this._skeletonCache) return;
 
@@ -141,7 +148,7 @@
         this._compeleteListener = listener;
         this.setCompleteListenerNative(function (trackEntry) {
             let loopCount = Math.floor(trackEntry.trackTime / trackEntry.animationEnd);
-            this._compeleteListener(trackEntry, loopCount);
+            this._compeleteListener && this._compeleteListener(trackEntry, loopCount);
         });
     };
 

@@ -50,18 +50,41 @@
             self.stopSystem();
         });
 
+        this._initProperties();
+    };
+
+    // value type properties
+    let propertiesList = ["positionType", "emissionRate", "totalParticles", "duration", "emitterMode", "life", "lifeVar", "startSize", "startSizeVar", "endSize", "endSizeVar", "startSpin", "startSpinVar", "endSpin", "endSpinVar", "angle", "angleVar", "speed", "speedVar", "radialAccel", "radialAccelVar", "tangentialAccel", "tangentialAccelVar", "rotationIsDir", "startRadius", "startRadiusVar", "endRadius", "endRadiusVar", "rotatePerS", "rotatePerSVar"];
+
+    propertiesList.forEach( function(getSetName) {
+        let varName = "_" + getSetName;
+        Object.defineProperty(PSProto, getSetName, {
+            get () {
+                this[varName] === undefined && (this[varName] = 0);
+                return this[varName];
+            },
+            set (val) {
+                this[varName] = val;
+                this._simulator && (this._simulator[getSetName] = val);
+            }
+        });
+    });
+
+    // object type properties
+    let objPropList = ['gravity','sourcePos','posVar','startColor','startColorVar','endColor','endColorVar'];
+
+    PSProto._initProperties = function () {
         // init properties
         for (let key in propertiesList) {
             let propName = propertiesList[key];
             this[propName] = this[propName];
         }
 
-        let objPropList = ['gravity','sourcePos','posVar','startColor','startColorVar','endColor','endColorVar'];
         for (let key in objPropList) {
             let propName = objPropList[key];
             this[propName] = this[propName];
         }
-    };
+    },
 
     Object.defineProperty(PSProto, 'gravity', {
         get () {
@@ -233,7 +256,6 @@
 
     PSProto._activateMaterial = function () {
         if (!this._texture || !this._texture.loaded) {
-            this._simulator.onDisable();
             this.markForRender(false);
             if (this._renderSpriteFrame) {
                 this._applySpriteFrame();
@@ -254,67 +276,18 @@
         material.setProperty('texture', this._texture);
         this._simulator.setEffect(material.effect._nativeObj);
         this.setMaterial(0, material);
-        this._simulator.onEnable();
         this.markForRender(true);
     };
 
     let _applyFile = PSProto._applyFile;
     PSProto._applyFile = function () {
         _applyFile.call(this);
-        this._simulator.setGravity(this._gravity.x, this._gravity.y, 0);
-        this._simulator.setSourcePos(this._sourcePos.x, this._sourcePos.y, 0);
-        this._simulator.setPosVar(this._posVar.x, this._posVar.y, 0);
-        this._simulator.setStartColor(this._startColor.r, this._startColor.g, this._startColor.b, this._startColor.a);
-        this._simulator.setStartColorVar(this._startColorVar.r, this._startColorVar.g, this._startColorVar.b, this._startColorVar.a);
-        this._simulator.setEndColor(this._endColor.r, this._endColor.g, this._endColor.b, this._endColor.a);
-        this._simulator.setEndColorVar(this._endColorVar.r, this._endColorVar.g, this._endColorVar.b, this._endColorVar.a);
+        this._initProperties();
     };
 
-    let propertiesList = [
-        "positionType",
-        "emissionRate",
-        "totalParticles",
-        "duration",
-        "emitterMode",
-        "life",
-        "lifeVar",
-        "startSize",
-        "startSizeVar",
-        "endSize",
-        "endSizeVar",
-        "startSpin",
-        "startSpinVar",
-        "endSpin",
-        "endSpinVar",
-        "angle",
-        "angleVar",
-        "speed",
-        "speedVar",
-        "radialAccel",
-        "radialAccelVar",
-        "tangentialAccel",
-        "tangentialAccelVar",
-        "rotationIsDir",
-        "startRadius",
-        "startRadiusVar",
-        "endRadius",
-        "endRadiusVar",
-        "rotatePerS",
-        "rotatePerSVar",
-    ];
-
-    propertiesList.forEach( function(getSetName) {
-        let varName = "_" + getSetName;
-        Object.defineProperty(PSProto, getSetName, {
-            get () {
-                this[varName] === undefined && (this[varName] = 0);
-                return this[varName];
-            },
-            set (val) {
-                this[varName] = val;
-                this._simulator && (this._simulator[getSetName] = val);
-            }
-        });
-    });
-    
+    let __preload = PSProto.__preload;
+    PSProto.__preload = function () {
+        __preload.call(this);
+        this._initProperties();
+    };
  })();
