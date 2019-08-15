@@ -53,6 +53,26 @@
         this._initProperties();
     };
 
+    // value type properties
+    let propertiesList = ["positionType", "emissionRate", "totalParticles", "duration", "emitterMode", "life", "lifeVar", "startSize", "startSizeVar", "endSize", "endSizeVar", "startSpin", "startSpinVar", "endSpin", "endSpinVar", "angle", "angleVar", "speed", "speedVar", "radialAccel", "radialAccelVar", "tangentialAccel", "tangentialAccelVar", "rotationIsDir", "startRadius", "startRadiusVar", "endRadius", "endRadiusVar", "rotatePerS", "rotatePerSVar"];
+
+    propertiesList.forEach( function(getSetName) {
+        let varName = "_" + getSetName;
+        Object.defineProperty(PSProto, getSetName, {
+            get () {
+                this[varName] === undefined && (this[varName] = 0);
+                return this[varName];
+            },
+            set (val) {
+                this[varName] = val;
+                this._simulator && (this._simulator[getSetName] = val);
+            }
+        });
+    });
+
+    // object type properties
+    let objPropList = ['gravity','sourcePos','posVar','startColor','startColorVar','endColor','endColorVar'];
+
     PSProto._initProperties = function () {
         // init properties
         for (let key in propertiesList) {
@@ -60,7 +80,6 @@
             this[propName] = this[propName];
         }
 
-        let objPropList = ['gravity','sourcePos','posVar','startColor','startColorVar','endColor','endColorVar'];
         for (let key in objPropList) {
             let propName = objPropList[key];
             this[propName] = this[propName];
@@ -271,52 +290,4 @@
         __preload.call(this);
         this._initProperties();
     };
-
-    let propertiesList = [
-        "positionType",
-        "emissionRate",
-        "totalParticles",
-        "duration",
-        "emitterMode",
-        "life",
-        "lifeVar",
-        "startSize",
-        "startSizeVar",
-        "endSize",
-        "endSizeVar",
-        "startSpin",
-        "startSpinVar",
-        "endSpin",
-        "endSpinVar",
-        "angle",
-        "angleVar",
-        "speed",
-        "speedVar",
-        "radialAccel",
-        "radialAccelVar",
-        "tangentialAccel",
-        "tangentialAccelVar",
-        "rotationIsDir",
-        "startRadius",
-        "startRadiusVar",
-        "endRadius",
-        "endRadiusVar",
-        "rotatePerS",
-        "rotatePerSVar",
-    ];
-
-    propertiesList.forEach( function(getSetName) {
-        let varName = "_" + getSetName;
-        Object.defineProperty(PSProto, getSetName, {
-            get () {
-                this[varName] === undefined && (this[varName] = 0);
-                return this[varName];
-            },
-            set (val) {
-                this[varName] = val;
-                this._simulator && (this._simulator[getSetName] = val);
-            }
-        });
-    });
-    
  })();
