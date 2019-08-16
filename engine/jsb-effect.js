@@ -20,6 +20,7 @@ class NativeEffect extends Effect {
     }
 
     setCullMode (cullMode = gfx.CULL_BACK) {
+        super.setCullMode(cullMode);
         this._nativeObj.setCullMode(cullMode);
     }
 
@@ -31,10 +32,12 @@ class NativeEffect extends Effect {
         blendSrcAlpha = gfx.BLEND_SRC_ALPHA,
         blendDstAlpha = gfx.BLEND_ONE_MINUS_SRC_ALPHA,
         blendColor = 0xffffffff) {
+        super.setBlend(blendEq, blendSrc, blendDst, blendAlphaEq, blendSrcAlpha, blendDstAlpha, blendColor);
         this._nativeObj.setBlend(blendEq, blendSrc, blendDst, blendAlphaEq, blendSrcAlpha, blendDstAlpha, blendColor);
     };
 
     setStencilEnabled (enabled) {
+        super.setStencilEnabled(enabled);
         this._nativeObj.setStencilTest(enabled);
     }
 
@@ -46,10 +49,12 @@ class NativeEffect extends Effect {
         stencilZFailOp = gfx.STENCIL_OP_KEEP,
         stencilZPassOp = gfx.STENCIL_OP_KEEP,
         stencilWriteMask = 0xff) {
+        super.setStencil(stencilFunc, stencilRef, stencilMask, stencilFailOp, stencilZFailOp, stencilZPassOp, stencilWriteMask);
         this._nativeObj.setStencil(stencilFunc, stencilRef, stencilMask, stencilFailOp, stencilZFailOp, stencilZPassOp, stencilWriteMask);
     }
 
     define(name, value) {
+        super.define(name, value);
         this._nativeObj.define(name, value);
     }
 
@@ -78,8 +83,8 @@ class NativeEffect extends Effect {
     }
 }
 
-Effect.parseTechniques = function () {
-    return [];
-}
+// Effect.parseTechniques = function () {
+//     return [];
+// }
 
 cc.Effect = NativeEffect;
