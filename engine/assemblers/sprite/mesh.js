@@ -23,8 +23,14 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-require('./sliced.js');
-require('./tiled.js');
-require('./radial-filled.js');
-require('./simple.js');
-require('./mesh.js');
+Object.assign(cc.Sprite.__assembler__.Mesh.prototype, {
+    updateWorldVerts (sprite) {
+        let local = this._local;
+        let world = this._renderData.vDatas[0];
+        let floatsPerVert = this.floatsPerVert;
+        for (let i = 0, l = local.length / 2; i < l; i++) {
+            world[i*floatsPerVert] = local[i*2];
+            world[i*floatsPerVert+1] = local[i*2 + 1];
+        }
+    },
+});
