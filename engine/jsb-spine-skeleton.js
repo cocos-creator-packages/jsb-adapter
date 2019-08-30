@@ -62,12 +62,15 @@
         }
     });
 
+    let skeletonCacheMgr = spine.SkeletonCacheMgr.getInstance();
+    spine.skeletonCacheMgr = skeletonCacheMgr;
     skeletonDataProto.destroy = function () {
         if (this._skeletonCache) {
             spine.disposeSkeletonData(this._uuid);
             this._jsbTextures = null;
             this._skeletonCache = null;
         }
+        skeletonCacheMgr.removeSkeletonAnimation(this._uuid);
         cc.Asset.prototype.destroy.call(this);
     };
 
@@ -196,6 +199,7 @@
 
     sp.Skeleton._assembler = null;
     let skeleton = sp.Skeleton.prototype;
+    const AnimationCacheMode = sp.Skeleton.AnimationCacheMode;
     Object.defineProperty(skeleton, 'paused', {
         get () {
             return this._paused || false;
@@ -239,7 +243,7 @@
     let _updateDebugDraw = skeleton._updateDebugDraw;
     skeleton._updateDebugDraw = function () {
         _updateDebugDraw.call(this);
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.setDebugMeshEnabled(this.debugMesh);
             this._nativeSkeleton.setDebugSlotsEnabled(this.debugSlots);
             this._nativeSkeleton.setDebugBonesEnabled(this.debugBones);
@@ -249,7 +253,7 @@
     let _updateUseTint = skeleton._updateUseTint;
     skeleton._updateUseTint = function () {
         _updateUseTint.call(this);
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.setUseTint(this.useTint);
         }
         this._assembler && this._assembler.clearEffect();
@@ -308,25 +312,31 @@
             this._nativeSkeleton = null;
         }
 
-        let nativeSkeleton = new spine.SkeletonAnimation();
-        try {
-            spine.initSkeletonRenderer(nativeSkeleton, uuid);
-        } catch (e) {
-            cc._throw(e);
-            return;
+        let nativeSkeleton = null;
+        if (this.isAnimationCached()) {
+            nativeSkeleton = new spine.SkeletonCacheAnimation(uuid, this._cacheMode == AnimationCacheMode.SHARED_CACHE);
+        } else {
+            nativeSkeleton = new spine.SkeletonAnimation();
+            try {
+                spine.initSkeletonRenderer(nativeSkeleton, uuid);
+            } catch (e) {
+                cc._throw(e);
+                return;
+            }
+            nativeSkeleton.setDebugSlotsEnabled(this.debugSlots);
+            nativeSkeleton.setDebugMeshEnabled(this.debugMesh);
+            nativeSkeleton.setDebugBonesEnabled(this.debugBones);
+            nativeSkeleton.setUseTint(this.useTint);
         }
-        this._nativeSkeleton = nativeSkeleton;
-        this._nativeSkeleton._comp = this;
 
-        this._nativeSkeleton.setOpacityModifyRGB(this.premultipliedAlpha);
-        this._nativeSkeleton.setDebugSlotsEnabled(this.debugSlots);
-        this._nativeSkeleton.setDebugMeshEnabled(this.debugMesh);
-        this._nativeSkeleton.setDebugBonesEnabled(this.debugBones);
-        this._nativeSkeleton.setUseTint(this.useTint);
-        this._nativeSkeleton.setTimeScale(this.timeScale);
-        this._nativeSkeleton.setBatchEnabled(this.enableBatch);
-        this._nativeSkeleton.bindNodeProxy(this.node._proxy);
-        this._skeleton = this._nativeSkeleton.getSkeleton();
+        this._nativeSkeleton = nativeSkeleton;
+        nativeSkeleton._comp = this;
+
+        nativeSkeleton.setOpacityModifyRGB(this.premultipliedAlpha);
+        nativeSkeleton.setTimeScale(this.timeScale);
+        nativeSkeleton.setBatchEnabled(this.enableBatch);
+        nativeSkeleton.bindNodeProxy(this.node._proxy);
+        this._skeleton = nativeSkeleton.getSkeleton();
 
         // init skeleton listener
         this._startListener && this.setStartListener(this._startListener);
@@ -340,7 +350,7 @@
     };
 
     skeleton.setAnimationStateData = function (stateData) {
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._stateData = stateData;
             return this._nativeSkeleton.setAnimationStateData(stateData);
         }
@@ -370,7 +380,9 @@
     };
 
     skeleton.setVertexEffectDelegate = function (effectDelegate) {
-        this._nativeSkeleton && this._nativeSkeleton.setVertexEffectDelegate(effectDelegate);
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
+            this._nativeSkeleton.setVertexEffectDelegate(effectDelegate);
+        }
     };
 
     skeleton.update = function () {
@@ -384,8 +396,8 @@
             nativeSkeleton.setColor(node.color);
             this.__preColor__ = node.color;
         }
-
-        if ((this.debugBones || this.debugSlots || this.debugMesh) && this._debugRenderer) {
+        
+        if (!this.isAnimationCached() && (this.debugBones || this.debugSlots || this.debugMesh) && this._debugRenderer) {
             
             let graphics = this._debugRenderer;
             graphics.clear();
@@ -452,23 +464,33 @@
     };
 
     skeleton.updateWorldTransform = function () {
-        this._nativeSkeleton && this._nativeSkeleton.updateWorldTransform();
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
+            this._nativeSkeleton.updateWorldTransform();
+        }
     };
 
     skeleton.setToSetupPose = function () {
-        this._nativeSkeleton && this._nativeSkeleton.setToSetupPose();
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
+            this._nativeSkeleton.setToSetupPose();
+        }
     };
 
     skeleton.setBonesToSetupPose = function () {
-        this._nativeSkeleton && this._nativeSkeleton.setBonesToSetupPose();
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
+            this._nativeSkeleton.setBonesToSetupPose();
+        }
     };
 
     skeleton.setSlotsToSetupPose = function () {
-        this._nativeSkeleton && this._nativeSkeleton.setSlotsToSetupPose();
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
+            this._nativeSkeleton.setSlotsToSetupPose();
+        }
     };
 
     skeleton.setSlotsRange = function (startSlotIndex, endSlotIndex) {
-        this._nativeSkeleton && this._nativeSkeleton.setSlotsRange(startSlotIndex, endSlotIndex);
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
+            this._nativeSkeleton.setSlotsRange(startSlotIndex, endSlotIndex);
+        }
     };
 
     skeleton.findBone = function (boneName) {
@@ -501,14 +523,18 @@
     };
 
     skeleton.setMix = function (fromAnimation, toAnimation, duration) {
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.setMix(fromAnimation, toAnimation, duration);
         }
     };
 
     skeleton.setAnimation = function (trackIndex, name, loop) {
         if (this._nativeSkeleton) {
-            return this._nativeSkeleton.setAnimation(trackIndex, name, loop);
+            if (this.isAnimationCached()) {
+                return this._nativeSkeleton.setAnimation(name, loop);
+            } else {
+                return this._nativeSkeleton.setAnimation(trackIndex, name, loop);
+            }
         }
         return null;
     };
@@ -516,7 +542,12 @@
     skeleton.addAnimation = function (trackIndex, name, loop, delay) {
         if (this._nativeSkeleton) {
             delay = delay || 0;
-            return this._nativeSkeleton.addAnimation(trackIndex, name, loop, delay);
+            if (this.isAnimationCached()) {
+                return this._nativeSkeleton.addAnimation(name, loop, delay);
+            } else {
+                return this._nativeSkeleton.addAnimation(trackIndex, name, loop, delay);
+            }
+            
         }
         return null;
     };
@@ -527,20 +558,20 @@
     };
 
     skeleton.getCurrent = function (trackIndex) {
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             return this._nativeSkeleton.getCurrent(trackIndex);
         }
         return null;
     };
 
     skeleton.clearTracks = function () {
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.clearTracks();
         }
     };
 
     skeleton.clearTrack = function (trackIndex) {
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.clearTrack(trackIndex);
         }
     };
@@ -554,7 +585,7 @@
 
     skeleton.setInterruptListener = function (listener) {
         this._interruptListener = listener;
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.setInterruptListener(listener);
         }
     };
@@ -568,7 +599,7 @@
 
     skeleton.setDisposeListener = function (listener) {
         this._disposeListener = listener;
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.setDisposeListener(listener);
         }
     };
@@ -582,49 +613,49 @@
 
     skeleton.setEventListener = function (listener) {
         this._eventListener = listener;
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.setEventListener(listener);
         }
     };
 
     skeleton.setTrackStartListener = function (entry, listener) {
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.setTrackStartListener(entry, listener);
         }
     };
 
     skeleton.setTrackInterruptListener = function (entry, listener) {
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.setTrackInterruptListener(entry, listener);
         }
     };
 
     skeleton.setTrackEndListener = function (entry, listener) {
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.setTrackEndListener(entry, listener);
         }
     };
 
     skeleton.setTrackDisposeListener = function (entry, listener) {
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.setTrackDisposeListener(entry, listener);
         }
     };
 
     skeleton.setTrackCompleteListener = function (entry, listener) {
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.setTrackCompleteListener(entry, listener);
         }
     };
 
     skeleton.setTrackEventListener = function (entry, listener) {
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             this._nativeSkeleton.setTrackEventListener(entry, listener);
         }
     };
 
     skeleton.getState = function () {
-        if (this._nativeSkeleton) {
+        if (this._nativeSkeleton && !this.isAnimationCached()) {
             return this._nativeSkeleton.getState();
         }
     };
