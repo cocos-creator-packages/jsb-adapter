@@ -70,7 +70,7 @@
             this._jsbTextures = null;
             this._skeletonCache = null;
         }
-        skeletonCacheMgr.removeSkeletonAnimation(this._uuid);
+        skeletonCacheMgr.removeSkeletonCache(this._uuid);
         cc.Asset.prototype.destroy.call(this);
     };
 
