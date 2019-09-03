@@ -45,7 +45,7 @@ let Assembler = {
     },
 
     initVertexFormat () {
-        this.setVertexFormat(cc.gfx.VertexFormat.XY_UV_Color._nativeObj);
+        this.setVertexFormat(this.getVfmt()._nativeObj);
     },
 
     init (renderComp) {
