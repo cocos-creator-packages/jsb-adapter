@@ -27,7 +27,7 @@
 
 let RenderFlow = cc.RenderFlow;
 const LOCAL_TRANSFORM = RenderFlow.FLAG_LOCAL_TRANSFORM;
-const OPACITY = RenderFlow.FLAG_OPACITY;
+const COLOR = RenderFlow.FLAG_COLOR;
 const UPDATE_RENDER_DATA = RenderFlow.FLAG_UPDATE_RENDER_DATA;
 
 const POSITION_ON = 1 << 0;
@@ -44,7 +44,7 @@ cc.js.getset(cc.Node.prototype, "_renderFlag",
     },
     function (flag) {
         this._dirtyPtr[0] = flag;
-        if (flag & UPDATE_RENDER_DATA) {
+        if (flag & UPDATE_RENDER_DATA | flag & COLOR) {
             cc.RenderFlow.register(this);
         }
     }

@@ -52,6 +52,11 @@ RenderFlow.render = function (scene) {
             node._dirtyPtr[0] &= ~RenderFlow.FLAG_UPDATE_RENDER_DATA;
             assembler._updateRenderData && assembler._updateRenderData();
         }
+        if (flag & RenderFlow.FLAG_COLOR) {
+            node._dirtyPtr[0] &= ~RenderFlow.FLAG_COLOR;
+            assembler.updateColor && assembler.updateColor(comp);
+        }
+
     }
 
     _dirtyTargets.length = 0;
