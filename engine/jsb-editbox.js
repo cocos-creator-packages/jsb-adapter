@@ -183,9 +183,10 @@
             let finalScaleX = matrix.m00 * scaleX;
             let finaleScaleY = matrix.m05 * scaleY;
 
+            let viewportRect = cc.view._viewportRect;
             return {
-                x: matrix.m12 * finalScaleX,
-                y: matrix.m13 * finaleScaleY,
+                x: matrix.m12 * finalScaleX + viewportRect.x,
+                y: matrix.m13 * finaleScaleY + viewportRect.y,
                 width: contentSize.width * finalScaleX,
                 height: contentSize.height * finaleScaleY
             };
