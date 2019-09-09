@@ -24,12 +24,17 @@
  THE SOFTWARE.
  ****************************************************************************/
 
+let js = cc.js;
+
 cc.Audio = function (src) {
     this.src = src;
     this.volume = 1;
     this.loop = false;
     this.id = -1;
 };
+
+let playingAudioIds = [];
+var pausedAudioIds = [];  // needed when call audioEngine.pauseAll(), or we don't know which audio was paused
 
 let handleVolume  = function (volume) {
     if (volume === undefined) {
@@ -146,8 +151,55 @@ let handleVolume  = function (volume) {
                 clip.loaded  = true;
             }
         }
-        return audioEngine.play2d(audioFilePath, loop, volume);
+        let audioId =  audioEngine.play2d(audioFilePath, loop, volume);
+        playingAudioIds.push(audioId);
+        // TODO: if user reset finish callback, this callback will be invalid
+        audioEngine.setFinishCallback(audioId, function (id, path) {
+            js.array.remove(playingAudioIds, id);
+        });
+        return audioId;
     };
+
+    // implemented in native
+    let pauseFunc = audioEngine.pause;
+    let stopFunc = audioEngine.stop;
+    let resumeFunc = audioEngine.resume;
+    var pauseAllFunc = audioEngine.pauseAll;
+    var resumeAllFunc = audioEngine.resumeAll;
+    var stopAllFunc = audioEngine.stopAll;
+
+    audioEngine.pause = function (id) {
+        js.array.remove(playingAudioIds, id);
+        pauseFunc.call(audioEngine, id);
+    };
+    audioEngine.stop = function (id) {
+        js.array.remove(playingAudioIds, id);
+        stopFunc.call(audioEngine, id);
+    };
+    audioEngine.resume = function (id) {
+        playingAudioIds.push(id);
+        resumeFunc.call(audioEngine, id);
+    };
+    audioEngine.pauseAll = function () {
+        playingAudioIds.forEach(function (id) {
+            pausedAudioIds.push(id);
+        });
+        playingAudioIds.length = 0;
+        pauseAllFunc.call(audioEngine);
+    };
+    audioEngine.resumeAll = function () {
+        pausedAudioIds.forEach(function (id) {
+            playingAudioIds.push(id);
+        });
+        pausedAudioIds.length = 0;
+        resumeAllFunc.call(audioEngine);
+    };
+    audioEngine.stopAll = function () {
+        playingAudioIds.length = 0;
+        pausedAudioIds.length = 0;
+        stopAllFunc.call(audioEngine);
+    };
+
     audioEngine.playMusic = function (clip, loop) {
         audioEngine.stop(_music.id);
         _music.id = audioEngine.play(clip, loop, _music.volume);
@@ -220,8 +272,21 @@ let handleVolume  = function (volume) {
     };
 
     // Unnecessary on native platform
-    audioEngine._break = function () {};
-    audioEngine._restore = function () {};
+    audioEngine._break = function () {
+        if (!cc.sys.isMobile) {
+            // need to pause all audios on PC
+            playingAudioIds.forEach(function (id) {
+                pauseFunc.call(audioEngine, id);
+            });
+        }
+    };
+    audioEngine._restore = function () {
+        if (!cc.sys.isMobile) {
+            playingAudioIds.forEach(function (id) {
+                resumeFunc.call(audioEngine, id);
+            });
+        }
+    };
 
     // deprecated
 
