@@ -317,10 +317,13 @@
         return armatureKey;
     };
 
+    let armatureCacheMgr = dragonBones.ArmatureCacheMgr.getInstance();
+    dragonBones.armatureCacheMgr = armatureCacheMgr;
     dbAsset._clear = function () {
         if (this._factory) {
             this._factory.removeDragonBonesDataByUUID(this._uuid, true);
         }
+        armatureCacheMgr.removeArmatureCache(this._uuid);
     };
 
     ////////////////////////////////////////////////////////////
@@ -329,6 +332,7 @@
     dragonBones.ArmatureDisplay._assembler = null;
     let armatureDisplayProto = dragonBones.ArmatureDisplay.prototype;
     let renderCompProto = cc.RenderComponent.prototype;
+    const AnimationCacheMode = dragonBones.ArmatureDisplay.AnimationCacheMode;
 
     Object.defineProperty(armatureDisplayProto, 'armatureName', {
         get () {
@@ -426,7 +430,8 @@
         this._armatureKey = this.dragonAsset.init(this._factory, atlasUUID);
 
         if (this.isAnimationCached()) {
-            this._nativeDisplay = new dragonBones.CCArmatureCacheDisplay(this.armatureName, this._armatureKey, atlasUUID);
+            this._nativeDisplay = new dragonBones.CCArmatureCacheDisplay(this.armatureName, this._armatureKey, atlasUUID, this._cacheMode == AnimationCacheMode.SHARED_CACHE);
+            this._armature = this._nativeDisplay.armature();
         } else {
             this._nativeDisplay = this._factory.buildArmatureDisplay(this.armatureName, this._armatureKey, "", atlasUUID);
             if (!this._nativeDisplay) {
@@ -435,16 +440,22 @@
             }
             
             this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
-            // add all event into native display
-            let callbackTable = this._eventTarget._callbackTable;
-            // just use to adapt to native api
-            let emptyHandle = function () {};
-            for (let key in callbackTable) {
-                let list = callbackTable[key];
-                if (!list || !list.callbacks || !list.callbacks.length) continue;
-                this._nativeDisplay.addDBEventListener(key, emptyHandle);
-            }
+            this._armature = this._nativeDisplay.armature();
             this._armature.animation.timeScale = this.timeScale;
+        }
+
+        // add all event into native display
+        let callbackTable = this._eventTarget._callbackTable;
+        // just use to adapt to native api
+        let emptyHandle = function () {};
+        for (let key in callbackTable) {
+            let list = callbackTable[key];
+            if (!list || !list.callbacks || !list.callbacks.length) continue;
+            if (this.isAnimationCached()) {
+                this._nativeDisplay.addDBEventListener(key, emptyHandle);
+            } else {
+                this._nativeDisplay.addDBEventListener(key);
+            }
         }
 
         this._nativeDisplay._ccNode = this.node;
@@ -458,10 +469,26 @@
         });
 
         this._activateMaterial();
-        this._armature = this._nativeDisplay.armature();
+        
         if (this.animationName) {
             this.playAnimation(this.animationName, this.playTimes);
         }
+    };
+
+    armatureDisplayProto.playAnimation = function (animName, playTimes) {
+        this.playTimes = (playTimes === undefined) ? -1 : playTimes;
+        this.animationName = animName;
+
+        if (this._nativeDisplay) {
+            if (this.isAnimationCached()) {
+                return this._nativeDisplay.playAnimation(animName, this.playTimes);
+            } else {
+                if (this._armature) {
+                    return this._armature.animation.play(animName, this.playTimes);
+                }
+            }
+        }
+        return null;
     };
 
     armatureDisplayProto._prepareToRender = function () {
