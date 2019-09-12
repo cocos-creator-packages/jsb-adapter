@@ -491,6 +491,17 @@
         return null;
     };
 
+    armatureDisplayProto.updateAnimationCache = function (animName) {
+        if (!this.isAnimationCached()) return;
+        if (this._nativeDisplay) {
+            if (animName) {
+                this._nativeDisplay.updateAnimationCache(animName);
+            } else {
+                this._nativeDisplay.updateAllAnimationCache();
+            }
+        }
+    };
+
     armatureDisplayProto._prepareToRender = function () {
         this.markForUpdateRenderData(false);
         this.markForRender(true);

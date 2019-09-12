@@ -493,6 +493,17 @@
         }
     };
 
+    skeleton.updateAnimationCache = function (animName) {
+        if (!this.isAnimationCached()) return;
+        if (this._nativeSkeleton) {
+            if (animName) {
+                this._nativeSkeleton.updateAnimationCache(animName);
+            } else {
+                this._nativeSkeleton.updateAllAnimationCache();
+            }
+        }
+    };
+
     skeleton.findBone = function (boneName) {
         if (this._nativeSkeleton) return this._nativeSkeleton.findBone(boneName);
         return null;
@@ -547,7 +558,6 @@
             } else {
                 return this._nativeSkeleton.addAnimation(trackIndex, name, loop, delay);
             }
-            
         }
         return null;
     };
