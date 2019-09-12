@@ -504,6 +504,13 @@
         }
     };
 
+    skeleton.invalidAnimationCache = function () {
+        if (!this.isAnimationCached()) return;
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.updateAllAnimationCache();
+        }
+    };
+
     skeleton.findBone = function (boneName) {
         if (this._nativeSkeleton) return this._nativeSkeleton.findBone(boneName);
         return null;
