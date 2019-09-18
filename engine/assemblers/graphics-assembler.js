@@ -27,7 +27,3 @@ proto.fill = function (graphics) {
     let buffer = this._buffer;
     buffer.meshbuffer.used(buffer.vertexStart, buffer.indiceStart);
 }
-
-proto.initVertexFormat = function () {
-    this.setVertexFormat(cc.gfx.VertexFormat.XY_Color._nativeObj);
-}
