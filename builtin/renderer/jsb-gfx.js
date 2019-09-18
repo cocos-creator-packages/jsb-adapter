@@ -159,8 +159,9 @@ function convertOptions(texture, options) {
         options.glFormat = gltf.format;
         options.glType = gltf.pixelType;
         options.bpp = gltf.bpp;
-        options.compressed = format >= enums.TEXTURE_FMT_RGB_DXT1 &&
-                             format <= enums.TEXTURE_FMT_RGBA_PVRTC_4BPPV1;
+        options.compressed = 
+            (format >= enums.TEXTURE_FMT_RGB_DXT1 && format <= enums.TEXTURE_FMT_RGBA_PVRTC_4BPPV1) ||
+            (format >= enums.TEXTURE_FMT_RGB_ETC2 && format <= enums.TEXTURE_FMT_RGBA_ETC2);
     }
 
     options.width = options.width || texture._width;
