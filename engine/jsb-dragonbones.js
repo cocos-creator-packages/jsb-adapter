@@ -512,7 +512,6 @@
 
     armatureDisplayProto._prepareToRender = function () {
         this.markForUpdateRenderData(false);
-        this.markForRender(true);
     };
 
     armatureDisplayProto.onEnable = function () {
