@@ -351,7 +351,6 @@
         material.setProperty('texture', texValues[0]);
         this.setMaterial(0, material);
         this.markForUpdateRenderData(false);
-        this.markForRender(true);
     };
 
     skeleton.onEnable = function () {
