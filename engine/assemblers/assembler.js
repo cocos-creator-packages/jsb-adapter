@@ -45,7 +45,9 @@ let Assembler = {
     },
 
     initVertexFormat () {
-        this.setVertexFormat(this.getVfmt()._nativeObj);
+        let vfmt = this.getVfmt();
+        if (!vfmt) return;
+        this.setVertexFormat(vfmt._nativeObj);
     },
 
     init (renderComp) {

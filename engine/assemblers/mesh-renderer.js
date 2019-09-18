@@ -4,6 +4,8 @@
     let proto = cc.MeshRenderer.__assembler__.prototype;
     let _init = proto.init;
     cc.js.mixin(proto, {
+        initVertexFormat () {},
+        
         _extendNative () {
             renderer.MeshAssembler.prototype.ctor.call(this);
         },
