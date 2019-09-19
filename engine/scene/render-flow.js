@@ -36,10 +36,12 @@ let _rendering = false;
 var director = cc.director;
 RenderFlow.render = function (scene) {
     _rendering = true;
+
+    RenderFlow.validateRenderers();
     
     for (let i = 0, l = _dirtyTargets.length; i < l; i++) {
         let node = _dirtyTargets[i];
-        node._inRenderList = false;
+        node._inJsbDirtyList = false;
 
         let comp = node._renderComponent;
         if (!comp) continue;
@@ -75,7 +77,7 @@ RenderFlow.init = function (nativeFlow) {
 };
 
 RenderFlow.register = function (target) {
-    if (target._inRenderList) return;
+    if (target._inJsbDirtyList) return;
 
     if (_rendering) {
         _dirtyWaiting.push(target);
@@ -83,5 +85,5 @@ RenderFlow.register = function (target) {
         _dirtyTargets.push(target);
     }
     
-    target._inRenderList = true;
+    target._inJsbDirtyList = true;
 }
