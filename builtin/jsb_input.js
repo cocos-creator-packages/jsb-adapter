@@ -92,6 +92,7 @@ jsb.inputBox = {
      * Values of options.inputType can be [text|email|number|phone|password].
      */
 	show: function(options) {
+		options.defaultValue = options.defaultValue ? "" + options.defaultValue : "";
 		jsb.showInputBox(options);
 	},
 	hide: function() {
