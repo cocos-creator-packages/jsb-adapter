@@ -23,8 +23,13 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-require('./sliced.js');
-require('./tiled.js');
-require('./radial-filled.js');
-require('./simple.js');
-require('./mesh.js');
+require('./2d/sliced.js');
+require('./2d/tiled.js');
+require('./2d/radial-filled.js');
+require('./2d/simple.js');
+require('./2d/mesh.js');
+
+require('./3d/sliced.js');
+require('./3d/tiled.js');
+require('./3d/radial-filled.js');
+require('./3d/mesh.js');
