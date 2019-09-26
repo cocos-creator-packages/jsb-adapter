@@ -256,6 +256,7 @@
 
     PSProto._activateMaterial = function () {
         if (!this._texture || !this._texture.loaded) {
+            this.markForRender(false);
             if (this._renderSpriteFrame) {
                 this._applySpriteFrame();
             }
@@ -275,6 +276,9 @@
         material.setProperty('texture', this._texture);
         this._simulator.setEffect(material.effect._nativeObj);
         this.setMaterial(0, material);
+        if (this.node && this.node._renderComponent == this) {
+            this.markForRender(true);
+        }
     };
 
     let _applyFile = PSProto._applyFile;
