@@ -49,7 +49,6 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         this.updateZOrder();
         this.updateCullingMask();
         owner.on(cc.Node.EventType.SIBLING_ORDER_CHANGED, this.updateZOrder, this);
-        owner.on(cc.Node.EventType.GROUP_CHANGED, this.updateCullingMask, this);
     },
 
     initNative () {
@@ -65,7 +64,6 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         this.destroyImmediately();
 
         this._owner.off(cc.Node.EventType.SIBLING_ORDER_CHANGED, this.updateZOrder, this);
-        this._owner.off(cc.Node.EventType.GROUP_CHANGED, this.updateCullingMask, this);
         this._owner._proxy = null;
         this._owner = null;
     },
