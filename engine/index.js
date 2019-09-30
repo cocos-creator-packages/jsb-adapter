@@ -50,7 +50,6 @@ if (CC_NATIVERENDERER) {
 
         require('./assemblers/assembler.js');
         require('./assemblers/assembler-2d.js');
-        require('./assemblers/assembler-3d.js');
 
         require('./assemblers/sprite/index.js');
         require('./assemblers/label/index.js');

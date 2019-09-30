@@ -30,6 +30,4 @@ require('./2d/simple.js');
 require('./2d/mesh.js');
 
 require('./3d/sliced.js');
-require('./3d/tiled.js');
-require('./3d/radial-filled.js');
-require('./3d/mesh.js');
+require('./3d/simple.js');
