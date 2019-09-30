@@ -5,8 +5,6 @@
     let nativeProto = renderer.AssemblerSprite.prototype;
 
     Object.assign(proto, { 
-        _extendNative  () {
-            nativeProto.ctor.call(this);
-        }
+        _extendNative: nativeProto.ctor
     })
 })()
