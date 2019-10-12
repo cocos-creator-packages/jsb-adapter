@@ -19,30 +19,29 @@
                     x1 = localX[xindex + 1];
 
                     // left bottom
-                    let offset = 0, padding = 6;
-                    world[vertexOffset + offset] = x;
-                    world[vertexOffset + offset + 1] = y;
-                    world[vertexOffset + offset + 2] = 0;
-                    offset += padding;
+                    let padding = 6;
+                    world[vertexOffset] = x;
+                    world[vertexOffset + 1] = y;
+                    world[vertexOffset + 2] = 0;
+                    vertexOffset += padding;
 
                     // right bottom
-                    world[vertexOffset + offset] = x1;
-                    world[vertexOffset + offset + 1] = y;
-                    world[vertexOffset + offset + 2] = 0;
-                    offset += padding;
+                    world[vertexOffset] = x1;
+                    world[vertexOffset + 1] = y;
+                    world[vertexOffset + 2] = 0;
+                    vertexOffset += padding;
 
                     // left top
-                    world[vertexOffset + offset] = x;
-                    world[vertexOffset + offset + 1] = y1;
-                    world[vertexOffset + offset + 2] = 0;
-                    offset += padding;
+                    world[vertexOffset] = x;
+                    world[vertexOffset + 1] = y1;
+                    world[vertexOffset + 2] = 0;
+                    vertexOffset += padding;
 
                     // right top
-                    world[vertexOffset + offset] = x1;
-                    world[vertexOffset + offset + 1] = y1;
-                    world[vertexOffset + offset + 2] = 0; 
-
-                    vertexOffset += 24;
+                    world[vertexOffset] = x1;
+                    world[vertexOffset + 1] = y1;
+                    world[vertexOffset + 2] = 0; 
+                    vertexOffset += padding;
                 }
             }
         }
