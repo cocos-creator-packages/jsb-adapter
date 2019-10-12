@@ -17,7 +17,7 @@
                 prop = value;
             }
             
-            this._nativeObj.setProperty(name, type, prop);
+            this._nativeObj.setProperty(name, type, prop, directly);
         }
 
         define (name, value) {
