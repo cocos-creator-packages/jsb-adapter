@@ -144,6 +144,9 @@ let handleVolume  = function (volume) {
                 if (md5Pipe) {
                     clip._nativeAsset = audioFilePath = md5Pipe.transformURL(clip.nativeUrl);
                 }
+                else {
+                    audioFilePath = clip._nativeAsset;
+                }
                 clip.loaded  = true;
             }
         }
