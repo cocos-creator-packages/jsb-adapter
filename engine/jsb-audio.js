@@ -141,12 +141,7 @@ let handleVolume  = function (volume) {
             }
             else {
                 // audio delay loading
-                if (md5Pipe) {
-                    clip._nativeAsset = audioFilePath = md5Pipe.transformURL(clip.nativeUrl);
-                }
-                else {
-                    audioFilePath = clip._nativeAsset;
-                }
+                clip._nativeAsset = audioFilePath = (md5Pipe ? md5Pipe.transformURL(clip.nativeUrl) : clip.nativeUrl);
                 clip.loaded  = true;
             }
         }
