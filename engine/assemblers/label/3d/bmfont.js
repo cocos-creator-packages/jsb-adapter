@@ -9,7 +9,7 @@
             let world = this._renderData.vDatas[0];
     
             let floatsPerVert = this.floatsPerVert;
-            for (let offset = 0, len = world.length; offset < len; offset += floatsPerVert) {
+            for (let offset = 0, l = world.length; offset < l; offset += floatsPerVert) {
                 world[offset] = local[offset];
                 world[offset+1] = local[offset+1];
                 world[offset+2] = 0;

@@ -3,13 +3,6 @@
 
     let proto = cc.Sprite.__assembler__.Tiled3D.prototype;
 
-    const vec3 = cc.vmath.vec3;
-
-    let vec3_temps = [];
-    for (let i = 0; i < 4; i++) {
-        vec3_temps.push(vec3.create());
-    }
-
     Object.assign(proto, { 
         updateWorldVerts (sprite) {
             let local = this._local;
@@ -24,20 +17,31 @@
                 for (let xindex = 0, xlength = col; xindex < xlength; ++xindex) {
                     x = localX[xindex];
                     x1 = localX[xindex + 1];
-    
-                    vec3.set(vec3_temps[0], x, y, 0);
-                    vec3.set(vec3_temps[1], x1, y, 0);
-                    vec3.set(vec3_temps[2], x, y1, 0);
-                    vec3.set(vec3_temps[3], x1, y1, 0);
-    
-                    for (let i = 0; i < 4; i++) {
-                        let vec3_temp = vec3_temps[i];
-                        let offset = i * 6;
-                        world[vertexOffset + offset] = vec3_temp.x;
-                        world[vertexOffset + offset + 1] = vec3_temp.y;
-                        world[vertexOffset + offset + 2] = vec3_temp.z;
-                    }
-    
+
+                    // left bottom
+                    let offset = 0, padding = 6;
+                    world[vertexOffset + offset] = x;
+                    world[vertexOffset + offset + 1] = y;
+                    world[vertexOffset + offset + 2] = 0;
+                    offset += padding;
+
+                    // right bottom
+                    world[vertexOffset + offset] = x1;
+                    world[vertexOffset + offset + 1] = y;
+                    world[vertexOffset + offset + 2] = 0;
+                    offset += padding;
+
+                    // left top
+                    world[vertexOffset + offset] = x;
+                    world[vertexOffset + offset + 1] = y1;
+                    world[vertexOffset + offset + 2] = 0;
+                    offset += padding;
+
+                    // right top
+                    world[vertexOffset + offset] = x1;
+                    world[vertexOffset + offset + 1] = y1;
+                    world[vertexOffset + offset + 2] = 0; 
+
                     vertexOffset += 24;
                 }
             }

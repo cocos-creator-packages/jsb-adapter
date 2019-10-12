@@ -9,30 +9,27 @@
 
             // left bottom
             let floatsPerVert = this.floatsPerVert;
-            let dstOffset = 0;
-            world[dstOffset] = vl;
-            world[dstOffset+1] = vb;
-            world[dstOffset+2] = 0;
-
-            dstOffset += floatsPerVert;
+            let offset = 0;
+            world[offset] = vl;
+            world[offset+1] = vb;
+            world[offset+2] = 0;
+            offset += floatsPerVert;
 
             // right bottom
-            world[dstOffset] = vr;
-            world[dstOffset+1] = vb;
-            world[dstOffset+2] = 0;
-
-            dstOffset += floatsPerVert;
+            world[offset] = vr;
+            world[offset+1] = vb;
+            world[offset+2] = 0;
+            offset += floatsPerVert;
 
             // left top
-            world[dstOffset] = vl;
-            world[dstOffset+1] = vt;
-            world[dstOffset+2] = 0;
-
-            dstOffset += floatsPerVert;
+            world[offset] = vl;
+            world[offset+1] = vt;
+            world[offset+2] = 0;
+            offset += floatsPerVert;
 
             // right top
-            world[dstOffset] = vr;
-            world[dstOffset+1] = vt;
-            world[dstOffset+2] = 0;     
+            world[offset] = vr;
+            world[offset+1] = vt;
+            world[offset+2] = 0;     
     }
 })()

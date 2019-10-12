@@ -8,12 +8,12 @@
             let local = this._local;
             let world = this._renderData.vDatas[0];
          
-            let floatsPerVert = this.floatsPerVert;
-            for (let i = 0, l = local.length/2; i < l; i++) {
-                let dstOffset = floatsPerVert * i;
-                world[dstOffset] = local[i*2];
-                world[dstOffset+1] = local[i*2+1];
-                world[dstOffset+2] = 0;
+            let floatsPerVert = this.floatsPerVert, offset = 0;
+            for (let i = 0, j = 0, l = local.length/2; i < l; i++, offset += floatsPerVert) {
+                j = i * 2;
+                world[offset] = local[j];
+                world[offset+1] = local[j++];
+                world[offset+2] = 0;
             }
         }
     })
