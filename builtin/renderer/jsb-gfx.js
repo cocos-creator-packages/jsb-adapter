@@ -220,6 +220,16 @@ _p._ctor = function(device, width, height, options) {
     }
 };
 
+/**
+ * FrameBuffer
+ */
+_p = gfx.RenderBuffer.prototype;
+_p._ctor = function(device, format, width, height, options) {
+    if (device) {
+        this.init(device, format, width, height);
+    }
+};
+
 gfx.RB_FMT_D16 = 0x81A5; // GL_DEPTH_COMPONENT16 hack for JSB
 
 export default gfx;
