@@ -32,7 +32,7 @@ class NativeEffect extends Effect {
         blendSrcAlpha = gfx.BLEND_SRC_ALPHA,
         blendDstAlpha = gfx.BLEND_ONE_MINUS_SRC_ALPHA,
         blendColor = 0xffffffff) {
-        super.setBlend(blendEq, blendSrc, blendDst, blendAlphaEq, blendSrcAlpha, blendDstAlpha, blendColor);
+        super.setBlend(enabled, blendEq, blendSrc, blendDst, blendAlphaEq, blendSrcAlpha, blendDstAlpha, blendColor);
         this._nativeObj.setBlend(blendEq, blendSrc, blendDst, blendAlphaEq, blendSrcAlpha, blendDstAlpha, blendColor);
     };
 
@@ -49,7 +49,7 @@ class NativeEffect extends Effect {
         stencilZFailOp = gfx.STENCIL_OP_KEEP,
         stencilZPassOp = gfx.STENCIL_OP_KEEP,
         stencilWriteMask = 0xff) {
-        super.setStencil(stencilFunc, stencilRef, stencilMask, stencilFailOp, stencilZFailOp, stencilZPassOp, stencilWriteMask);
+        super.setStencil(enabled, stencilFunc, stencilRef, stencilMask, stencilFailOp, stencilZFailOp, stencilZPassOp, stencilWriteMask);
         this._nativeObj.setStencil(stencilFunc, stencilRef, stencilMask, stencilFailOp, stencilZFailOp, stencilZPassOp, stencilWriteMask);
     }
 
