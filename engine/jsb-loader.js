@@ -205,6 +205,7 @@ cc.loader.addDownloadHandlers({
     'binary' : downloadBinary,
     'bin' : downloadBinary,
     'dbbin': downloadBinary,
+    'skel': downloadBinary,
 
     'default' : downloadText
 });
