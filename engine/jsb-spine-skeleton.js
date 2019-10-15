@@ -360,7 +360,6 @@
         let texValues = this.skeletonData.textures;
         material.setProperty('texture', texValues[0]);
         this.setMaterial(0, material);
-        this.markForUpdateRenderData(false);
         if (this.node && this.node._renderComponent == this) {
             this.markForRender(true);
         }
