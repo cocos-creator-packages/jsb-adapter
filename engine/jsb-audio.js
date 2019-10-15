@@ -55,27 +55,7 @@ let handleVolume  = function (volume) {
         audioEngine.stop(this.id);
 
         let clip = this.src;
-        if (clip.loaded) {
-            this.id = audioEngine.play2d(clip._nativeAsset, this.loop, this.volume);
-        }
-        else {
-            let self = this;
-            cc.loader.load({
-                url: clip.nativeUrl,
-                // For audio, we should skip loader otherwise it will load a new audioClip.
-                skips: ['Loader'],
-            },
-            function (err, audioNativeAsset) {
-                if (err) {
-                    cc.error(err);
-                    return;
-                }
-                if (!clip.loaded) {
-                    clip._nativeAsset = audioNativeAsset;
-                    self.id = audioEngine.play2d(audioNativeAsset, self.loop, self.volume);
-                }
-            });
-        }
+        this.id = audioEngine.play(clip, this.loop, this.volume);
     };
 
     proto.pause = function () {
@@ -145,43 +125,27 @@ let handleVolume  = function (volume) {
         if (typeof volume !== 'number') {
             volume = 1;
         }
+        let audioFilePath;
+        let md5Pipe = cc.loader.md5Pipe;
         if (typeof clip === 'string') {
             // backward compatibility since 1.10
             cc.warnID(8401, 'cc.audioEngine', 'cc.AudioClip', 'AudioClip', 'cc.AudioClip', 'audio');
-            let path = clip;
-            let md5Pipe = cc.loader.md5Pipe;
+            audioFilePath = clip;
             if (md5Pipe) {
-                path = md5Pipe.transformURL(path);
+                audioFilePath = md5Pipe.transformURL(audioFilePath);
             }
-            return audioEngine.play2d(path, loop, volume);
         }
         else {
-            if (!clip) {
-                return;
-            }
             if (clip.loaded) {
-                return audioEngine.play2d(clip._nativeAsset, loop, volume);
+                audioFilePath = clip._nativeAsset;
             }
             else {
-                cc.loader.load({
-                    url: clip.nativeUrl,
-                    // For audio, we should skip loader otherwise it will load a new audioClip.
-                    skips: ['Loader'],
-                },
-                function (err, audioNativeAsset) {
-                    if (err) {
-                        cc.error(err);
-                        return;
-                    }
-                    if (!clip.loaded) {
-                        clip._nativeAsset = audioNativeAsset;
-                        audioEngine.play2d(audioNativeAsset, loop, volume);
-                    }
-                });
-                // Deffered loading return audioID -1
-                return -1;
+                // audio delay loading
+                clip._nativeAsset = audioFilePath = (md5Pipe ? md5Pipe.transformURL(clip.nativeUrl) : clip.nativeUrl);
+                clip.loaded  = true;
             }
         }
+        return audioEngine.play2d(audioFilePath, loop, volume);
     };
     audioEngine.playMusic = function (clip, loop) {
         audioEngine.stop(_music.id);

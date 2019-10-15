@@ -17,7 +17,7 @@
             this.setRenderDataList(this._renderDataList);
 
             this.setUseModel(true);
-            this.updateMeshData(comp);
+            this.updateMeshData();
         },
 
         updateRenderData (comp) {   
@@ -27,9 +27,15 @@
             this.setNode(node._proxy);
         },
 
-        updateMeshData (comp) {
+        updateMeshData () {
+            let comp = this._renderComp;
             let mesh = comp.mesh;
             if (!mesh) return;
+
+            if (!mesh.loaded) {
+                mesh.once('load', this.updateMeshData, this);
+                return;
+            }
 
             let subdatas = comp.mesh.subDatas;
             for(let i = 0, len = subdatas.length; i < len; i++) {

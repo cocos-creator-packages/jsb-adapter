@@ -23,15 +23,15 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-let originReserveQuads = cc.Label.__assembler__.Bmfont.prototype._reserveQuads;
-Object.assign(cc.Label.__assembler__.Bmfont.prototype, {
-    updateWorldVerts (comp) {
+
+Object.assign(cc.Sprite.__assembler__.RadialFilled.prototype, {
+    updateWorldVerts (sprite) {
         let local = this._local;
         let world = this._renderData.vDatas[0];
         let floatsPerVert = this.floatsPerVert;
-        for (let offset = 0; offset < local.length; offset += floatsPerVert) {
+        for (let offset = 0, l = world.length; offset < l; offset += floatsPerVert) {
             world[offset] = local[offset];
-            world[offset + 1] = local[offset + 1];
+            world[offset+1] = local[offset + 1];
         }
-    }
+    },
 });

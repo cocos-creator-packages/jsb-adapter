@@ -50,6 +50,13 @@ const GL_RGBA = 6408;             // gl.RGBA
 const GL_LUMINANCE = 6409;        // gl.LUMINANCE
 const GL_LUMINANCE_ALPHA = 6410;  // gl.LUMINANCE_ALPHA
 
+// https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_texture_float.txt
+// for native GL_ARB_texture_float extension
+const GL_RGBA32F = 0x8814;
+const GL_RGB32F = 0x8815;
+const GL_RGBA16F = 0x881A;
+const GL_RGB16F = 0x881B;
+
 const GL_COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83F0;   // ext.COMPRESSED_RGB_S3TC_DXT1_EXT
 const GL_COMPRESSED_RGBA_S3TC_DXT1_EXT = 0x83F1;  // ext.COMPRESSED_RGBA_S3TC_DXT1_EXT
 const GL_COMPRESSED_RGBA_S3TC_DXT3_EXT = 0x83F2;  // ext.COMPRESSED_RGBA_S3TC_DXT3_EXT
@@ -123,16 +130,16 @@ const _textureFmtGL = [
   { format: GL_RGBA, internalFormat: GL_RGBA, pixelType: GL_UNSIGNED_BYTE },
 
   // TEXTURE_FMT_RGB16F: 17
-  { format: GL_RGB, internalFormat: GL_RGB, pixelType: GL_HALF_FLOAT_OES },
+  { format: GL_RGB, internalFormat: GL_RGB16F, pixelType: GL_HALF_FLOAT_OES },
 
   // TEXTURE_FMT_RGBA16F: 18
-  { format: GL_RGBA, internalFormat: GL_RGBA, pixelType: GL_HALF_FLOAT_OES },
+  { format: GL_RGBA, internalFormat: GL_RGBA16F, pixelType: GL_HALF_FLOAT_OES },
 
   // TEXTURE_FMT_RGB32F: 19
-  { format: GL_RGB, internalFormat: GL_RGB, pixelType: GL_FLOAT },
+  { format: GL_RGB, internalFormat: GL_RGB32F, pixelType: GL_FLOAT },
 
   // TEXTURE_FMT_RGBA32F: 20
-  { format: GL_RGBA, internalFormat: GL_RGBA, pixelType: GL_FLOAT },
+  { format: GL_RGBA, internalFormat: GL_RGBA32F, pixelType: GL_FLOAT },
 
   // TEXTURE_FMT_R32F: 21
   { format: null, internalFormat: null, pixelType: null },

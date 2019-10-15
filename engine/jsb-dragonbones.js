@@ -317,10 +317,13 @@
         return armatureKey;
     };
 
+    let armatureCacheMgr = dragonBones.ArmatureCacheMgr.getInstance();
+    dragonBones.armatureCacheMgr = armatureCacheMgr;
     dbAsset._clear = function () {
         if (this._factory) {
             this._factory.removeDragonBonesDataByUUID(this._uuid, true);
         }
+        armatureCacheMgr.removeArmatureCache(this._uuid);
     };
 
     ////////////////////////////////////////////////////////////
@@ -329,7 +332,7 @@
     dragonBones.ArmatureDisplay._assembler = null;
     let armatureDisplayProto = dragonBones.ArmatureDisplay.prototype;
     let renderCompProto = cc.RenderComponent.prototype;
-    let RenderFlow = cc.RenderFlow;
+    const AnimationCacheMode = dragonBones.ArmatureDisplay.AnimationCacheMode;
 
     Object.defineProperty(armatureDisplayProto, 'armatureName', {
         get () {
@@ -344,14 +347,16 @@
             }
 
             if (this._armature) {
+                if (!this.isAnimationCached()) {
+                    this._factory.remove(this._armature);
+                }
                 this._armature.dispose();
-                this._factory.remove(this._armature);
                 this._armature = null;
             }
             this._nativeDisplay = null;
             
             this._refresh();
-            if (this._armature) {
+            if (this._armature && !this.isAnimationCached()) {
                 this._factory.add(this._armature);
             }
         },
@@ -376,7 +381,7 @@
     let _initDebugDraw = armatureDisplayProto._initDebugDraw;
     armatureDisplayProto._initDebugDraw = function () {
         _initDebugDraw.call(this);
-        if (this._nativeDisplay) {
+        if (this._armature && !this.isAnimationCached()) {
             this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
         }
     };
@@ -423,22 +428,21 @@
 
         let atlasUUID = this.dragonAtlasAsset._uuid;
         this._armatureKey = this.dragonAsset.init(this._factory, atlasUUID);
-        this._nativeDisplay = this._factory.buildArmatureDisplay(this.armatureName, this._armatureKey, "", atlasUUID);
-        if (!this._nativeDisplay) {
-            this._clearRenderData();
-            return;
-        }
 
-        this._nativeDisplay._ccNode = this.node;
-        this._nativeDisplay._comp = this;
-        this._nativeDisplay._eventTarget = this._eventTarget;
-        this._nativeDisplay.bindNodeProxy(this.node._proxy);
-        this._nativeDisplay.setOpacityModifyRGB(this.premultipliedAlpha);
-        this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
-        this._nativeDisplay.setDBEventCallback(function(eventObject) {
-            this._eventTarget.emit(eventObject.type, eventObject);
-        });
-        this._activateMaterial();
+        if (this.isAnimationCached()) {
+            this._nativeDisplay = new dragonBones.CCArmatureCacheDisplay(this.armatureName, this._armatureKey, atlasUUID, this._cacheMode == AnimationCacheMode.SHARED_CACHE);
+            this._armature = this._nativeDisplay.armature();
+        } else {
+            this._nativeDisplay = this._factory.buildArmatureDisplay(this.armatureName, this._armatureKey, "", atlasUUID);
+            if (!this._nativeDisplay) {
+                this._clearRenderData();
+                return;
+            }
+            
+            this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
+            this._armature = this._nativeDisplay.armature();
+            this._armature.animation.timeScale = this.timeScale;
+        }
 
         // add all event into native display
         let callbackTable = this._eventTarget._callbackTable;
@@ -447,25 +451,76 @@
         for (let key in callbackTable) {
             let list = callbackTable[key];
             if (!list || !list.callbacks || !list.callbacks.length) continue;
-            this._nativeDisplay.addDBEventListener(key, emptyHandle);
+            if (this.isAnimationCached()) {
+                this._nativeDisplay.addDBEventListener(key, emptyHandle);
+            } else {
+                this._nativeDisplay.addDBEventListener(key);
+            }
         }
 
-        this._armature = this._nativeDisplay.armature();
-        this._armature.animation.timeScale = this.timeScale;
+        this._nativeDisplay._ccNode = this.node;
+        this._nativeDisplay._comp = this;
+        this._nativeDisplay._eventTarget = this._eventTarget;
 
+        this._nativeDisplay.bindNodeProxy(this.node._proxy);
+        this._nativeDisplay.setOpacityModifyRGB(this.premultipliedAlpha);
+        this._nativeDisplay.setBatchEnabled(this.enableBatch);
+        this._nativeDisplay.setDBEventCallback(function(eventObject) {
+            this._eventTarget.emit(eventObject.type, eventObject);
+        });
+
+        this._activateMaterial();
+        
         if (this.animationName) {
             this.playAnimation(this.animationName, this.playTimes);
         }
     };
 
+    armatureDisplayProto.playAnimation = function (animName, playTimes) {
+        this.playTimes = (playTimes === undefined) ? -1 : playTimes;
+        this.animationName = animName;
+
+        if (this._nativeDisplay) {
+            if (this.isAnimationCached()) {
+                return this._nativeDisplay.playAnimation(animName, this.playTimes);
+            } else {
+                if (this._armature) {
+                    return this._armature.animation.play(animName, this.playTimes);
+                }
+            }
+        }
+        return null;
+    };
+
+    armatureDisplayProto.updateAnimationCache = function (animName) {
+        if (!this.isAnimationCached()) return;
+        if (this._nativeDisplay) {
+            if (animName) {
+                this._nativeDisplay.updateAnimationCache(animName);
+            } else {
+                this._nativeDisplay.updateAllAnimationCache();
+            }
+        }
+    };
+
+    armatureDisplayProto.invalidAnimationCache = function () {
+        if (!this.isAnimationCached()) return;
+        if (this._nativeDisplay) {
+            this._nativeDisplay.updateAllAnimationCache();
+        }
+    };
+
     armatureDisplayProto._prepareToRender = function () {
         this.markForUpdateRenderData(false);
-        this.markForRender(true);
+        // only when component's onEnable function has been invoke, need to enable render
+        if (this.node && this.node._renderComponent == this) {
+            this.markForRender(true);
+        }
     };
 
     armatureDisplayProto.onEnable = function () {
         renderCompProto.onEnable.call(this);
-        if (this._armature) {
+        if (this._armature && !this.isAnimationCached()) {
             this._factory.add(this._armature);
         }
         this._activateMaterial();
@@ -473,7 +528,7 @@
 
     armatureDisplayProto.onDisable = function () {
         renderCompProto.onDisable.call(this);
-        if (this._armature) {
+        if (this._armature && !this.isAnimationCached()) {
             this._factory.remove(this._armature);
         }
     };
@@ -486,21 +541,21 @@
     };
 
     armatureDisplayProto.once = function (eventType, listener, target) {
-        if (this._nativeDisplay) {
+        if (this._nativeDisplay && !this.isAnimationCached()) {
             this._nativeDisplay.addDBEventListener(eventType, listener);
         }
         this._eventTarget.once(eventType, listener, target);
     };
 
     armatureDisplayProto.addEventListener = function (eventType, listener, target) {
-        if (this._nativeDisplay) {
+        if (this._nativeDisplay && !this.isAnimationCached()) {
             this._nativeDisplay.addDBEventListener(eventType, listener);
         }
         this._eventTarget.on(eventType, listener, target);
     };
 
     armatureDisplayProto.removeEventListener = function (eventType, listener, target) {
-        if (this._nativeDisplay) {
+        if (this._nativeDisplay && !this.isAnimationCached()) {
             this._nativeDisplay.removeDBEventListener(eventType, listener);
         }
         this._eventTarget.off(eventType, listener, target);
@@ -518,7 +573,18 @@
     };
     
     armatureDisplayProto.update = function() {
-        if (this._debugDraw && this.debugBones) {
+        let nativeDisplay = this._nativeDisplay;
+        if (!nativeDisplay) return;
+
+        let node = this.node;
+        if (!node) return;
+
+        if (this.__preColor__ === undefined || !node.color.equals(this.__preColor__)) {
+            nativeDisplay.setColor(node.color);
+            this.__preColor__ = node.color;
+        }
+
+        if (!this.isAnimationCached() && this._debugDraw && this.debugBones) {
 
             let nativeDisplay = this._nativeDisplay;
             this._debugData = this._debugData || nativeDisplay.getDebugData();

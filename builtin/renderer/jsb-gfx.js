@@ -33,12 +33,25 @@ var _tmpGetSetDesc = {
     configurable: true
 };
 
+/**
+ * Device
+ */
+
+var deviceInstance;
+
 gfx.Device.prototype.setBlendColor32 = gfx.Device.prototype.setBlendColor;
 gfx.Device._getInstance = gfx.Device.getInstance;
 gfx.Device.getInstance = function () {
-    var device = gfx.Device._getInstance();
-    device._gl = window.__gl;
-    return device;
+    // init native device instance
+    if (!deviceInstance) {
+        deviceInstance = gfx.Device._getInstance();
+        deviceInstance._gl = window.__gl;
+        deviceInstance.ext = function (extName) {
+            return window.__gl.getExtension(extName);
+        };
+    }
+
+    return deviceInstance;
 }
 
 //FIXME:
@@ -52,6 +65,10 @@ gfx.Device.getInstance = function () {
 //     maxColorAttatchments: 8
 // };
 
+
+/**
+ * Program
+ */
 var _p = gfx.Program.prototype;
 _p._ctor = function(device, options) {
     if (device) {
@@ -59,6 +76,9 @@ _p._ctor = function(device, options) {
     }
 };
 
+/**
+ * VertexBuffer
+ */
 _p = gfx.VertexBuffer.prototype;
 _p._ctor = function(device, format, usage, data, numVertices) {
     this._attr2el = format._attr2el;
@@ -74,6 +94,9 @@ _tmpGetSetDesc.get = _p.getCount;
 _tmpGetSetDesc.set = undefined;
 Object.defineProperty(_p, "count", _tmpGetSetDesc);
 
+/**
+ * IndexBuffer
+ */
 _p = gfx.IndexBuffer.prototype;
 _p._ctor = function(device, format, usage, data, numIndices) {
     if (device) {
@@ -88,6 +111,9 @@ Object.defineProperty(_p, "count", _tmpGetSetDesc);
 gfx.VertexFormat = VertexFormat;
 Object.assign(gfx, enums);
 
+/**
+ * Texture2D
+ */
 function convertImages(images) {
     if (images) {
         for (let i = 0, len = images.length; i < len; ++i) {
@@ -133,8 +159,9 @@ function convertOptions(texture, options) {
         options.glFormat = gltf.format;
         options.glType = gltf.pixelType;
         options.bpp = gltf.bpp;
-        options.compressed = options.glFormat >= enums.TEXTURE_FMT_RGB_DXT1 &&
-                             options.glFormat <= enums.TEXTURE_FMT_RGBA_PVRTC_4BPPV1;
+        options.compressed = 
+            (format >= enums.TEXTURE_FMT_RGB_DXT1 && format <= enums.TEXTURE_FMT_RGBA_PVRTC_4BPPV1) ||
+            (format >= enums.TEXTURE_FMT_RGB_ETC2 && format <= enums.TEXTURE_FMT_RGBA_ETC2);
     }
 
     options.width = options.width || texture._width;
@@ -183,7 +210,9 @@ Object.defineProperty(_p, "_width", _tmpGetSetDesc);
 _tmpGetSetDesc.get = _p.getHeight;
 Object.defineProperty(_p, "_height", _tmpGetSetDesc);
 
-
+/**
+ * FrameBuffer
+ */
 _p = gfx.FrameBuffer.prototype;
 _p._ctor = function(device, width, height, options) {
     if (device) {
@@ -191,29 +220,15 @@ _p._ctor = function(device, width, height, options) {
     }
 };
 
-var TextHAlignment = {
-    LEFT : 0,
-    CENTER : 1,
-    RIGHT : 2
+/**
+ * FrameBuffer
+ */
+_p = gfx.RenderBuffer.prototype;
+_p._ctor = function(device, format, width, height, options) {
+    if (device) {
+        this.init(device, format, width, height);
+    }
 };
-
-var TextVAlignment = {
-    TOP : 0,
-    CENTER : 1,
-    BOTTOM : 2
-};
-
-var DeviceTextAlign = {
-    CENTER        : 0x33, /** Horizontal center and vertical center. */
-    TOP           : 0x13, /** Horizontal center and vertical top. */
-    TOP_RIGHT     : 0x12, /** Horizontal right and vertical top. */
-    RIGHT         : 0x32, /** Horizontal right and vertical center. */
-    BOTTOM_RIGHT  : 0x22, /** Horizontal right and vertical bottom. */
-    BOTTOM        : 0x23, /** Horizontal center and vertical bottom. */
-    BOTTOM_LEFT   : 0x21, /** Horizontal left and vertical bottom. */
-    LEFT          : 0x31, /** Horizontal left and vertical center. */
-    TOP_LEFT      : 0x11 /** Horizontal left and vertical top. */
-}
 
 gfx.RB_FMT_D16 = 0x81A5; // GL_DEPTH_COMPONENT16 hack for JSB
 
