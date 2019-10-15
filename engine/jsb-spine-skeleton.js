@@ -253,7 +253,7 @@
     let _updateUseTint = skeleton._updateUseTint;
     skeleton._updateUseTint = function () {
         _updateUseTint.call(this);
-        if (this._nativeSkeleton && !this.isAnimationCached()) {
+        if (this._nativeSkeleton) {
             this._nativeSkeleton.setUseTint(this.useTint);
         }
         this._assembler && this._assembler.clearEffect();
@@ -326,12 +326,12 @@
             nativeSkeleton.setDebugSlotsEnabled(this.debugSlots);
             nativeSkeleton.setDebugMeshEnabled(this.debugMesh);
             nativeSkeleton.setDebugBonesEnabled(this.debugBones);
-            nativeSkeleton.setUseTint(this.useTint);
         }
 
         this._nativeSkeleton = nativeSkeleton;
         nativeSkeleton._comp = this;
 
+        nativeSkeleton.setUseTint(this.useTint);
         nativeSkeleton.setOpacityModifyRGB(this.premultipliedAlpha);
         nativeSkeleton.setTimeScale(this.timeScale);
         nativeSkeleton.setBatchEnabled(this.enableBatch);
