@@ -183,9 +183,6 @@ function bindBufferOpt(target, buffer) {
     if (typeof buffer === 'number') {
         id = buffer;
     }
-    else if (typeof buffer === 'object') {
-        id = buffer._id;
-    }
     buffer_data[next_index] = GL_COMMAND_BIND_BUFFER;
     buffer_data[next_index + 1] = target;
     buffer_data[next_index + 2] = id;
@@ -202,9 +199,6 @@ function bindFramebufferOpt(target, framebuffer) {
     if (typeof framebuffer === 'number') {
         id = framebuffer;
     }
-    else if (typeof framebuffer === 'object') {
-        id = framebuffer._id;
-    }
     buffer_data[next_index] = GL_COMMAND_BIND_FRAME_BUFFER;
     buffer_data[next_index + 1] = target;
     buffer_data[next_index + 2] = id;
@@ -220,9 +214,6 @@ function bindRenderbufferOpt(target, renderbuffer) {
     let id = 0;
     if (typeof renderbuffer === 'number') {
         id = renderbuffer;
-    }
-    else if (typeof renderbuffer === 'object') {
-        id = renderbuffer._id;
     }
     buffer_data[next_index] = GL_COMMAND_BIND_RENDER_BUFFER;
     buffer_data[next_index + 1] = target;
