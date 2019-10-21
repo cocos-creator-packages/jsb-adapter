@@ -215,8 +215,12 @@ Object.defineProperty(_p, "_height", _tmpGetSetDesc);
  */
 _p = gfx.FrameBuffer.prototype;
 _p._ctor = function(device, width, height, options) {
-    if (device) {
-        this.init(device, width, height, options);
+    if (!device) return;
+    this.init(device, width, height, options);
+
+    this._glID = { _id: this.getHandle()};
+    this.getHandle = function () {
+        return this._glID;
     }
 };
 
@@ -224,9 +228,13 @@ _p._ctor = function(device, width, height, options) {
  * FrameBuffer
  */
 _p = gfx.RenderBuffer.prototype;
-_p._ctor = function(device, format, width, height, options) {
-    if (device) {
-        this.init(device, format, width, height);
+_p._ctor = function(device, format, width, height) {
+    if (!device) return;
+    this.init(device, format, width, height);
+
+    this._glID = { _id: this.getHandle()};
+    this.getHandle = function () {
+        return this._glID;
     }
 };
 
