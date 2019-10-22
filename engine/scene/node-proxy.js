@@ -118,7 +118,7 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         let sky = owner._skewY;
         skewPtr[0] = skx;
         skewPtr[1] = sky;
-        if (!this._isVisitTraverse && (skx !== 0.0 || sky !== 0.0)) {
+        if (!this._isVisitTraverse && (skx !== 0 || sky !== 0)) {
             this.switchTraverseToVisit();
             this._isVisitTraverse = true;
         }
