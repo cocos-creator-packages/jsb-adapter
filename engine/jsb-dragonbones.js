@@ -510,14 +510,6 @@
         }
     };
 
-    armatureDisplayProto._prepareToRender = function () {
-        this.markForUpdateRenderData(false);
-        // only when component's onEnable function has been invoke, need to enable render
-        if (this.node && this.node._renderComponent == this) {
-            this.markForRender(true);
-        }
-    };
-
     armatureDisplayProto.onEnable = function () {
         renderCompProto.onEnable.call(this);
         if (this._armature && !this.isAnimationCached()) {
