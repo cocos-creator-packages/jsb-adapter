@@ -36,15 +36,9 @@ var cacheManager = {
 
     cachedFileName: 'cacheList.json',
 
-    // whether or not cache asset into user's storage space
-    saveFile: true,
-
     deletePeriod: 500,
 
     writeFilePeriod: 2000,
-
-    // whether or not storage space has run out
-    outOfStorage: false,
 
     cachedFiles: null,
 
