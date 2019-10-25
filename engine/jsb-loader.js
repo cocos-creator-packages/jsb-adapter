@@ -23,81 +23,86 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-'use strict';
 
-function downloadScript (item, callback) {
-    require(item.url);
-    return null;
-}
+ 'use strict';
 
-let audioDownloader = new jsb.Downloader();
-let audioUrlMap = {};  // key: url, value: { loadingItem, callback }
+const cacheManager = require('./jsb-cache-manager');
+const { downloadFile, readText, readArrayBuffer, readJson } = require('./jsb-fs-utils');
 
-audioDownloader.setOnFileTaskSuccess(task => {
-    let { item, callback } = audioUrlMap[task.requestURL];
-    if (!(item && callback)) {
-        return;
+const REGEX = /^\w+:\/\/.*/;
+const downloader = cc.assetManager.downloader;
+const parser = cc.assetManager.parser;
+
+function downloadScript (url, options, onComplete) {
+    if (typeof options === 'function') {
+        onComplete = options;
+        options = null;
     }
-
-    item.url = task.storagePath;
-    item.rawUrl = task.storagePath;
-    
-    callback(null, item);
-    delete audioUrlMap[task.requestURL];
-});
-
-audioDownloader.setOnTaskError((task, errorCode, errorCodeInternal, errorStr) => {
-    let { callback } = audioUrlMap[task.requestURL];
-    callback && callback(errorStr, null);
-    delete audioUrlMap[task.requestURL];
-});
-
-function downloadAudio (item, callback) {
-    if (/^http/.test(item.url)) {
-        let index = item.url.lastIndexOf('/');
-        let fileName = item.url.substr(index+1);
-        let storagePath = jsb.fileUtils.getWritablePath() + fileName;
-
-        // load from local cache
-        if (jsb.fileUtils.isFileExist(storagePath)) {
-            item.url = storagePath;
-            item.rawUrl = storagePath;
-            callback && callback(null, item);
-        }
-        // download remote audio
-        else {
-            audioUrlMap[item.url] = { item, callback };
-            audioDownloader.createDownloadFileTask(item.url, storagePath);
-        }
-        // Don't return anything to use async loading.
+    if (REGEX.test(url)) {
+        onComplete && onComplete(new Error('Native does not support loading remote scripts'));
     }
     else {
-        return item.url;
+        require('../../../' + url);
+        onComplete && onComplete(null);
     }
 }
 
-function loadAudio (item, callback) {
-    var loadByDeserializedAsset = item._owner instanceof cc.AudioClip;
-    if (loadByDeserializedAsset) {
-        return item.url;
+
+function download (url, func, options, onProgress, onComplete) {
+    var result = transformUrl(url, options);
+    if (result.inLocal) {
+        func(result.url, options, onComplete);
+    }
+    else if (result.inCache) {
+        cacheManager.updateLastTime(url)
+        func(result.url, options, onComplete);
     }
     else {
-        var audioClip = new cc.AudioClip();
-        // obtain user url through nativeUrl
-        audioClip._setRawAsset(item.rawUrl, false);
-        // obtain download url through _nativeAsset
-        audioClip._nativeAsset = item.url;
-        return audioClip;
+        var time = Date.now();
+        var storagePath = cacheManager.cacheDir + '/' + time + cc.path.extname(url);
+        downloadFile(url, storagePath, options.header, onProgress, function (err, path) {
+            if (err) {
+                onComplete(err, null);
+                return;
+            }
+            func(path, options, function (err, data) {
+                if (!err) {
+                    cacheManager.cacheFile(url, storagePath);
+                }
+                onComplete(err, data);
+            });
+        });
     }
 }
 
-function downloadImage(item, callback) {
-    let img = new Image();
-    img.src = item.url;
-    img.onload = function(info) {
-        callback(null, img);
+function transformUrl (url, options) {
+    var inLocal = false;
+    var inCache = false;
+    if (REGEX.test(url)) {
+        var cache = cacheManager.cachedFiles.get(url);
+        if (!options.reload && cache) {
+            inCache = true;
+            url = cache.url;
+        }
     }
-    // Don't return anything to use async loading.
+    else {
+        inLocal = true;
+    }
+    return { url, inLocal, inCache };
+}
+
+function downloadAudio (url, options, onComplete) {
+    download(url, function (url, options, onComplete) {
+        onComplete(null, url);
+    }, options, options.onProgress, onComplete);
+}
+
+function downloadImage (url, options, onComplete) {
+    download(url, downloader.downloadDomImage, options, options.onProgress, onComplete);
+}
+
+function downloadFont (url, options, onComplete) {
+    download(url, loadFont, options, options.onProgress, onComplete);
 }
 
 function _getFontFamily (fontHandle) {
@@ -117,32 +122,36 @@ function _getFontFamily (fontHandle) {
     return fontFamilyName;
 }
 
-function downloadText (item) {
-    var url = item.url;
-
-    var result = jsb.fileUtils.getStringFromFile(url);
-    if (typeof result === 'string' && result) {
-        return result;
-    }
-    else {
-        return new Error('Download text failed: ' + url);
-    }
-}
-
-function downloadBinary (item) {
-    var url = item.url;
-
-    var result = jsb.fileUtils.getDataFromFile(url);
-    if (result) {
-        return result;
-    }
-    else {
-        return new Error('Download binary file failed: ' + url);
+function readFile(filePath, options, onComplete) {
+    switch (options.responseType) {
+        case 'json': 
+            readJson(filePath, onComplete);
+            break;
+        case 'arraybuffer':
+            readArrayBuffer(filePath, onComplete);
+            break;
+        default:
+            readText(filePath, onComplete);
+            break;
     }
 }
 
-function loadFont (item, callback) {
-    let url = item.url;
+function downloadText (url, options, onComplete) {
+    options.responseType = "text";
+    download(url, readFile, options, options.onProgress, onComplete);
+}
+
+function downloadArrayBuffer (url, options, onComplete) {
+    options.responseType = "arraybuffer";
+    download(url, readFile, options, options.onProgress, onComplete);
+}
+
+function downloadJson (url, options, onComplete) {
+    options.responseType = "json";
+    download(url, readFile, options, options.onProgress, onComplete);
+} 
+
+function loadFont (url, options, onComplete) {
     let fontFamilyName = _getFontFamily(url);
 
     let fontFace = new FontFace(fontFamilyName, "url('" + url + "')");
@@ -150,34 +159,29 @@ function loadFont (item, callback) {
 
     fontFace.load();
     fontFace.loaded.then(function() {
-        callback(null, fontFamilyName);
+        onComplete(null, fontFamilyName);
     }, function () {
         cc.warnID(4933, fontFamilyName);
-        callback(null, fontFamilyName);
+        onComplete(null, fontFamilyName);
     });
 }
 
-function loadCompressedTex (item) {
-    return item.content;
+function parsePVRTex (file, options, onComplete) {
+    onComplete && onComplete(null, file);
 }
 
-cc.loader.addDownloadHandlers({
-    // JS
-    'js' : downloadScript,
-    'jsc' : downloadScript,
+function parsePKMTex (file, options, onComplete) {
+    onComplete && onComplete(null, file);
+}
 
-    // Images
-    'png' : downloadImage,
-    'jpg' : downloadImage,
-    'bmp' : downloadImage,
-    'jpeg' : downloadImage,
-    'gif' : downloadImage,
-    'ico' : downloadImage,
-    'tiff' : downloadImage,
-    'webp' : downloadImage,
-    'image' : downloadImage,
-    'pvr' : downloadImage,
-    'pkm' : downloadImage,
+parser.parsePVRTex = parsePVRTex;
+parser.parsePKMTex = parsePKMTex;
+downloader.downloadScript = downloadScript;
+
+downloader.register({
+    // JS
+    '.js' : downloadScript,
+    '.jsc' : downloadScript,
 
     // Audio
     'mp3' : downloadAudio,
@@ -186,46 +190,56 @@ cc.loader.addDownloadHandlers({
     'mp4' : downloadAudio,
     'm4a' : downloadAudio,
 
+    // Images
+    '.png' : downloadImage,
+    '.jpg' : downloadImage,
+    '.bmp' : downloadImage,
+    '.jpeg' : downloadImage,
+    '.gif' : downloadImage,
+    '.ico' : downloadImage,
+    '.tiff' : downloadImage,
+    '.webp' : downloadImage,
+    '.image' : downloadImage,
+    '.pvr' : downloadImage,
+    '.pkm' : downloadImage,
+
     // Text
-    'txt' : downloadText,
-    'xml' : downloadText,
-    'vsh' : downloadText,
-    'fsh' : downloadText,
-    'atlas' : downloadText,
+    '.txt' : downloadText,
+    '.xml' : downloadText,
+    '.vsh' : downloadText,
+    '.fsh' : downloadText,
+    '.atlas' : downloadText,
 
-    'tmx' : downloadText,
-    'tsx' : downloadText,
+    '.tmx' : downloadText,
+    '.tsx' : downloadText,
 
-    'json' : downloadText,
-    'ExportJson' : downloadText,
-    'plist' : downloadText,
+    '.json' : downloadJson,
+    '.ExportJson' : downloadJson,
+    '.plist' : downloadText,
 
-    'fnt' : downloadText,
+    '.fnt' : downloadText,
 
-    'binary' : downloadBinary,
-    'bin' : downloadBinary,
-    'dbbin': downloadBinary,
+    '.binary' : downloadArrayBuffer,
+    '.bin' : downloadArrayBuffer,
+    '.dbbin': downloadArrayBuffer,
 
-    'default' : downloadText
+    // Font
+    '.font' : downloadFont,
+    '.eot' : downloadFont,
+    '.ttf' : downloadFont,
+    '.woff' : downloadFont,
+    '.svg' : downloadFont,
+    '.ttc' : downloadFont
 });
 
-cc.loader.addLoadHandlers({
-    // Font
-    'font' : loadFont,
-    'eot' : loadFont,
-    'ttf' : loadFont,
-    'woff' : loadFont,
-    'svg' : loadFont,
-    'ttc' : loadFont,
-
-    // Audio
-    'mp3' : loadAudio,
-    'ogg' : loadAudio,
-    'wav' : loadAudio,
-    'mp4' : loadAudio,
-    'm4a' : loadAudio,
-
+parser.register({
     // compressed texture
     'pvr': loadCompressedTex,
     'pkm': loadCompressedTex,
 });
+
+var originInit = cc.assetManager.init;
+cc.assetManager.init = function (options) {
+    originInit.call(cc.assetManager, options);
+    cacheManager.init();
+};
