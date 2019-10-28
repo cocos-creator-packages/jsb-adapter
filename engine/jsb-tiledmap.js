@@ -142,6 +142,12 @@
         _updateRenderData () {
             if (!this._renderComp || !this._renderComp.isValid) return;
             this.updateRenderData(this._renderComp);
+
+            let materials = this._renderComp.sharedMaterials;
+            for (let i = 0; i < materials.length; i++) {
+                let m = materials[i];
+                if (m) m.getHash();
+            }
         },
 
         updateRenderData (comp) {
