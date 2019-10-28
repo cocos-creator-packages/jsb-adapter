@@ -138,6 +138,12 @@
             renderer.TiledMapAssembler.prototype.ctor.call(this);
         },
 
+        // override _updateRenderData function avoid base class cover material
+        _updateRenderData () {
+            if (!this._renderComp || !this._renderComp.isValid) return;
+            this.updateRenderData(this._renderComp);
+        },
+
         updateRenderData (comp) {
             if (!comp._modelBatcherDelegate) {
                 comp._buffer = new cc.TiledMapBuffer(null, cc.gfx.VertexFormat.XY_UV_Color);
