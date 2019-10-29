@@ -265,6 +265,12 @@
         this._initProperties();
     };
 
+    let _initWithDictionary = PSProto._initWithDictionary;
+    PSProto._initWithDictionary = function () {
+        _initWithDictionary.call(this);
+        this._initProperties();
+    };
+
     let __preload = PSProto.__preload;
     PSProto.__preload = function () {
         __preload.call(this);
