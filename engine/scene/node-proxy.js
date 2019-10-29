@@ -43,7 +43,7 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         this._opacityPtr = spaceInfo.opacity;
         this._is3DPtr = spaceInfo.is3D;
         this._skewPtr = spaceInfo.skew;
-        this._isVisitTraverse = false;
+        this._isVisitingTraversal = false;
 
         owner._proxy = this;
         this.updateOpacity();
@@ -118,9 +118,9 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         let sky = owner._skewY;
         skewPtr[0] = skx;
         skewPtr[1] = sky;
-        if (!this._isVisitTraverse && (skx !== 0 || sky !== 0)) {
+        if (!this._isVisitingTraversal && (skx !== 0 || sky !== 0)) {
             this.switchTraverseToVisit();
-            this._isVisitTraverse = true;
+            this._isVisitingTraversal = true;
         }
     }
 });
