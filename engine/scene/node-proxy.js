@@ -42,12 +42,15 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         this._cullingMaskPtr = spaceInfo.cullingMask;
         this._opacityPtr = spaceInfo.opacity;
         this._is3DPtr = spaceInfo.is3D;
+        this._skewPtr = spaceInfo.skew;
+        this._isVisitingTraversal = false;
 
         owner._proxy = this;
         this.updateOpacity();
         this.update3DNode();
         this.updateZOrder();
         this.updateCullingMask();
+        this.updateSkew();
         owner.on(cc.Node.EventType.SIBLING_ORDER_CHANGED, this.updateZOrder, this);
     },
 
@@ -57,6 +60,7 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         this.updateOpacity();
         this.update3DNode();
         this.updateZOrder();
+        this.updateSkew();
         this.updateCullingMask();
     },
 
@@ -106,4 +110,17 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         this._is3DPtr[0] = this._owner.is3DNode ? 0x1 : 0x0;
         this._dirtyPtr[0] |= RenderFlow.FLAG_LOCAL_TRANSFORM;
     },
+
+    updateSkew () {
+        let skewPtr = this._skewPtr;
+        let owner = this._owner;
+        let skx = owner._skewX;
+        let sky = owner._skewY;
+        skewPtr[0] = skx;
+        skewPtr[1] = sky;
+        if (!this._isVisitingTraversal && (skx !== 0 || sky !== 0)) {
+            this.switchTraverseToVisit();
+            this._isVisitingTraversal = true;
+        }
+    }
 });
