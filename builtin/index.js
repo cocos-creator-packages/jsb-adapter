@@ -155,8 +155,8 @@ jsb.device.setMotionEnabled = function(enabled) {
     if (__motionEnabled === enabled)
         return;
 
+    jsb.device.setAccelerometerEnabled(enabled);
     if (enabled) {
-        jsb.device.setAccelerometerEnabled(enabled);
         var motionValue;
         var event = new DeviceMotionEvent();
         __motionCallbackID = window.setInterval(function(){

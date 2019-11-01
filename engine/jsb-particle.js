@@ -259,9 +259,9 @@
         material && this._simulator.setEffect(material.effect._nativeObj);
     };
 
-    let _applyFile = PSProto._applyFile;
-    PSProto._applyFile = function () {
-        _applyFile.call(this);
+    let _initWithDictionary = PSProto._initWithDictionary;
+    PSProto._initWithDictionary = function (content) {
+        _initWithDictionary.call(this, content);
         this._initProperties();
     };
 
