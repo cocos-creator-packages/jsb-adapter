@@ -452,9 +452,9 @@
             let list = callbackTable[key];
             if (!list || !list.callbacks || !list.callbacks.length) continue;
             if (this.isAnimationCached()) {
-                this._nativeDisplay.addDBEventListener(key, emptyHandle);
-            } else {
                 this._nativeDisplay.addDBEventListener(key);
+            } else {
+                this._nativeDisplay.addDBEventListener(key, emptyHandle);
             }
         }
 
@@ -541,22 +541,35 @@
     };
 
     armatureDisplayProto.once = function (eventType, listener, target) {
-        if (this._nativeDisplay && !this.isAnimationCached()) {
-            this._nativeDisplay.addDBEventListener(eventType, listener);
+        if (this._nativeDisplay) {
+            if (this.isAnimationCached()) {
+                this._nativeDisplay.addDBEventListener(eventType);
+            } else {
+                this._nativeDisplay.addDBEventListener(eventType, listener);
+            }
         }
         this._eventTarget.once(eventType, listener, target);
     };
 
     armatureDisplayProto.addEventListener = function (eventType, listener, target) {
-        if (this._nativeDisplay && !this.isAnimationCached()) {
-            this._nativeDisplay.addDBEventListener(eventType, listener);
+        if (this._nativeDisplay) {
+            if (this.isAnimationCached()) {
+                this._nativeDisplay.addDBEventListener(eventType);
+            } else {
+                this._nativeDisplay.addDBEventListener(eventType, listener);
+            }
+            
         }
         this._eventTarget.on(eventType, listener, target);
     };
 
     armatureDisplayProto.removeEventListener = function (eventType, listener, target) {
-        if (this._nativeDisplay && !this.isAnimationCached()) {
-            this._nativeDisplay.removeDBEventListener(eventType, listener);
+        if (this._nativeDisplay) {
+            if (this.isAnimationCached()) {
+                this._nativeDisplay.removeDBEventListener(eventType);
+            } else {
+                this._nativeDisplay.removeDBEventListener(eventType, listener);
+            }
         }
         this._eventTarget.off(eventType, listener, target);
     };
