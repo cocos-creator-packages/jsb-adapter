@@ -112,7 +112,7 @@
 
     _p.createDomElementIfNeeded = function () {
         if (!jsb.VideoPlayer) {
-            cc.warn('VideoPlayer only supports mobile platform.');
+            cc.warn('VideoPlayer is not supported.');
             return null;
         }
 
