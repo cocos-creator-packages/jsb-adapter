@@ -191,7 +191,7 @@
 
     _p.resume = function () {
         let video = this._video;
-        if (!this._playing || !video) return;
+        if (this._playing || !video) return;
 
         video.resume();
         this._playing = true;
