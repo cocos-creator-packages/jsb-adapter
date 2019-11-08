@@ -28,8 +28,7 @@
         return;
     }
 
-    var math = cc.vmath;
-    var _mat4_temp = math.mat4.create();
+    var _mat4_temp = cc.mat4();
 
     var _impl = cc.VideoPlayer.Impl;
     var _p = cc.VideoPlayer.Impl.prototype;
