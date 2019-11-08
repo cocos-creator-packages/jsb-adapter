@@ -47,7 +47,6 @@
     _p._updateVisibility = function () {
         if (!this._iframe) return;
         this._iframe.setVisible(this._visible);
-        this._forceUpdate = true;
     };
     _p._updateSize = function (w, h) {
 
@@ -250,8 +249,7 @@
     _p.updateMatrix = function (node) {
         if (!this._iframe || !this._visible) return;
         node.getWorldMatrix(_worldMat);
-        if (!this._forceUpdate &&
-            this._m00 === _worldMat.m[0] && this._m01 === _worldMat.m[1] &&
+        if (this._m00 === _worldMat.m[0] && this._m01 === _worldMat.m[1] &&
             this._m04 === _worldMat.m[4] && this._m05 === _worldMat.m[5] &&
             this._m12 === _worldMat.m[12] && this._m13 === _worldMat.m[13] &&
             this._w === node._contentSize.width && this._h === node._contentSize.height) {
