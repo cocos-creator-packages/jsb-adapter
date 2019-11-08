@@ -166,16 +166,14 @@
                 scaleX = cc.view._scaleX, scaleY = cc.view._scaleY;
             let dpr = cc.view._devicePixelRatio;
 
-            let math = cc.vmath;
-            let matrix = math.mat4.create();
+            let matrix = cc.mat4();
             node.getWorldMatrix(matrix);
             let contentSize = node._contentSize;
             let vec3 = cc.v3();
             vec3.x = -node._anchorPoint.x * contentSize.width;
             vec3.y = -node._anchorPoint.y * contentSize.height;
 
-
-            math.mat4.translate(matrix, matrix, vec3);
+            cc.Mat4.translate(matrix, matrix, vec3);
 
             scaleX /= dpr;
             scaleY /= dpr;

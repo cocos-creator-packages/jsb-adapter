@@ -29,8 +29,7 @@
         return;
     }
 
-    var math = cc.vmath;
-    var _mat4_temp = math.mat4.create();
+    var _mat4_temp = cc.mat4();
 
     cc.WebView.Impl = cc.Class({
         extends: cc.WebView.Impl,
