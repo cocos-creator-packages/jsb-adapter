@@ -30,7 +30,8 @@
     }
 
     var math = cc.vmath;
-    var _mat4_temp = math.mat4.create();
+    var _worldMat = math.mat4.create();
+    var _cameraMat = math.mat4.create();
 
     cc.WebView.Impl = cc.Class({
         extends: cc.WebView.Impl,
@@ -46,7 +47,6 @@
     _p._updateVisibility = function () {
         if (!this._iframe) return;
         this._iframe.setVisible(this._visible);
-        this._forceUpdate = true;
     };
     _p._updateSize = function (w, h) {
 
@@ -248,50 +248,51 @@
     };
     _p.updateMatrix = function (node) {
         if (!this._iframe || !this._visible) return;
-        node.getWorldMatrix(_mat4_temp);
-        if (!this._forceUpdate &&
-            this._m00 === _mat4_temp.m[0] && this._m01 === _mat4_temp.m[1] &&
-            this._m04 === _mat4_temp.m[4] && this._m05 === _mat4_temp.m[5] &&
-            this._m12 === _mat4_temp.m[12] && this._m13 === _mat4_temp.m[13] &&
+        node.getWorldMatrix(_worldMat);
+        if (this._m00 === _worldMat.m[0] && this._m01 === _worldMat.m[1] &&
+            this._m04 === _worldMat.m[4] && this._m05 === _worldMat.m[5] &&
+            this._m12 === _worldMat.m[12] && this._m13 === _worldMat.m[13] &&
             this._w === node._contentSize.width && this._h === node._contentSize.height) {
             return;
         }
         // update matrix cache
-        this._m00 = _mat4_temp.m[0];
-        this._m01 = _mat4_temp.m[1];
-        this._m04 = _mat4_temp.m[4];
-        this._m05 = _mat4_temp.m[5];
-        this._m12 = _mat4_temp.m[12];
-        this._m13 = _mat4_temp.m[13];
+        this._m00 = _worldMat.m[0];
+        this._m01 = _worldMat.m[1];
+        this._m04 = _worldMat.m[4];
+        this._m05 = _worldMat.m[5];
+        this._m12 = _worldMat.m[12];
+        this._m13 = _worldMat.m[13];
         this._w = node._contentSize.width;
         this._h = node._contentSize.height;
-        let scaleX = cc.view._scaleX,
-            scaleY = cc.view._scaleY;
+
+        let camera = cc.Camera.findCamera(node);
+        camera.getWorldToScreenMatrix2D(_cameraMat);
+        math.mat4.mul(_cameraMat, _cameraMat, _worldMat);
+
+        let viewScaleX = cc.view._scaleX,
+            viewScaleY = cc.view._scaleY;
         let dpr = cc.view._devicePixelRatio;
-        scaleX /= dpr;
-        scaleY /= dpr;
-        let container = cc.game.container;
-        let a = _mat4_temp.m[0] * scaleX,
-            b = _mat4_temp.m[1],
-            c = _mat4_temp.m[4],
-            d = _mat4_temp.m[5] * scaleY;
-        let offsetX = container && container.style.paddingLeft ? parseInt(container.style.paddingLeft) : 0;
-        let offsetY = container && container.style.paddingBottom ? parseIn(container.style.paddingBottom) : 0;
-        this._updateSize(this._w, this._h);
-        let w = this._w * scaleX;
-        let h = this._h * scaleY;
-        let appx = (w * _mat4_temp.m[0]) * node._anchorPoint.x;
-        let appy = (h * _mat4_temp.m[5]) * node._anchorPoint.y;
+        viewScaleX /= dpr;
+        viewScaleY /= dpr;
+
+        let finalScaleX = _cameraMat.m[0] * viewScaleX,
+            finalScaleY = _cameraMat.m[5] * viewScaleY;
+
+        let finalWidth = this._w * finalScaleX,
+            finalHeight = this._h * finalScaleY;
+
+        let appx = finalWidth * node._anchorPoint.x;
+        let appy = finalHeight * node._anchorPoint.y;
 
         let viewport = cc.view._viewportRect;
-        offsetX += viewport.x / dpr;
-        offsetY += viewport.y / dpr;
+        let offsetX = viewport.x / dpr,
+            offsetY = viewport.y / dpr;
 
-        let tx = _mat4_temp.m[12] * scaleX - appx + offsetX,
-            ty = _mat4_temp.m[13] * scaleY - appy + offsetY;
+        let tx = _cameraMat.m[12] * viewScaleX - appx + offsetX,
+            ty = _cameraMat.m[13] * viewScaleY - appy + offsetY;
 
         var height = cc.view.getFrameSize().height;
         // set webview rect
-        this._iframe.setFrame(tx, height - h - ty, this._w * a, this._h * d)
+        this._iframe.setFrame(tx, height - finalHeight - ty, finalWidth, finalHeight);
     }
 })();
