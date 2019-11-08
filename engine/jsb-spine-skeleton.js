@@ -336,6 +336,8 @@
         nativeSkeleton.setTimeScale(this.timeScale);
         nativeSkeleton.setBatchEnabled(this.enableBatch);
         nativeSkeleton.bindNodeProxy(this.node._proxy);
+        nativeSkeleton.setColor(this.node.color);
+
         this._skeleton = nativeSkeleton.getSkeleton();
 
         // init skeleton listener
@@ -347,6 +349,12 @@
         this._disposeListener && this.setDisposeListener(this._disposeListener);
 
         this._activateMaterial();
+    };
+
+    skeleton._updateColor = function () {
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setColor(this.node.color);
+        }
     };
 
     skeleton.setAnimationStateData = function (stateData) {
@@ -393,11 +401,6 @@
 
         let node = this.node;
         if (!node) return;
-
-        if (this.__preColor__ === undefined || !node.color.equals(this.__preColor__)) {
-            nativeSkeleton.setColor(node.color);
-            this.__preColor__ = node.color;
-        }
         
         if (!this.isAnimationCached() && (this.debugBones || this.debugSlots || this.debugMesh) && this._debugRenderer) {
             

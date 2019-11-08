@@ -465,6 +465,8 @@
         this._nativeDisplay.bindNodeProxy(this.node._proxy);
         this._nativeDisplay.setOpacityModifyRGB(this.premultipliedAlpha);
         this._nativeDisplay.setBatchEnabled(this.enableBatch);
+        this._nativeDisplay.setColor(this.node.color);
+        
         this._nativeDisplay.setDBEventCallback(function(eventObject) {
             this._eventTarget.emit(eventObject.type, eventObject);
         });
@@ -473,6 +475,12 @@
         
         if (this.animationName) {
             this.playAnimation(this.animationName, this.playTimes);
+        }
+    };
+
+    armatureDisplayProto._updateColor = function () {
+        if (this._nativeDisplay) {
+            this._nativeDisplay.setColor(this.node.color);
         }
     };
 
@@ -591,11 +599,6 @@
 
         let node = this.node;
         if (!node) return;
-
-        if (this.__preColor__ === undefined || !node.color.equals(this.__preColor__)) {
-            nativeDisplay.setColor(node.color);
-            this.__preColor__ = node.color;
-        }
 
         if (!this.isAnimationCached() && this._debugDraw && this.debugBones) {
 
