@@ -7,10 +7,15 @@ proto.init = function (renderComp) {
     this.ignoreOpacityFlag();
 }
 
-let _genBuffer = proto.genBuffer;
 proto.genBuffer = function (graphics, cverts) {
-    let buffer = _genBuffer.call(this, graphics, cverts);
-    buffer.meshbuffer.setNativeAssembler(this);
+    let buffers = this.getBuffers(); 
+    let buffer = buffers[this._bufferOffset];
+    let meshbuffer = buffer.meshbuffer;
+
+    meshbuffer.requestStatic(cverts, cverts*3);
+    this._buffer = buffer;
+
+    meshbuffer.setNativeAssembler(this);
     return buffer;
 }
 
