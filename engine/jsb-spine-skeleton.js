@@ -65,13 +65,18 @@
     let skeletonCacheMgr = spine.SkeletonCacheMgr.getInstance();
     spine.skeletonCacheMgr = skeletonCacheMgr;
     skeletonDataProto.destroy = function () {
+        this.reset();
+        skeletonCacheMgr.removeSkeletonCache(this._uuid);
+        cc.Asset.prototype.destroy.call(this);
+    };
+
+    skeletonDataProto.reset = function () {
         if (this._skeletonCache) {
             spine.disposeSkeletonData(this._uuid);
             this._jsbTextures = null;
             this._skeletonCache = null;
         }
-        skeletonCacheMgr.removeSkeletonCache(this._uuid);
-        cc.Asset.prototype.destroy.call(this);
+        this._atlasCache = null;
     };
 
     skeletonDataProto.getRuntimeData = function () {
