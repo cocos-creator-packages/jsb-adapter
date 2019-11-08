@@ -33,6 +33,10 @@
     const InputMode = EditBox.InputMode;
     const InputFlag = EditBox.InputFlag;
 
+    let math = cc.vmath;
+    let worldMat = math.mat4.create(),
+        cameraMat = math.mat4.create();
+
     function getInputType (type) {
         switch (type) {
             case InputMode.EMAIL_ADDR:
@@ -165,10 +169,6 @@
             let node = this._delegate.node,
                 viewScaleX = cc.view._scaleX, viewScaleY = cc.view._scaleY;
             let dpr = cc.view._devicePixelRatio;
-
-            let math = cc.vmath;
-            let worldMat = math.mat4.create(),
-                cameraMat = math.mat4.create();
             node.getWorldMatrix(worldMat);
 
             let camera = cc.Camera.findCamera(node);
