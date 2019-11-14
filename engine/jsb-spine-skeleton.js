@@ -126,7 +126,14 @@
             jsbTextures[textureNames[i]] = spTex;
         }
         this._jsbTextures = jsbTextures;
-        this._skeletonCache = spine.initSkeletonData(uuid, this.skeletonJsonStr, atlasText, jsbTextures, this.scale);
+
+        let filePath = null;
+        if (this.skeletonJsonStr) {
+            filePath = this.skeletonJsonStr;
+        } else {
+            filePath = cc.loader.md5Pipe ? cc.loader.md5Pipe.transformURL(this.nativeUrl) : this.nativeUrl;
+        }
+        this._skeletonCache = spine.initSkeletonData(uuid, filePath, atlasText, jsbTextures, this.scale);
     };
 
     skeletonDataProto.recordTexture = function (texture) {
@@ -360,7 +367,6 @@
         let texValues = this.skeletonData.textures;
         material.setProperty('texture', texValues[0]);
         this.setMaterial(0, material);
-        this.markForUpdateRenderData(false);
         if (this.node && this.node._renderComponent == this) {
             this.markForRender(true);
         }

@@ -55,6 +55,7 @@ cc.js.mixin(proto, {
 }, renderer.MaskAssembler.prototype);
 
 let originCreateGraphics = cc.Mask.prototype._createGraphics;
+let originRemoveGraphics = cc.Mask.prototype._removeGraphics;
 cc.js.mixin(cc.Mask.prototype, {
     _createGraphics () {
         originCreateGraphics.call(this);
@@ -62,9 +63,28 @@ cc.js.mixin(cc.Mask.prototype, {
             this._assembler.setRenderSubHandle(this._graphics._assembler);
         }
 
-        if (this._clearGraphics) {
+        // TODO: remove clearGraphics
+        if (!this._clearGraphics) {
+            this._clearGraphics = new cc.Graphics();
+            cc.Assembler.init(this._clearGraphics);
+            this._clearGraphics.node = new cc.Node();
+            this._clearGraphics._activateMaterial();
+            this._clearGraphics.lineWidth = 0;
+            this._clearGraphics.rect(-1, -1, 2, 2);
+            this._clearGraphics.fill();
+
             this._clearGraphics._assembler.ignoreWorldMatrix();
             this._assembler.setClearSubHandle(this._clearGraphics._assembler);
+        }
+    },
+
+    _removeGraphics () {
+        originRemoveGraphics.call(this);
+
+        // TODO: remove clearGraphics
+        if (this._clearGraphics) {
+            this._clearGraphics.destroy();
+            this._clearGraphics = null;
         }
     }
 })

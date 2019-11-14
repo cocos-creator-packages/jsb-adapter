@@ -31,6 +31,12 @@ let FLAG_VERTICES_OPACITY_CHANGED = 1 << 0;
 let FLAG_VERTICES_DIRTY = 1 << 1;
 
 let Assembler = {
+    _ctor () {
+        this._dirtyPtr = new Uint32Array(1);
+        this.setDirty(this._dirtyPtr);
+        this.initVertexFormat();
+    },
+
     destroy () {
         this._renderComp = null;
         this._effect = null;
@@ -51,21 +57,14 @@ let Assembler = {
     },
 
     init (renderComp) {
-        this._extendNative();
-
         this._effect = [];
-        this._dirtyPtr = new Uint32Array(1);
-        this.setDirty(this._dirtyPtr);
 
         originInit.call(this, renderComp);
-
-        this.initVertexFormat();
 
         if (renderComp.node && renderComp.node._proxy) {
             renderComp.node._proxy.setAssembler(this);
         }
     },
-
 
     _updateRenderData () {
         if (!this._renderComp || !this._renderComp.isValid) return;

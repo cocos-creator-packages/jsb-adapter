@@ -184,11 +184,11 @@ downloader.register({
     '.jsc' : downloadScript,
 
     // Audio
-    'mp3' : downloadAudio,
-    'ogg' : downloadAudio,
-    'wav' : downloadAudio,
-    'mp4' : downloadAudio,
-    'm4a' : downloadAudio,
+    '.mp3' : downloadAudio,
+    '.ogg' : downloadAudio,
+    '.wav' : downloadAudio,
+    '.mp4' : downloadAudio,
+    '.m4a' : downloadAudio,
 
     // Images
     '.png' : downloadImage,
@@ -222,6 +222,7 @@ downloader.register({
     '.binary' : downloadArrayBuffer,
     '.bin' : downloadArrayBuffer,
     '.dbbin': downloadArrayBuffer,
+    '.skel': downloadArrayBuffer,
 
     // Font
     '.font' : downloadFont,

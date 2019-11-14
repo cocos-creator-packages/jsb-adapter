@@ -47,7 +47,7 @@
             let proxy = node._proxy;
             proxy && proxy.enableVisit();
         }
-    }
+    };
 
     // tiledmap buffer
     let TiledMapBuffer = cc.TiledMapBuffer.prototype;
@@ -65,6 +65,13 @@
         renderData.ia = {};
         renderData.nodesRenderList = [];
         this._dataList.push(renderData);
+    };
+
+    TiledMapRenderDataList.reset = function () {
+        this._offset = 0;
+        let assembler = this._nativeAssembler;
+        assembler._effect.length = 0;
+        assembler.reset();
     };
 
     TiledMapRenderDataList.setNativeAssembler = function (assembler) {
@@ -138,8 +145,20 @@
             renderer.TiledMapAssembler.prototype.ctor.call(this);
         },
 
+        // override _updateRenderData function avoid base class cover material
+        _updateRenderData () {
+            if (!this._renderComp || !this._renderComp.isValid) return;
+            this.updateRenderData(this._renderComp);
+        },
+
         updateRenderData (comp) {
             if (!comp._modelBatcherDelegate) {
+                let materials = this._renderComp.sharedMaterials;
+                for (let i = 0; i < materials.length; i++) {
+                    let m = materials[i];
+                    if (m) m.getHash();
+                }
+
                 comp._buffer = new cc.TiledMapBuffer(null, cc.gfx.VertexFormat.XY_UV_Color);
                 comp._renderDataList = new cc.TiledMapRenderDataList();
                 comp._modelBatcherDelegate = new ModelBatcherDelegate();
