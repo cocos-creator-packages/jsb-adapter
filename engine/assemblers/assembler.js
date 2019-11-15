@@ -94,6 +94,14 @@ let Assembler = {
 
     updateColor(comp, color) {
         this._dirtyPtr[0] |= FLAG_VERTICES_OPACITY_CHANGED;
+    },
+
+    updateIADatas (iaIndex, meshIndex) {
+        // When the MeshBuffer is switched, it is necessary to synchronize the iaData of the native assembler.
+        this.updateMeshIndex(iaIndex, meshIndex);
+        let materials = this._renderComp.sharedMaterials; 
+        let material = materials[iaIndex] || materials[0];
+        this.updateMaterial(iaIndex, material);
     }
 };
 
