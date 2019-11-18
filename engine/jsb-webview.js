@@ -202,7 +202,7 @@
     _p.evaluateJS = function (str) {
         let iframe = this._iframe;
         if (iframe) {
-            return iframe.evaluateJS();
+            return iframe.evaluateJS(str);
         }
     };
     /**
