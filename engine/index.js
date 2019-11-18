@@ -58,6 +58,7 @@ if (CC_NATIVERENDERER) {
         require('./assemblers/graphics-assembler.js');
         require('./assemblers/motion-streak.js');
         require('./assemblers/mesh-renderer.js');
+        require('./assemblers/particle-3d-assembler.js');
 
         require('./jsb-dragonbones.js');
         require('./jsb-spine-skeleton.js');
