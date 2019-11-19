@@ -311,7 +311,7 @@
         if (this.dragonBonesJson) {
             filePath = this.dragonBonesJson;
         } else {
-            filePath = cc.loader.md5Pipe ? cc.loader.md5Pipe.transformURL(this.nativeUrl) : this.nativeUrl;
+            filePath = this.nativeUrl;
         }
         this._factory.parseDragonBonesDataByPath(filePath, armatureKey);
         return armatureKey;
