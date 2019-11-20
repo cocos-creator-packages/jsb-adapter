@@ -601,7 +601,15 @@
     skeleton.setStartListener = function (listener) {
         this._startListener = listener;
         if (this._nativeSkeleton) {
-            this._nativeSkeleton.setStartListener(listener);
+            if (this.isAnimationCached()) {
+                this._nativeSkeleton.setStartListener(function (animationName) {
+                    let self = this._comp;
+                    self._startEntry.animation.name = animationName;
+                    self._startListener && self._startListener(self._startEntry);
+                });
+            } else {
+                this._nativeSkeleton.setStartListener(listener);
+            }
         }
     };
 
@@ -615,7 +623,15 @@
     skeleton.setEndListener = function (listener) {
         this._endListener = listener;
         if (this._nativeSkeleton) {
-            this._nativeSkeleton.setEndListener(listener);
+            if (this.isAnimationCached()) {
+                this._nativeSkeleton.setEndListener(function (animationName) {
+                    let self = this._comp;
+                    self._endEntry.animation.name = animationName;
+                    self._endListener && self._endListener(self._endEntry);
+                });
+            } else {
+                this._nativeSkeleton.setEndListener(listener);
+            }
         }
     };
 
@@ -629,7 +645,15 @@
     skeleton.setCompleteListener = function (listener) {
         this._completeListener = listener;
         if (this._nativeSkeleton) {
-            this._nativeSkeleton.setCompleteListener(listener);
+            if (this.isAnimationCached()) {
+                this._nativeSkeleton.setCompleteListener(function (animationName) {
+                    let self = this._comp;
+                    self._endEntry.animation.name = animationName;
+                    self._completeListener && self._completeListener(self._endEntry);
+                });
+            } else {
+                this._nativeSkeleton.setCompleteListener(listener);
+            }
         }
     };
 
