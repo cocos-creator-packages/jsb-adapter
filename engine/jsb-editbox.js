@@ -33,9 +33,8 @@
     const InputMode = EditBox.InputMode;
     const InputFlag = EditBox.InputFlag;
 
-    let math = cc.vmath;
-    let worldMat = math.mat4.create(),
-        cameraMat = math.mat4.create();
+    let worldMat = new cc.Mat4(),
+        cameraMat = new cc.Mat4();
 
     function getInputType (type) {
         switch (type) {
@@ -173,7 +172,7 @@
 
             let camera = cc.Camera.findCamera(node);
             camera.getWorldToScreenMatrix2D(cameraMat);
-            math.mat4.mul(cameraMat, cameraMat, worldMat);
+            cc.Mat4.multiply(cameraMat, cameraMat, worldMat);
 
             let contentSize = node._contentSize;
             let vec3 = cc.v3();
@@ -181,7 +180,7 @@
             vec3.y = -node._anchorPoint.y * contentSize.height;
 
 
-            math.mat4.translate(cameraMat, cameraMat, vec3);
+            cc.Mat4.translate(cameraMat, cameraMat, vec3);
 
             viewScaleX /= dpr;
             viewScaleY /= dpr;

@@ -29,9 +29,8 @@
         return;
     }
 
-    var math = cc.vmath;
-    var _worldMat = math.mat4.create();
-    var _cameraMat = math.mat4.create();
+    var _worldMat = new cc.Mat4();
+    var _cameraMat = new cc.Mat4();
 
     cc.WebView.Impl = cc.Class({
         extends: cc.WebView.Impl,
@@ -267,7 +266,7 @@
 
         let camera = cc.Camera.findCamera(node);
         camera.getWorldToScreenMatrix2D(_cameraMat);
-        math.mat4.mul(_cameraMat, _cameraMat, _worldMat);
+        cc.Mat4.multiply(_cameraMat, _cameraMat, _worldMat);
 
         let viewScaleX = cc.view._scaleX,
             viewScaleY = cc.view._scaleY;
