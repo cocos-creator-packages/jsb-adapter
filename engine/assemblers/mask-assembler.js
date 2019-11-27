@@ -52,7 +52,7 @@ cc.js.mixin(proto, {
 
         mask.node._renderFlag |= cc.RenderFlow.FLAG_UPDATE_RENDER_DATA;
     }
-}, renderer.MaskAssembler.prototype);
+}, renderer.MaskAssembler.prototype, {constructor: cc.Mask.__assembler__});
 
 let originCreateGraphics = cc.Mask.prototype._createGraphics;
 let originRemoveGraphics = cc.Mask.prototype._removeGraphics;
