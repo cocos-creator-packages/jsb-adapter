@@ -78,7 +78,7 @@
   },
   {
     "name": "MotionStreak",
-    "entries": [],
+    "entries": ["./engine/assemblers/motion-streak.js"],
     "dependencies": ["WebGL Renderer"]
   },
   {
