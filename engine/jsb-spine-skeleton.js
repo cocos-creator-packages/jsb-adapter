@@ -343,6 +343,8 @@
         nativeSkeleton.setTimeScale(this.timeScale);
         nativeSkeleton.setBatchEnabled(this.enableBatch);
         nativeSkeleton.bindNodeProxy(this.node._proxy);
+        nativeSkeleton.setColor(this.node.color);
+
         this._skeleton = nativeSkeleton.getSkeleton();
 
         // init skeleton listener
@@ -354,6 +356,12 @@
         this._disposeListener && this.setDisposeListener(this._disposeListener);
 
         this._activateMaterial();
+    };
+
+    skeleton._updateColor = function () {
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setColor(this.node.color);
+        }
     };
 
     skeleton.setAnimationStateData = function (stateData) {
@@ -399,11 +407,6 @@
 
         let node = this.node;
         if (!node) return;
-
-        if (this.__preColor__ === undefined || !node.color.equals(this.__preColor__)) {
-            nativeSkeleton.setColor(node.color);
-            this.__preColor__ = node.color;
-        }
         
         if (!this.isAnimationCached() && (this.debugBones || this.debugSlots || this.debugMesh) && this._debugRenderer) {
             
@@ -604,7 +607,15 @@
     skeleton.setStartListener = function (listener) {
         this._startListener = listener;
         if (this._nativeSkeleton) {
-            this._nativeSkeleton.setStartListener(listener);
+            if (this.isAnimationCached()) {
+                this._nativeSkeleton.setStartListener(function (animationName) {
+                    let self = this._comp;
+                    self._startEntry.animation.name = animationName;
+                    self._startListener && self._startListener(self._startEntry);
+                });
+            } else {
+                this._nativeSkeleton.setStartListener(listener);
+            }
         }
     };
 
@@ -618,7 +629,15 @@
     skeleton.setEndListener = function (listener) {
         this._endListener = listener;
         if (this._nativeSkeleton) {
-            this._nativeSkeleton.setEndListener(listener);
+            if (this.isAnimationCached()) {
+                this._nativeSkeleton.setEndListener(function (animationName) {
+                    let self = this._comp;
+                    self._endEntry.animation.name = animationName;
+                    self._endListener && self._endListener(self._endEntry);
+                });
+            } else {
+                this._nativeSkeleton.setEndListener(listener);
+            }
         }
     };
 
@@ -632,7 +651,15 @@
     skeleton.setCompleteListener = function (listener) {
         this._completeListener = listener;
         if (this._nativeSkeleton) {
-            this._nativeSkeleton.setCompleteListener(listener);
+            if (this.isAnimationCached()) {
+                this._nativeSkeleton.setCompleteListener(function (animationName) {
+                    let self = this._comp;
+                    self._endEntry.animation.name = animationName;
+                    self._completeListener && self._completeListener(self._endEntry);
+                });
+            } else {
+                this._nativeSkeleton.setCompleteListener(listener);
+            }
         }
     };
 
