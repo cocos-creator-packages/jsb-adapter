@@ -124,8 +124,8 @@
     _p.removeDom = function () {
         let video = this._video;
         if (video) {
-            this._video.stop()
-            this._video.setVisible(false)
+            video.stop()
+            video.setVisible(false)
 
             let cbs = this.__eventListeners;
 
@@ -135,6 +135,8 @@
             cbs.pause = null;
             cbs.click = null;
             cbs.onCanPlay = null;
+
+            video.destroy();
         }
 
         this._video = null;
