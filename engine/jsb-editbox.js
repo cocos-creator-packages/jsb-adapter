@@ -72,12 +72,12 @@
         return 'done';
     }
 
+    const BaseClass = EditBox._ImplClass;
     function JsbEditBoxImpl () {
-        this._delegate = null;
-        this._editing = false;
+        BaseClass.call(this);
     }
 
-    js.extend(JsbEditBoxImpl, EditBox._ImplClass);
+    js.extend(JsbEditBoxImpl, BaseClass);
     EditBox._ImplClass = JsbEditBoxImpl;
 
     Object.assign(JsbEditBoxImpl.prototype, {
@@ -87,19 +87,6 @@
                 return;
             }
             this._delegate = delegate;
-        },
-
-        setFocus (value) {
-            if (value) {
-                this.beginEditing();
-            }
-            else {
-                this.endEditing();
-            }
-        },
-
-        isFocused () {
-            return this._editing;
         },
 
         beginEditing () {
