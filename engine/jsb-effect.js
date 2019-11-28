@@ -1,28 +1,46 @@
 // Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
+
 const gfx = window.gfx;
 
+// Effect
 let Effect = cc.Effect;
+let _init = Effect.prototype.init;
+let _clone = Effect.prototype.clone;
 
-class NativeEffect extends Effect {
-    constructor(name, techniques, properties = {}, defines = {}, dependencies = [], asset = null) {
-        super(name, techniques, properties, defines, dependencies);
+Object.assign(Effect.prototype, {
+    init (name, techniques, asset = null) {
+        _init.call(this, name, techniques);
 
         if (asset) {
-            var definesArr = [];
-            for (var key in defines) {
-                definesArr.push({name:key, value:defines[key]});
-            }
-        
             this._nativeObj = new renderer.EffectNative();
-            this._nativeObj.init(JSON.stringify(asset), properties, definesArr);
+            this._nativeObj.init(techniques);
             this._nativePtr = this._nativeObj.self();
         }
-    }
+    },
 
-    setCullMode (cullMode = gfx.CULL_BACK) {
-        super.setCullMode(cullMode);
-        this._nativeObj.setCullMode(cullMode);
+    clone () {
+        let effect = _clone.call(this);
+        effect._nativeObj = new renderer.EffectNative();
+        effect._nativeObj.copy(this._nativeObj);
+        effect._nativePtr = effect._nativeObj.self();
+        return effect;
     }
+});
+
+// EffectBase
+let EffectBase = cc.EffectBase;
+let _setCullMode = EffectBase.prototype.setCullMode;
+let _setBlend = EffectBase.prototype.setBlend;
+let _setStencilEnabled = EffectBase.prototype.setStencilEnabled;
+let _setStencil = EffectBase.prototype.setStencil;
+let _define = EffectBase.prototype.define;
+let _setProperty = EffectBase.prototype.setProperty;
+
+Object.assign(EffectBase.prototype, {
+    setCullMode (cullMode = gfx.CULL_BACK, passIdx) {
+        _setCullMode.call(this, cullMode, passIdx);
+        this._nativeObj.setCullMode(cullMode);
+    },
 
     setBlend (enabled = false,
         blendEq = gfx.BLEND_FUNC_ADD,
@@ -31,15 +49,16 @@ class NativeEffect extends Effect {
         blendAlphaEq = gfx.BLEND_FUNC_ADD,
         blendSrcAlpha = gfx.BLEND_SRC_ALPHA,
         blendDstAlpha = gfx.BLEND_ONE_MINUS_SRC_ALPHA,
-        blendColor = 0xffffffff) {
-        super.setBlend(enabled, blendEq, blendSrc, blendDst, blendAlphaEq, blendSrcAlpha, blendDstAlpha, blendColor);
+        blendColor = 0xffffffff, 
+        passIdx) {
+        _setBlend.call(this, enabled, blendEq, blendSrc, blendDst, blendAlphaEq, blendSrcAlpha, blendDstAlpha, blendColor, passIdx);
         this._nativeObj.setBlend(blendEq, blendSrc, blendDst, blendAlphaEq, blendSrcAlpha, blendDstAlpha, blendColor);
-    };
+    },
 
-    setStencilEnabled (enabled) {
-        super.setStencilEnabled(enabled);
+    setStencilEnabled (enabled, passIdx) {
+        _setStencilEnabled.call(this, enabled, passIdx);
         this._nativeObj.setStencilTest(enabled);
-    }
+    },
 
     setStencil (enabled = gfx.STENCIL_INHERIT,
         stencilFunc = gfx.DS_FUNC_ALWAYS,
@@ -48,43 +67,27 @@ class NativeEffect extends Effect {
         stencilFailOp = gfx.STENCIL_OP_KEEP,
         stencilZFailOp = gfx.STENCIL_OP_KEEP,
         stencilZPassOp = gfx.STENCIL_OP_KEEP,
-        stencilWriteMask = 0xff) {
-        super.setStencil(enabled, stencilFunc, stencilRef, stencilMask, stencilFailOp, stencilZFailOp, stencilZPassOp, stencilWriteMask);
+        stencilWriteMask = 0xff, 
+        passIdx) {
+        _setStencil.call(this, enabled, stencilFunc, stencilRef, stencilMask, stencilFailOp, stencilZFailOp, stencilZPassOp, stencilWriteMask, passIdx);
         this._nativeObj.setStencil(stencilFunc, stencilRef, stencilMask, stencilFailOp, stencilZFailOp, stencilZPassOp, stencilWriteMask);
-    }
+    },
 
-    define(name, value) {
-        super.define(name, value);
+    define (name, value, passIdx, force) {
+        _define.call(this, name, value, passIdx, force);
         this._nativeObj.define(name, value);
-    }
+    },
 
-    updateHash(hash) {
+    updateHash (hash) {
         this._nativeObj.updateHash(hash);
-    }
-    
-    getTechnique(stage) {
-    }
+    },
 
-    setProperty (name, val) {
-        super.setProperty(name, val);
+    setProperty (name, val, passIdx) {
+        _setProperty.call(this, name, val, passIdx);
 
-        let prop = this._properties[name];
-        if (prop) {
-            this._nativeObj.setProperty(name, prop.value);
+        let prop = this.getProperty(name);
+        if (prop !== undefined) {
+            this._nativeObj.setProperty(name, prop);
         }
     }
-
-    clone () {
-        let effect = super.clone();
-        effect._nativeObj = new renderer.EffectNative();
-        effect._nativeObj.copy(this._nativeObj);
-        effect._nativePtr = effect._nativeObj.self();
-        return effect;
-    }
-}
-
-// Effect.parseTechniques = function () {
-//     return [];
-// }
-
-cc.Effect = NativeEffect;
+})
