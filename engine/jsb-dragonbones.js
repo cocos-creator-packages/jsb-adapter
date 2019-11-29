@@ -426,6 +426,9 @@
             this._nativeDisplay = null;
         }
 
+        // reset attached node proxy
+        this._attachedNodeProxy = null;
+
         let atlasUUID = this.dragonAtlasAsset._uuid;
         this._armatureKey = this.dragonAsset.init(this._factory, atlasUUID);
 
@@ -472,10 +475,50 @@
         });
 
         this._activateMaterial();
-        
+        this._associateAttachedNode();
+
         if (this.animationName) {
             this.playAnimation(this.animationName, this.playTimes);
         }
+    };
+
+    let _prepareAttachedNode = armatureDisplayProto._prepareAttachedNode;
+    armatureDisplayProto._prepareAttachedNode = function () {
+        _prepareAttachedNode.call(this);
+        // native platform no need to store attach root node in js.
+        this._attachedRootNode = null;
+    };
+
+    armatureDisplayProto._buildSlotAttachedNode = function (slot) {
+        let slotNodeName = 'ATTACHED_NODE:' + slot.name;
+        let slotNode = new cc.Node(slotNodeName);
+        return slotNode;
+    };
+
+    let _generateAllAttachedNode = armatureDisplayProto.generateAllAttachedNode;
+    armatureDisplayProto.generateAllAttachedNode = function () {
+        _generateAllAttachedNode.call(this);
+        this._associateAttachedNode();
+    };
+
+    let _generateAttachedNode = armatureDisplayProto.generateAttachedNode;
+    armatureDisplayProto.generateAttachedNode = function () {
+        _generateAttachedNode.call(this, ...arguments);
+        this._associateAttachedNode();
+    };
+
+    armatureDisplayProto._associateAttachedNode = function () {
+        let rootNode = this.node.getChildByName('ATTACHED_NODE:ROOT');
+        if (!rootNode || !rootNode.isValid) return;
+        if (!this._attachedNodeProxy) {
+            if (this.isAnimationCached()) {
+                this._attachedNodeProxy = new dragonBones.CacheModeAttachedNode();
+            } else {
+                this._attachedNodeProxy = new dragonBones.RealTimeAttachedNode();
+            }
+            this._nativeDisplay.setAttachedNode(this._attachedNodeProxy);
+        }
+        this._attachedNodeProxy.associateAttachedNode(this._armature, this.node._proxy);
     };
 
     armatureDisplayProto._updateColor = function () {
