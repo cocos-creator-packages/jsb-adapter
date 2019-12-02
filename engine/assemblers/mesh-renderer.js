@@ -44,7 +44,6 @@
                     this._renderDataList.updateMesh(i, data.vData, data.iData);
                 }
             }
-            this.setCustomProperties(comp._customProperties._nativeObj);
             this.setVertexFormat(subdatas[0].vfm._nativeObj);
         }
     }, renderer.MeshAssembler.prototype);
