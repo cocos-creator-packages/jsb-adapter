@@ -482,19 +482,6 @@
         }
     };
 
-    let _prepareAttachedNode = armatureDisplayProto._prepareAttachedNode;
-    armatureDisplayProto._prepareAttachedNode = function () {
-        _prepareAttachedNode.call(this);
-        // native platform no need to store attach root node in js.
-        this._attachedRootNode = null;
-    };
-
-    armatureDisplayProto._buildSlotAttachedNode = function (slot) {
-        let slotNodeName = 'ATTACHED_NODE:' + slot.name;
-        let slotNode = new cc.Node(slotNodeName);
-        return slotNode;
-    };
-
     let _generateAllAttachedNode = armatureDisplayProto.generateAllAttachedNode;
     armatureDisplayProto.generateAllAttachedNode = function () {
         _generateAllAttachedNode.call(this);
