@@ -9,7 +9,7 @@
         init (effect) {
             _init.call(this, effect);
 
-            this._nativeObj = new renderer.CustomProperties(effect._nativeObj);
+            this._nativeObj = new renderer.EffectVariant(effect._nativeObj);
         },
 
         _onEffectChanged () {
