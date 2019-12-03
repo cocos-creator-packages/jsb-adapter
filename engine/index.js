@@ -23,46 +23,13 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-require('./jsb-sys.js');
-require('./jsb-game.js');
-require('./jsb-videoplayer.js');
-require('./jsb-webview.js');
-require('./jsb-audio.js');
-require('./jsb-loader.js');
-require('./jsb-editbox.js');
 require('./jsb-reflection.js');
 require('./jsb-assets-manager.js');
 
-if (CC_NATIVERENDERER) {
-    require('./jsb-effect.js');
-    require('./jsb-custom-properties.js');
-    require('./scene/camera.js');
-    require('./scene/light.js');
-    require('./scene/node-proxy.js');
-    require('./scene/render-flow.js');
-    // must be required after render flow
-    require('./scene/node.js');
-
-    cc.game.on(cc.game.EVENT_ENGINE_INITED, function () {
-        require('./scene/mesh-buffer.js');
-        require('./scene/quad-buffer.js');
-        require('./scene/render-data.js');
-
-        require('./assemblers/assembler.js');
-        require('./assemblers/assembler-2d.js');
-        require('./assemblers/assembler-3d.js');
-
-        require('./assemblers/sprite/index.js');
-        require('./assemblers/label/index.js');
-        require('./assemblers/mask-assembler.js');
-        require('./assemblers/graphics-assembler.js');
-        require('./assemblers/motion-streak.js');
-        require('./assemblers/mesh-renderer.js');
-
-        require('./jsb-dragonbones.js');
-        require('./jsb-spine-skeleton.js');
-        require('./jsb-particle.js');
-        require('./jsb-tiledmap.js');
-        require('./jsb-skin-mesh.js');
-    });
-}
+require('./jsb-sys.js');
+require('./jsb-game.js');
+require('./jsb-loader.js');
+// require('./jsb-videoplayer.js');
+// require('./jsb-webview.js');
+// require('./jsb-audio.js');
+// require('./jsb-editbox.js');
