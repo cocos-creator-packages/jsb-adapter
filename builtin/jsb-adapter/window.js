@@ -35,6 +35,13 @@ function inject () {
     window.KeyboardEvent = require('./KeyboardEvent');
     window.DeviceMotionEvent = require('./DeviceMotionEvent');
 
+    // ES6
+    var m_fetch = require('./fetch');
+    window.fetch = m_fetch.fetch;
+    window.Headers = m_fetch.Headers;
+    window.Request = m_fetch.Request;
+    window.Response = m_fetch.Response;
+
     const ROTATION_0 = 0;
     const ROTATION_90 = 1;
     const ROTATION_180 = 2;
