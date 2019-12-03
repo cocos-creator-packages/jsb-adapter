@@ -16,11 +16,6 @@ require('./jsb_opengl');
 require('./jsb-adapter');
 require('./jsb_audioengine');
 require('./jsb_input');
-// external interface of native renderer
-require('./renderer/enums');
-require('./renderer/jsb-vertex-format');
-require('./renderer/jsb-gfx');
-require('./renderer/jsb-renderer');
 
 let _oldRequestFrameCallback = null;
 let _requestAnimationFrameID = 0;
