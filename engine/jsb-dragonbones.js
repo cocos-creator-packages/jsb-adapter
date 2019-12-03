@@ -327,6 +327,45 @@
     };
 
     ////////////////////////////////////////////////////////////
+    // adapt attach util
+    ////////////////////////////////////////////////////////////
+
+    let attachUtilProto = dragonBones.AttachUtil.prototype;
+
+    let _attachUtilInit = attachUtilProto.init;
+    attachUtilProto.init = function (armatureDisplay) {
+        _attachUtilInit.call(this, armatureDisplay);
+        this._nativeDisplay = armatureDisplay._nativeDisplay;
+        this._attachUtilNative = null;
+    };
+
+    let _generateAllAttachedNode = attachUtilProto.generateAllAttachedNode;
+    attachUtilProto.generateAllAttachedNode = function () {
+        _generateAllAttachedNode.call(this);
+        this._associateAttachedNode();
+    };
+
+    let _generateAttachedNode = attachUtilProto.generateAttachedNode;
+    attachUtilProto.generateAttachedNode = function (boneName) {
+        _generateAttachedNode.call(this, boneName);
+        this._associateAttachedNode();
+    };
+
+    attachUtilProto._associateAttachedNode = function () {
+        let rootNode = this._armatureNode.getChildByName('ATTACHED_NODE_TREE');
+        if (!rootNode || !rootNode.isValid) return;
+        if (!this._attachUtilNative) {
+            if (this._armatureDisplay.isAnimationCached()) {
+                this._attachUtilNative = new dragonBones.CacheModeAttachUtil();
+            } else {
+                this._attachUtilNative = new dragonBones.RealTimeAttachUtil();
+            }
+            this._nativeDisplay.setAttachUtil(this._attachUtilNative);
+        }
+        this._attachUtilNative.associateAttachedNode(this._armature, this._armatureNode._proxy);
+    };
+
+    ////////////////////////////////////////////////////////////
     // override ArmatureDisplay
     ////////////////////////////////////////////////////////////
     dragonBones.ArmatureDisplay._assembler = null;
@@ -426,9 +465,6 @@
             this._nativeDisplay = null;
         }
 
-        // reset attached node proxy
-        this._attachedNodeProxy = null;
-
         let atlasUUID = this.dragonAtlasAsset._uuid;
         this._armatureKey = this.dragonAsset.init(this._factory, atlasUUID);
 
@@ -461,6 +497,7 @@
             }
         }
 
+        this._preCacheMode = this._cacheMode;
         this._nativeDisplay._ccNode = this.node;
         this._nativeDisplay._comp = this;
         this._nativeDisplay._eventTarget = this._eventTarget;
@@ -475,37 +512,12 @@
         });
 
         this._activateMaterial();
-        this._associateAttachedNode();
+        this.attachUtil.init(this);
+        this.attachUtil._associateAttachedNode();
 
         if (this.animationName) {
             this.playAnimation(this.animationName, this.playTimes);
         }
-    };
-
-    let _generateAllAttachedNode = armatureDisplayProto.generateAllAttachedNode;
-    armatureDisplayProto.generateAllAttachedNode = function () {
-        _generateAllAttachedNode.call(this);
-        this._associateAttachedNode();
-    };
-
-    let _generateAttachedNode = armatureDisplayProto.generateAttachedNode;
-    armatureDisplayProto.generateAttachedNode = function () {
-        _generateAttachedNode.call(this, ...arguments);
-        this._associateAttachedNode();
-    };
-
-    armatureDisplayProto._associateAttachedNode = function () {
-        let rootNode = this.node.getChildByName('ATTACHED_NODE:ROOT');
-        if (!rootNode || !rootNode.isValid) return;
-        if (!this._attachedNodeProxy) {
-            if (this.isAnimationCached()) {
-                this._attachedNodeProxy = new dragonBones.CacheModeAttachedNode();
-            } else {
-                this._attachedNodeProxy = new dragonBones.RealTimeAttachedNode();
-            }
-            this._nativeDisplay.setAttachedNode(this._attachedNodeProxy);
-        }
-        this._attachedNodeProxy.associateAttachedNode(this._armature, this.node._proxy);
     };
 
     armatureDisplayProto._updateColor = function () {
