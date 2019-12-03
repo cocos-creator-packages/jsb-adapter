@@ -93,9 +93,12 @@ class Document extends Node {
       return [document.body]
     } else if (query === 'canvas') {
       return [window.__canvas]
+    } else if (query.startsWith('script[type="systemjs-importmap"]')) {
+      return HTMLScriptElement._getAllScriptElementsSystemJSImportType();
     }
     return [new HTMLElement(query)];
   }
+
 
   createTextNode() {
       return new HTMLElement('text');
