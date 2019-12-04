@@ -351,9 +351,17 @@
         this._associateAttachedNode();
     };
 
+    let _associateAttachedNode = attachUtilProto._associateAttachedNode;
     attachUtilProto._associateAttachedNode = function () {
+        if (!this._inited) return;
+
         let rootNode = this._armatureNode.getChildByName('ATTACHED_NODE_TREE');
         if (!rootNode || !rootNode.isValid) return;
+
+        // associate js
+        _associateAttachedNode.call(this);
+
+        // associate native
         if (!this._attachUtilNative) {
             if (this._armatureDisplay.isAnimationCached()) {
                 this._attachUtilNative = new dragonBones.CacheModeAttachUtil();
@@ -481,6 +489,7 @@
             this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
             this._armature = this._nativeDisplay.armature();
             this._armature.animation.timeScale = this.timeScale;
+            this._factory.add(this._armature);
         }
 
         // add all event into native display

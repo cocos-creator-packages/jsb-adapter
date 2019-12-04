@@ -720,6 +720,11 @@
         if (this.skeletonData) {
             this.skeletonData.init();
             this.setSkeletonData(this.skeletonData);
+
+            this.attachUtil.init(this);
+            this.attachUtil._associateAttachedNode();
+            this._preCacheMode = this._cacheMode;
+
             this.defaultSkin && this._nativeSkeleton.setSkin(this.defaultSkin);
             this.animation = this.defaultAnimation;
         } else {
@@ -743,4 +748,51 @@
         this._materialCache = null;
     };
 
+
+    ////////////////////////////////////////////////////////////
+    // adapt attach util
+    ////////////////////////////////////////////////////////////
+
+    let attachUtilProto = sp.AttachUtil.prototype;
+
+    let _attachUtilInit = attachUtilProto.init;
+    attachUtilProto.init = function (skeletonComp) {
+        _attachUtilInit.call(this, skeletonComp);
+        this._nativeSkeleton = skeletonComp._nativeSkeleton;
+        this._attachUtilNative = null;
+    };
+
+    let _generateAllAttachedNode = attachUtilProto.generateAllAttachedNode;
+    attachUtilProto.generateAllAttachedNode = function () {
+        _generateAllAttachedNode.call(this);
+        this._associateAttachedNode();
+    };
+
+    let _generateAttachedNode = attachUtilProto.generateAttachedNode;
+    attachUtilProto.generateAttachedNode = function (boneName) {
+        _generateAttachedNode.call(this, boneName);
+        this._associateAttachedNode();
+    };
+
+    let _associateAttachedNode = attachUtilProto._associateAttachedNode;
+    attachUtilProto._associateAttachedNode = function () {
+        if (!this._inited) return;
+        
+        let rootNode = this._skeletonNode.getChildByName('ATTACHED_NODE_TREE');
+        if (!rootNode || !rootNode.isValid) return;
+
+        // associate js
+        _associateAttachedNode.call(this);
+
+        // associate native
+        if (!this._attachUtilNative) {
+            if (this._skeletonComp.isAnimationCached()) {
+                this._attachUtilNative = new spine.CacheModeAttachUtil();
+            } else {
+                this._attachUtilNative = new spine.RealTimeAttachUtil();
+            }
+            this._nativeSkeleton.setAttachUtil(this._attachUtilNative);
+        }
+        this._attachUtilNative.associateAttachedNode(this._skeleton, this._skeletonNode._proxy);
+    };
 })();
