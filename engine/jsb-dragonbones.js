@@ -1,3 +1,5 @@
+import { RSA_NO_PADDING } from "constants";
+
 /****************************************************************************
  Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
 
@@ -339,16 +341,18 @@
         this._attachUtilNative = null;
     };
 
-    let _generateAllAttachedNode = attachUtilProto.generateAllAttachedNode;
-    attachUtilProto.generateAllAttachedNode = function () {
-        _generateAllAttachedNode.call(this);
+    let _generateAllAttachedNodes = attachUtilProto.generateAllAttachedNodes;
+    attachUtilProto.generateAllAttachedNodes = function () {
+        let res = _generateAllAttachedNodes.call(this);
         this._associateAttachedNode();
+        return res;
     };
 
-    let _generateAttachedNode = attachUtilProto.generateAttachedNode;
-    attachUtilProto.generateAttachedNode = function (boneName) {
-        _generateAttachedNode.call(this, boneName);
+    let _generateAttachedNodes = attachUtilProto.generateAttachedNodes;
+    attachUtilProto.generateAttachedNodes = function (boneName) {
+        let res = _generateAttachedNodes.call(this, boneName);
         this._associateAttachedNode();
+        return res;
     };
 
     let _associateAttachedNode = attachUtilProto._associateAttachedNode;
