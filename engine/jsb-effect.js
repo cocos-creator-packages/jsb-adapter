@@ -8,10 +8,10 @@ let _init = Effect.prototype.init;
 let _clone = Effect.prototype.clone;
 
 Object.assign(Effect.prototype, {
-    init (name, techniques, asset = null) {
-        _init.call(this, name, techniques);
+    init (name, techniques, techniqueIndex, asset, createNative) {
+        _init.call(this, name, techniques, techniqueIndex, asset);
 
-        if (asset) {
+        if (createNative) {
             this._nativeObj = new renderer.EffectNative();
             this._nativeObj.init(techniques);
             this._nativePtr = this._nativeObj.self();
