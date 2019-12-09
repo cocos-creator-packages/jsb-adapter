@@ -33,13 +33,14 @@ let _setCullMode = EffectBase.prototype.setCullMode;
 let _setBlend = EffectBase.prototype.setBlend;
 let _setStencilEnabled = EffectBase.prototype.setStencilEnabled;
 let _setStencil = EffectBase.prototype.setStencil;
+let _setDepth = EffectBase.prototype.setDepth;
 let _define = EffectBase.prototype.define;
 let _setProperty = EffectBase.prototype.setProperty;
 
 Object.assign(EffectBase.prototype, {
     setCullMode (cullMode = gfx.CULL_BACK, passIdx) {
         _setCullMode.call(this, cullMode, passIdx);
-        this._nativeObj.setCullMode(cullMode);
+        this._nativeObj.setCullMode(cullMode, passIdx === undefined ? -1 : passIdx);
     },
 
     setBlend (enabled = false,
@@ -49,15 +50,20 @@ Object.assign(EffectBase.prototype, {
         blendAlphaEq = gfx.BLEND_FUNC_ADD,
         blendSrcAlpha = gfx.BLEND_SRC_ALPHA,
         blendDstAlpha = gfx.BLEND_ONE_MINUS_SRC_ALPHA,
-        blendColor = 0xffffffff, 
+        blendColor = 0xffffffff,
         passIdx) {
         _setBlend.call(this, enabled, blendEq, blendSrc, blendDst, blendAlphaEq, blendSrcAlpha, blendDstAlpha, blendColor, passIdx);
-        this._nativeObj.setBlend(blendEq, blendSrc, blendDst, blendAlphaEq, blendSrcAlpha, blendDstAlpha, blendColor);
+        this._nativeObj.setBlend(enabled, blendEq, blendSrc, blendDst, blendAlphaEq, blendSrcAlpha, blendDstAlpha, blendColor, passIdx === undefined ? -1 : passIdx);
+    },
+
+    setDepth (depthTest, depthWrite, depthFunc, passIdx) {
+        _setDepth.call(this, depthTest, depthWrite, depthFunc, passIdx);
+        this._nativeObj.setDepth(depthTest, depthWrite, depthFunc, passIdx === undefined ? -1 : passIdx);
     },
 
     setStencilEnabled (enabled, passIdx) {
         _setStencilEnabled.call(this, enabled, passIdx);
-        this._nativeObj.setStencilTest(enabled);
+        this._nativeObj.setStencilTest(enabled, passIdx === undefined ? -1 : passIdx);
     },
 
     setStencil (enabled = gfx.STENCIL_INHERIT,
@@ -67,15 +73,15 @@ Object.assign(EffectBase.prototype, {
         stencilFailOp = gfx.STENCIL_OP_KEEP,
         stencilZFailOp = gfx.STENCIL_OP_KEEP,
         stencilZPassOp = gfx.STENCIL_OP_KEEP,
-        stencilWriteMask = 0xff, 
+        stencilWriteMask = 0xff,
         passIdx) {
         _setStencil.call(this, enabled, stencilFunc, stencilRef, stencilMask, stencilFailOp, stencilZFailOp, stencilZPassOp, stencilWriteMask, passIdx);
-        this._nativeObj.setStencil(stencilFunc, stencilRef, stencilMask, stencilFailOp, stencilZFailOp, stencilZPassOp, stencilWriteMask);
+        this._nativeObj.setStencil(stencilFunc, stencilRef, stencilMask, stencilFailOp, stencilZFailOp, stencilZPassOp, stencilWriteMask, passIdx === undefined ? -1 : passIdx);
     },
 
     define (name, value, passIdx, force) {
         _define.call(this, name, value, passIdx, force);
-        this._nativeObj.define(name, value);
+        this._nativeObj.define(name, value, passIdx === undefined ? -1 : passIdx);
     },
 
     updateHash (hash) {
@@ -87,7 +93,7 @@ Object.assign(EffectBase.prototype, {
 
         let prop = this.getProperty(name);
         if (prop !== undefined) {
-            this._nativeObj.setProperty(name, prop);
+            this._nativeObj.setProperty(name, prop, passIdx === undefined ? -1 : passIdx);
         }
     }
 })
