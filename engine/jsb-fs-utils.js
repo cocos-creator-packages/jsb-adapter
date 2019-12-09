@@ -80,7 +80,7 @@ var fsUtils = {
         downloading.add(remoteUrl, { onProgress, onComplete });
         var storagePath = filePath;
         if (!storagePath) storagePath = tempDir + '/' + performance.now() + cc.path.extname(remoteUrl);
-        jsb_downloader.createDownloadFileTask(remoteUrl, storagePath, options.header);
+        jsb_downloader.createDownloadFileTask(remoteUrl, storagePath, header);
     },
 
     saveFile (srcPath, destPath, onComplete) {
