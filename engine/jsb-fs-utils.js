@@ -109,7 +109,7 @@ var fsUtils = {
     writeFile (path, data, encoding, onComplete) {
         var err = null;
         try {
-            if (encoding === 'utf-8') {
+            if (encoding === 'utf-8' || encoding === 'utf8') {
                 fs.writeStringToFile(data, path);
             }
             else {
@@ -124,7 +124,7 @@ var fsUtils = {
 
     writeFileSync (path, data, encoding) {
         try {
-            if (encoding === 'utf-8') {
+            if (encoding === 'utf-8' || encoding === 'utf8') {
                 fs.writeStringToFile(data, path);
             }
             else {
