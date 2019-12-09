@@ -140,7 +140,7 @@ var fsUtils = {
     readFile (filePath, encoding, onComplete) {
         var content = null, err = null;
         try {
-            if (encoding === 'utf-8') {
+            if (encoding === 'utf-8' || encoding === 'utf8') {
                 content = fs.getStringFromFile(filePath);
             }
             else {

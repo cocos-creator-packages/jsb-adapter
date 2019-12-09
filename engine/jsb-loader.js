@@ -42,7 +42,7 @@ function downloadScript (url, options, onComplete) {
         onComplete && onComplete(new Error('Native does not support loading remote scripts'));
     }
     else {
-        require('../../../' + url);
+        require(url);
         onComplete && onComplete(null);
     }
 }
@@ -79,10 +79,15 @@ function transformUrl (url, options) {
     var inLocal = false;
     var inCache = false;
     if (REGEX.test(url)) {
-        var cache = cacheManager.cachedFiles.get(url);
-        if (!options.reload && cache) {
-            inCache = true;
-            url = cache.url;
+        if (options.reload) {
+            return { url };
+        }
+        else {
+            var cache = cacheManager.cachedFiles.get(url);
+            if (cache) {
+                inCache = true;
+                url = cache.url;
+            }
         }
     }
     else {
