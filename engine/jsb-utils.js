@@ -2,14 +2,9 @@ const jsbUtils = {
     /**
      * JS Implementation of MurmurHash2
      *
-     * @author <a href="mailto:gary.court@gmail.com">Gary Court</a>
-     * @see http://github.com/garycourt/murmurhash-js
-     * @author <a href="mailto:aappleby@gmail.com">Austin Appleby</a>
-     * @see http://sites.google.com/site/murmurhash/
-     *
-     * @param {string} str ASCII only
-     * @param {number} seed Positive integer only
-     * @return {number} 32-bit positive integer hash
+     * Author: Gary Court
+     * Homepage: http://github.com/garycourt/murmurhash-js
+     * Licensed under the MIT license.
      */
     murmurhash2_32_gc (str, seed) {
         var
