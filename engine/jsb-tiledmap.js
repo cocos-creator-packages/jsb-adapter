@@ -153,7 +153,7 @@
 
         updateRenderData (comp) {
             if (!comp._modelBatcherDelegate) {
-                let materials = this._renderComp.sharedMaterials;
+                let materials = this._renderComp._materials;
                 for (let i = 0; i < materials.length; i++) {
                     let m = materials[i];
                     if (m) m.getHash();

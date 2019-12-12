@@ -502,7 +502,7 @@ import { RSA_NO_PADDING } from "constants";
         let emptyHandle = function () {};
         for (let key in callbackTable) {
             let list = callbackTable[key];
-            if (!list || !list.callbacks || !list.callbacks.length) continue;
+            if (!list || !list.callbackInfos || !list.callbackInfos.length) continue;
             if (this.isAnimationCached()) {
                 this._nativeDisplay.addDBEventListener(key);
             } else {
