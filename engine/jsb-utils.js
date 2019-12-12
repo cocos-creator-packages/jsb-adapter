@@ -3,8 +3,6 @@ const jsbUtils = {
     Copyright (c) 2011 Gary Court
    
     http://github.com/garycourt/murmurhash-js
-   
-    Copyright (c) 2011 Gary Court
 
     Permission is hereby granted, free of charge, to any person obtaining a copy 
     of this software and associated documentation files (the "Software"), to deal 
