@@ -27,11 +27,11 @@ cc.game.restart = function () {
     __restartVM();
 };
 
-jsb.onHide = function () {
+jsb.onPause = function () {
     cc.game.emit(cc.game.EVENT_HIDE);
 };
 
-jsb.onShow = function () {
+jsb.onResume = function () {
     cc.game.emit(cc.game.EVENT_SHOW);
 };
 
