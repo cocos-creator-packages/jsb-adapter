@@ -24,6 +24,7 @@
  THE SOFTWARE.
  ****************************************************************************/
 'use strict';
+const jsbUtils = require('./jsb-utils');
 
 function downloadScript (item, callback) {
     require(item.url);
@@ -54,8 +55,7 @@ audioDownloader.setOnTaskError((task, errorCode, errorCodeInternal, errorStr) =>
 
 function downloadAudio (item, callback) {
     if (/^http/.test(item.url)) {
-        let index = item.url.lastIndexOf('/');
-        let fileName = item.url.substr(index+1);
+        let fileName = jsbUtils.murmurhash2_32_gc(item.url) + cc.path.extname(item.url);
         let storagePath = jsb.fileUtils.getWritablePath() + fileName;
 
         // load from local cache
