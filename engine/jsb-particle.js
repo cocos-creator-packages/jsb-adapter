@@ -255,7 +255,7 @@
     PSProto._updateMaterial = function () {
         _updateMaterial.call(this);
         
-        let material = this.sharedMaterials[0];
+        let material = this._materials[0];
         material && this._simulator.setEffect(material.effect._nativeObj);
     };
 
