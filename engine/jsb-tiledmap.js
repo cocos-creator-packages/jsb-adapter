@@ -36,7 +36,7 @@
         let result = _addUserNode.call(this, node);
         if (result) {
             let proxy = node._proxy;
-            proxy && proxy.disableVisit();
+            proxy && proxy.enableVisit(false);
         }
     };
 
@@ -45,7 +45,7 @@
         let result = _removeUserNode.call(this, node);
         if (result) {
             let proxy = node._proxy;
-            proxy && proxy.enableVisit();
+            proxy && proxy.enableVisit(true);
         }
     };
 

@@ -1,3 +1,5 @@
+import { RSA_NO_PADDING } from "constants";
+
 /****************************************************************************
  Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
 
@@ -327,6 +329,55 @@
     };
 
     ////////////////////////////////////////////////////////////
+    // adapt attach util
+    ////////////////////////////////////////////////////////////
+
+    let attachUtilProto = dragonBones.AttachUtil.prototype;
+
+    let _attachUtilInit = attachUtilProto.init;
+    attachUtilProto.init = function (armatureDisplay) {
+        _attachUtilInit.call(this, armatureDisplay);
+        this._nativeDisplay = armatureDisplay._nativeDisplay;
+        this._attachUtilNative = null;
+    };
+
+    let _generateAllAttachedNodes = attachUtilProto.generateAllAttachedNodes;
+    attachUtilProto.generateAllAttachedNodes = function () {
+        let res = _generateAllAttachedNodes.call(this);
+        this._associateAttachedNode();
+        return res;
+    };
+
+    let _generateAttachedNodes = attachUtilProto.generateAttachedNodes;
+    attachUtilProto.generateAttachedNodes = function (boneName) {
+        let res = _generateAttachedNodes.call(this, boneName);
+        this._associateAttachedNode();
+        return res;
+    };
+
+    let _associateAttachedNode = attachUtilProto._associateAttachedNode;
+    attachUtilProto._associateAttachedNode = function () {
+        if (!this._inited) return;
+
+        let rootNode = this._armatureNode.getChildByName('ATTACHED_NODE_TREE');
+        if (!rootNode || !rootNode.isValid) return;
+
+        // associate js
+        _associateAttachedNode.call(this);
+
+        // associate native
+        if (!this._attachUtilNative) {
+            if (this._armatureDisplay.isAnimationCached()) {
+                this._attachUtilNative = new dragonBones.CacheModeAttachUtil();
+            } else {
+                this._attachUtilNative = new dragonBones.RealTimeAttachUtil();
+            }
+            this._nativeDisplay.setAttachUtil(this._attachUtilNative);
+        }
+        this._attachUtilNative.associateAttachedNode(this._armature, this._armatureNode._proxy);
+    };
+
+    ////////////////////////////////////////////////////////////
     // override ArmatureDisplay
     ////////////////////////////////////////////////////////////
     dragonBones.ArmatureDisplay._assembler = null;
@@ -442,6 +493,7 @@
             this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
             this._armature = this._nativeDisplay.armature();
             this._armature.animation.timeScale = this.timeScale;
+            this._factory.add(this._armature);
         }
 
         // add all event into native display
@@ -458,6 +510,7 @@
             }
         }
 
+        this._preCacheMode = this._cacheMode;
         this._nativeDisplay._ccNode = this.node;
         this._nativeDisplay._comp = this;
         this._nativeDisplay._eventTarget = this._eventTarget;
@@ -472,7 +525,9 @@
         });
 
         this._activateMaterial();
-        
+        this.attachUtil.init(this);
+        this.attachUtil._associateAttachedNode();
+
         if (this.animationName) {
             this.playAnimation(this.animationName, this.playTimes);
         }
