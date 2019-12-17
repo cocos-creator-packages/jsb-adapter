@@ -250,7 +250,7 @@
     PSProto._onTextureLoaded = function () {
         this._simulator.updateUVs(this._renderSpriteFrame.uv);
         this._syncAspect();
-        this._simulator.aspectRatio = this._aspectRatio;
+        this._simulator.aspectRatio = this._aspectRatio || 1.0;
     };
 
     let _updateMaterial = PSProto._updateMaterial;
