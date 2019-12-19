@@ -184,6 +184,8 @@
         this._playing = true;
     };
 
+    _p.setStayOnBottom = function (enabled) {};
+
     _p.pause = function () {
         let video = this._video;
         if (!this._playing || !video) return;
