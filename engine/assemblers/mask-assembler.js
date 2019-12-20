@@ -31,6 +31,9 @@ const graphicsAssembler = cc.Graphics.__assembler__.prototype;
 
 let proto = cc.Mask.__assembler__.prototype;
 let _updateRenderData = proto.updateRenderData;
+// Avoid constructor being overridden.
+renderer.MaskAssembler.prototype.constructor = cc.Mask.__assembler__;
+
 cc.js.mixin(proto, {
     _extendNative () {
         renderer.MaskAssembler.prototype.ctor.call(this);
@@ -52,7 +55,7 @@ cc.js.mixin(proto, {
 
         mask.node._renderFlag |= cc.RenderFlow.FLAG_UPDATE_RENDER_DATA;
     }
-}, renderer.MaskAssembler.prototype, {constructor: cc.Mask.__assembler__});
+}, renderer.MaskAssembler.prototype);
 
 let originCreateGraphics = cc.Mask.prototype._createGraphics;
 let originRemoveGraphics = cc.Mask.prototype._removeGraphics;
