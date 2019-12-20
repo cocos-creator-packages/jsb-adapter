@@ -251,6 +251,8 @@
         this._simulator.updateUVs(this._renderSpriteFrame.uv);
         this._syncAspect();
         this._simulator.aspectRatio = this._aspectRatio || 1.0;
+        this._updateMaterial();
+        this.markForRender(true);
     };
 
     let _updateMaterial = PSProto._updateMaterial;
