@@ -149,9 +149,10 @@ import { RSA_NO_PADDING } from "constants";
 
     nativeArmatureDisplayProto.convertToWorldSpace = function (point) {
         let newPos = this.convertToRootSpace(point);
+        newPos = cc.v2(newPos.x, newPos.y);
         let ccNode = this.getRootNode();
         if (!ccNode) return newPos;
-        let finalPos = ccNode.convertToWorldSpace(newPos);
+        let finalPos = ccNode.convertToWorldSpaceAR(newPos);
         return finalPos;
     };
 
@@ -455,12 +456,19 @@ import { RSA_NO_PADDING } from "constants";
         this.node._proxy.setAssembler(this._assembler);
     };
 
-    let _setMaterial = armatureDisplayProto.setMaterial;
-    armatureDisplayProto.setMaterial = function(index, material) {
-        _setMaterial.call(this, index, material);
+    let _updateMaterial = armatureDisplayProto._updateMaterial;
+    let _materialHash2IDMap = {};
+    let _materialId = 1;
+    armatureDisplayProto._updateMaterial = function() {
+        _updateMaterial.call(this);
         this._assembler && this._assembler.clearEffect();
         if (this._nativeDisplay) {
-            let nativeEffect = material.effect._nativeObj;
+            let baseMaterial = this.getMaterial(0);
+            let originHash = baseMaterial.effect.getHash();
+            let id = _materialHash2IDMap[originHash] || _materialId++;
+            _materialHash2IDMap[originHash] = id;
+            baseMaterial.effect.updateHash(id);
+            let nativeEffect = baseMaterial.effect._nativeObj;
             this._nativeDisplay.setEffect(nativeEffect);
         }
     };
@@ -524,13 +532,15 @@ import { RSA_NO_PADDING } from "constants";
             this._eventTarget.emit(eventObject.type, eventObject);
         });
 
-        this._activateMaterial();
         this.attachUtil.init(this);
         this.attachUtil._associateAttachedNode();
 
         if (this.animationName) {
             this.playAnimation(this.animationName, this.playTimes);
         }
+
+        this._updateMaterial();
+        this.markForRender(true);
     };
 
     armatureDisplayProto._updateColor = function () {
@@ -578,7 +588,6 @@ import { RSA_NO_PADDING } from "constants";
         if (this._armature && !this.isAnimationCached()) {
             this._factory.add(this._armature);
         }
-        this._activateMaterial();
     };
 
     armatureDisplayProto.onDisable = function () {

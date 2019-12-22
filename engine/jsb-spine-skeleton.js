@@ -292,12 +292,19 @@
         this.node._proxy.setAssembler(this._assembler);
     };
 
-    let _setMaterial = skeleton.setMaterial;
-    skeleton.setMaterial = function(index, material) {
-        _setMaterial.call(this, index, material);
+    let _updateMaterial = skeleton._updateMaterial;
+    let _materialHashMap = {};
+    let _materialId = 1;
+    skeleton._updateMaterial = function() {
+        _updateMaterial.call(this);
         this._assembler && this._assembler.clearEffect();
         if (this._nativeSkeleton) {
-            let nativeEffect = material.effect._nativeObj;
+            let baseMaterial = this.getMaterial(0);
+            let originHash = baseMaterial.effect.getHash();
+            let id = _materialHashMap[originHash] || _materialId++;
+            _materialHashMap[originHash] = id;
+            baseMaterial.effect.updateHash(id);
+            let nativeEffect = baseMaterial.effect._nativeObj;
             this._nativeSkeleton.setEffect(nativeEffect);
         }
     };
@@ -360,7 +367,8 @@
         this._interruptListener && this.setInterruptListener(this._interruptListener);
         this._disposeListener && this.setDisposeListener(this._disposeListener);
 
-        this._activateMaterial();
+        this._updateMaterial();
+        this.markForRender(true);
     };
 
     skeleton._updateColor = function () {
@@ -376,21 +384,11 @@
         }
     };
 
-    skeleton._prepareToRender = function (material) {
-        let texValues = this.skeletonData.textures;
-        material.setProperty('texture', texValues[0]);
-        this.setMaterial(0, material);
-        if (this.node && this.node._renderComponent == this) {
-            this.markForRender(true);
-        }
-    };
-
     skeleton.onEnable = function () {
         renderCompProto.onEnable.call(this);
         if (this._nativeSkeleton) {
             this._nativeSkeleton.onEnable();
         }
-        this._activateMaterial();
     };
 
     skeleton.onDisable = function () {
