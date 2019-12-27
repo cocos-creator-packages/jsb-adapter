@@ -58,7 +58,14 @@ function inject () {
     //FIXME: The value needs to be updated when device orientation changes.
     window.orientation = orientation;
 
-    window.devicePixelRatio = 1.0;
+    // window.devicePixelRatio is readonly
+    Object.defineProperty(window, "devicePixelRatio", {
+        value:  jsb.device.getDevicePixelRatio ? jsb.device.getDevicePixelRatio() : 1,
+        writable: false,
+        enumerable: true,
+        configurable: true
+    });
+
     window.screen = {
         availTop: 0,
         availLeft: 0,

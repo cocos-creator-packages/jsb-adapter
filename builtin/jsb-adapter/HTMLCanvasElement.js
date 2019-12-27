@@ -101,11 +101,11 @@ class HTMLCanvasElement extends HTMLElement {
     }
 
     get clientWidth() {
-        return this._width;
+        return this._width / window.devicePixelRatio;
     }
 
     get clientHeight() {
-        return this._height;
+        return this._height / window.devicePixelRatio;
     }
 
     get data() {
