@@ -24,18 +24,17 @@
  ****************************************************************************/
 
 (function () {
-    if (!(cc && cc.EditBox)) {
+    if (!(cc && cc.EditBoxComponent)) {
         return;
     }
-    const EditBox = cc.EditBox;
+
+    const EditBox = cc.EditBoxComponent;
     const js = cc.js;
     const KeyboardReturnType = EditBox.KeyboardReturnType;
     const InputMode = EditBox.InputMode;
     const InputFlag = EditBox.InputFlag;
 
-    let math = cc.vmath;
-    let worldMat = math.mat4.create(),
-        cameraMat = math.mat4.create();
+    let worldMat = cc.mat4();
 
     function getInputType (type) {
         switch (type) {
@@ -72,13 +71,13 @@
         return 'done';
     }
 
-    const BaseClass = EditBox._ImplClass;
+    const BaseClass = EditBox._EditBoxImpl;
     function JsbEditBoxImpl () {
         BaseClass.call(this);
     }
 
     js.extend(JsbEditBoxImpl, BaseClass);
-    EditBox._ImplClass = JsbEditBoxImpl;
+    EditBox._EditBoxImpl = JsbEditBoxImpl;
 
     Object.assign(JsbEditBoxImpl.prototype, {
         init (delegate) {
@@ -94,6 +93,7 @@
             let delegate = this._delegate;
             let multiline = (delegate.inputMode === InputMode.ANY);
             let rect = this._getRect();
+            this.setMaxLength(delegate.maxLength);
 
             let inputTypeString = getInputType(delegate.inputMode);
             if (delegate.inputFlag === InputFlag.PASSWORD) {
@@ -101,15 +101,16 @@
             }
 
             function onConfirm (res) {
-                delegate.editBoxEditingReturn();
+                delegate._editBoxEditingReturn();
             }
 
             function onInput (res) {
-                if (res.value.length > delegate.maxLength) {
-                    res.value = res.value.slice(0, delegate.maxLength);
+                if (res.value.length > self._maxLength) {
+                    res.value = res.value.slice(0, self._maxLength);
                 }
-                if (delegate._string !== res.value) {
-                    delegate.editBoxTextChanged(res.value);
+
+                if (delegate.string !== res.value) {
+                    delegate._editBoxTextChanged(res.value);
                 }
             }
 
@@ -125,11 +126,12 @@
             jsb.inputBox.onComplete(onComplete);
 
             if (!cc.sys.isMobile) {
-                this._delegate._hideLabels();
+                delegate._hideLabels();
             }
+
             jsb.inputBox.show({
-                defaultValue: delegate._string,
-                maxLength: delegate.maxLength,
+                defaultValue: delegate.string,
+                maxLength: self._maxLength,
                 multiple: multiline,
                 confirmHold: false,
                 confirmType: getKeyboardReturnType(delegate.returnType),
@@ -140,7 +142,7 @@
                 height: rect.height
             });
             this._editing = true;
-            delegate.editBoxEditingDidBegan();
+            delegate._editBoxEditingDidBegan();
         },
 
         endEditing () {
@@ -149,41 +151,56 @@
                 this._delegate._showLabels();
             }
             jsb.inputBox.hide();
-            this._delegate.editBoxEditingDidEnded();
+            this._delegate._editBoxEditingDidEnded();
+        },
+
+        setMaxLength (maxLength) {
+            if (!isNaN(maxLength)) {
+                if (maxLength < 0) {
+                    //we can't set Number.MAX_VALUE to input's maxLength property
+                    //so we use a magic number here, it should works at most use cases.
+                    maxLength = 65535;
+                }
+                this._maxLength = maxLength;
+            }
         },
 
         _getRect () {
-            let node = this._delegate.node,
-                viewScaleX = cc.view._scaleX, viewScaleY = cc.view._scaleY;
+            let node = this._delegate.node;
+            let viewScaleX = cc.view._scaleX;
+            let viewScaleY = cc.view._scaleY;
             let dpr = cc.view._devicePixelRatio;
             node.getWorldMatrix(worldMat);
 
-            let camera = cc.Camera.findCamera(node);
-            camera.getWorldToScreenMatrix2D(cameraMat);
-            math.mat4.mul(cameraMat, cameraMat, worldMat);
-
-            let contentSize = node._contentSize;
+            let transform = node._uiProps.uiTransformComp;
             let vec3 = cc.v3();
-            vec3.x = -node._anchorPoint.x * contentSize.width;
-            vec3.y = -node._anchorPoint.y * contentSize.height;
+            let width = 0;
+            let height = 0;
+            if (transform) {
+                const contentSize = transform.contentSize;
+                const anchorPoint = transform.anchorPoint;
+                width = contentSize.width;
+                height = contentSize.height;
+                vec3.x = -anchorPoint.x * width;
+                vec3.y = -anchorPoint.y * height;
+            }
 
-
-            math.mat4.translate(cameraMat, cameraMat, vec3);
+            cc.Mat4.translate(worldMat, worldMat, vec3);
 
             viewScaleX /= dpr;
             viewScaleY /= dpr;
 
-            let finalScaleX = cameraMat.m[0] * viewScaleX;
-            let finaleScaleY = cameraMat.m[5] * viewScaleY;
+            let finalScaleX = worldMat.m00 * viewScaleX;
+            let finaleScaleY = worldMat.m05 * viewScaleY;
 
             let viewportRect = cc.view._viewportRect;
             let offsetX = viewportRect.x / dpr,
                 offsetY = viewportRect.y / dpr;
             return {
-                x: cameraMat.m[12] * viewScaleX + offsetX,
-                y: cameraMat.m[13] * viewScaleY + offsetY,
-                width: contentSize.width * finalScaleX,
-                height: contentSize.height * finaleScaleY
+                x: worldMat.m12 * viewScaleX + offsetX,
+                y: worldMat.m13 * viewScaleY + offsetY,
+                width: width * finalScaleX,
+                height: height * finaleScaleY
             };
         },
     });
