@@ -16,5 +16,6 @@ jsb.AudioEngine.TIME_UNKNOWN = -1
 
 // Adapt to normal runtime based API
 jsb.AudioEngine.play = jsb.AudioEngine.play2d;
+jsb.AudioEngine.setErrorCallback = () => {};
 
 })(jsb)
