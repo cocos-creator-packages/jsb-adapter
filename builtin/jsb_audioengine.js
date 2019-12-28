@@ -14,4 +14,7 @@ jsb.AudioEngine.AudioState = {
 jsb.AudioEngine.INVALID_AUDIO_ID = -1
 jsb.AudioEngine.TIME_UNKNOWN = -1
 
+// Adapt to normal runtime based API
+jsb.AudioEngine.play = jsb.AudioEngine.play2d;
+
 })(jsb)
