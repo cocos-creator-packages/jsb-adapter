@@ -116,7 +116,7 @@ class HTMLCanvasElement extends HTMLElement {
     }
 
     getBoundingClientRect() {
-        return new DOMRect(0, 0, this._width / window.devicePixelRatio, this._height / this._width.devicePixelRatio);
+        return new DOMRect(0, 0, this._width / window.devicePixelRatio, this._height / window.devicePixelRatio);
     }
 }
 
