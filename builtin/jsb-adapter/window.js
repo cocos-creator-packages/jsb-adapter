@@ -60,8 +60,10 @@ function inject () {
 
     // window.devicePixelRatio is readonly
     Object.defineProperty(window, "devicePixelRatio", {
-        value:  jsb.device.getDevicePixelRatio ? jsb.device.getDevicePixelRatio() : 1,
-        writable: false,
+        get: function() {
+            return jsb.device.getDevicePixelRatio ? jsb.device.getDevicePixelRatio() : 1;
+        },
+        set: function(_dpr) {/* ignore */},
         enumerable: true,
         configurable: true
     });
