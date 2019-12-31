@@ -29,12 +29,10 @@
         return;
     }
 
-    var math = cc.vmath;
-    var vec3 = math.vec3;
-    var _worldMat = math.mat4.create();
+    var _worldMat = new cc.Mat4();
 
-    var _topLeft = vec3.create();
-    var _bottomRight = vec3.create();
+    var _topLeft = new cc.Vec3();
+    var _bottomRight = new cc.Vec3();
 
     cc.WebView.Impl = cc.Class({
         extends: cc.WebView.Impl,
