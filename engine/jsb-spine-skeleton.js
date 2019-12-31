@@ -493,19 +493,19 @@
     };
 
     skeleton.setToSetupPose = function () {
-        if (this._nativeSkeleton && !this.isAnimationCached()) {
+        if (this._nativeSkeleton) {
             this._nativeSkeleton.setToSetupPose();
         }
     };
 
     skeleton.setBonesToSetupPose = function () {
-        if (this._nativeSkeleton && !this.isAnimationCached()) {
+        if (this._nativeSkeleton) {
             this._nativeSkeleton.setBonesToSetupPose();
         }
     };
 
     skeleton.setSlotsToSetupPose = function () {
-        if (this._nativeSkeleton && !this.isAnimationCached()) {
+        if (this._nativeSkeleton) {
             this._nativeSkeleton.setSlotsToSetupPose();
         }
     };
