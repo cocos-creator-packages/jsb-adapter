@@ -167,6 +167,15 @@
         });
     };
 
+    // The methods are added to be compatibility with old versions.
+    animation.setTrackCompleteListener = function (trackEntry, listener) {
+        this._trackCompeleteListener = listener;
+        this.setTrackCompleteListenerNative(trackEntry, function (trackEntryNative) {
+            let loopCount = Math.floor(trackEntryNative.trackTime / trackEntryNative.animationEnd);
+            this._trackCompeleteListener && this._trackCompeleteListener(trackEntryNative, loopCount);
+        });
+    };
+
     // Temporary solution before upgrade the Spine API
     animation.setAnimationListener = function (target, callback) {
         this._target = target;
