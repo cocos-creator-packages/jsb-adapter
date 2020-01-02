@@ -29,10 +29,11 @@
         return;
     }
 
+    var vec3 = cc.Vec3;
     var _worldMat = new cc.Mat4();
 
-    var _topLeft = new cc.Vec3();
-    var _bottomRight = new cc.Vec3();
+    var _topLeft = new vec3();
+    var _bottomRight = new vec3();
 
     cc.WebView.Impl = cc.Class({
         extends: cc.WebView.Impl,
@@ -270,20 +271,20 @@
         let camera = cc.Camera.findCamera(node)._camera;
 
         let canvas_width = cc.game.canvas.width;
-        let canvas_height = cc.game.canvas.height;    
+        let canvas_height = cc.game.canvas.height;
         let ap = node._anchorPoint;
         // Vectors in node space
-        cc.Vec3.set(_topLeft,  - ap.x * this._w, (1.0 - ap.y) * this._h, 0);
-        cc.Vec3.set(_bottomRight, (1 - ap.x) * this._w, - ap.y * this._h, 0);
+        vec3.set(_topLeft, - ap.x * this._w, (1.0 - ap.y) * this._h, 0);
+        vec3.set(_bottomRight, (1 - ap.x) * this._w, - ap.y * this._h, 0);
         // Convert to world space
-        cc.Vec3.transformMat4(_topLeft, _topLeft, _worldMat);
-        cc.Vec3.transformMat4(_bottomRight, _bottomRight, _worldMat);
+        vec3.transformMat4(_topLeft, _topLeft, _worldMat);
+        vec3.transformMat4(_bottomRight, _bottomRight, _worldMat);
         // Convert to screen space
         camera.worldToScreen(_topLeft, _topLeft, canvas_width, canvas_height);
         camera.worldToScreen(_bottomRight, _bottomRight, canvas_width, canvas_height);
 
         let finalWidth = _bottomRight.x - _topLeft.x;
         let finalHeight = _topLeft.y - _bottomRight.y;
-        this._iframe.setFrame(_topLeft.x, canvas_height  - _topLeft.y, finalWidth, finalHeight);
+        this._iframe.setFrame(_topLeft.x, canvas_height - _topLeft.y, finalWidth, finalHeight);
     }
 })();
