@@ -307,8 +307,8 @@
     skeleton._updateMaterial = function() {
         _updateMaterial.call(this);
         this._assembler && this._assembler.clearEffect();
-        if (this._nativeSkeleton) {
-            let baseMaterial = this.getMaterial(0);
+        let baseMaterial = this.getMaterial(0);
+        if (this._nativeSkeleton && baseMaterial) {
             let originHash = baseMaterial.effect.getHash();
             let id = _materialHashMap[originHash] || _materialId++;
             _materialHashMap[originHash] = id;
