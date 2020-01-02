@@ -273,11 +273,11 @@
         let canvas_height = cc.game.canvas.height;    
         let ap = node._anchorPoint;
         // Vectors in node space
-        vec3.set(_topLeft,  - ap.x * this._w, (1.0 - ap.y) * this._h, 0);
-        vec3.set(_bottomRight, (1 - ap.x) * this._w, - ap.y * this._h, 0);
+        cc.Vec3.set(_topLeft,  - ap.x * this._w, (1.0 - ap.y) * this._h, 0);
+        cc.Vec3.set(_bottomRight, (1 - ap.x) * this._w, - ap.y * this._h, 0);
         // Convert to world space
-        vec3.transformMat4(_topLeft, _topLeft, _worldMat);
-        vec3.transformMat4(_bottomRight, _bottomRight, _worldMat);
+        cc.Vec3.transformMat4(_topLeft, _topLeft, _worldMat);
+        cc.Vec3.transformMat4(_bottomRight, _bottomRight, _worldMat);
         // Convert to screen space
         camera.worldToScreen(_topLeft, _topLeft, canvas_width, canvas_height);
         camera.worldToScreen(_bottomRight, _bottomRight, canvas_width, canvas_height);
