@@ -31,6 +31,9 @@ const graphicsAssembler = cc.Graphics.__assembler__.prototype;
 
 let proto = cc.Mask.__assembler__.prototype;
 let _updateRenderData = proto.updateRenderData;
+// Avoid constructor being overridden.
+renderer.MaskAssembler.prototype.constructor = cc.Mask.__assembler__;
+
 cc.js.mixin(proto, {
     _extendNative () {
         renderer.MaskAssembler.prototype.ctor.call(this);

@@ -28,7 +28,8 @@
         return;
     }
 
-    var _mat4_temp = cc.mat4();
+    var _worldMat = new cc.Mat4();
+    var _cameraMat = new cc.Mat4();
 
     var _impl = cc.VideoPlayer.Impl;
     var _p = cc.VideoPlayer.Impl.prototype;
@@ -102,7 +103,6 @@
             video.pause();
             this._playing = false;
         }
-        this._forceUpdate = true;
     };
 
     _p._updateSize = function (width, height) {
@@ -111,7 +111,7 @@
 
     _p.createDomElementIfNeeded = function () {
         if (!jsb.VideoPlayer) {
-            cc.warn('VideoPlayer only supports mobile platform.');
+            cc.warn('VideoPlayer is not supported.');
             return null;
         }
 
@@ -123,8 +123,8 @@
     _p.removeDom = function () {
         let video = this._video;
         if (video) {
-            this._video.stop()
-            this._video.setVisible(false)
+            video.stop()
+            video.setVisible(false)
 
             let cbs = this.__eventListeners;
 
@@ -134,6 +134,8 @@
             cbs.pause = null;
             cbs.click = null;
             cbs.onCanPlay = null;
+
+            video.destroy();
         }
 
         this._video = null;
@@ -166,6 +168,7 @@
         this._loadedmeta = false;
 
         video.setURL(this._url);
+        this._forceUpdate = true;
     };
 
     _p.getURL = function() {
@@ -180,6 +183,8 @@
         this._playing = true;
     };
 
+    _p.setStayOnBottom = function (enabled) {};
+
     _p.pause = function () {
         let video = this._video;
         if (!this._playing || !video) return;
@@ -190,7 +195,7 @@
 
     _p.resume = function () {
         let video = this._video;
-        if (!this._playing || !video) return;
+        if (this._playing || !video) return;
 
         video.resume();
         this._playing = true;
@@ -330,65 +335,54 @@
     _p.updateMatrix = function (node) {
         if (!this._video || !this._visible) return;
 
-        node.getWorldMatrix(_mat4_temp);
+        node.getWorldMatrix(_worldMat);
         if (!this._forceUpdate &&
-            this._m00 === _mat4_temp.m[0] && this._m01 === _mat4_temp.m[1] &&
-            this._m04 === _mat4_temp.m[4] && this._m05 === _mat4_temp.m[5] &&
-            this._m12 === _mat4_temp.m[12] && this._m13 === _mat4_temp.m[13] &&
+            this._m00 === _worldMat.m[0] && this._m01 === _worldMat.m[1] &&
+            this._m04 === _worldMat.m[4] && this._m05 === _worldMat.m[5] &&
+            this._m12 === _worldMat.m[12] && this._m13 === _worldMat.m[13] &&
             this._w === node._contentSize.width && this._h === node._contentSize.height) {
             return;
         }
 
         // update matrix cache
-        this._m00 = _mat4_temp.m[0];
-        this._m01 = _mat4_temp.m[1];
-        this._m04 = _mat4_temp.m[4];
-        this._m05 = _mat4_temp.m[5];
-        this._m12 = _mat4_temp.m[12];
-        this._m13 = _mat4_temp.m[13];
+        this._m00 = _worldMat.m[0];
+        this._m01 = _worldMat.m[1];
+        this._m04 = _worldMat.m[4];
+        this._m05 = _worldMat.m[5];
+        this._m12 = _worldMat.m[12];
+        this._m13 = _worldMat.m[13];
         this._w = node._contentSize.width;
         this._h = node._contentSize.height;
 
-        let scaleX = cc.view._scaleX,
-            scaleY = cc.view._scaleY;
+        let camera = cc.Camera.findCamera(node);
+        camera.getWorldToScreenMatrix2D(_cameraMat);
+        cc.Mat4.multiply(_cameraMat, _cameraMat, _worldMat);
+
+        let viewScaleX = cc.view._scaleX,
+            viewScaleY = cc.view._scaleY;
         let dpr = cc.view._devicePixelRatio;
+        viewScaleX /= dpr;
+        viewScaleY /= dpr;
 
-        scaleX /= dpr;
-        scaleY /= dpr;
+        let finalScaleX = _cameraMat.m[0] * viewScaleX,
+            finalScaleY = _cameraMat.m[5] * viewScaleY;
 
-        let container = cc.game.container;
-        let a = _mat4_temp.m[0] * scaleX,
-            b = _mat4_temp.m[1],
-            c = _mat4_temp.m[4],
-            d = _mat4_temp.m[5] * scaleY;
+        let finalWidth = this._w * finalScaleX,
+            finalHeight = this._h * finalScaleY;
 
-        let offsetX = container && container.style.paddingLeft ? parseInt(container.style.paddingLeft) : 0;
-        let offsetY = container && container.style.paddingBottom ? parseInt(container.style.paddingBottom) : 0;
-        let w, h;
-        if (_impl._polyfill.zoomInvalid) {
-            this._updateSize(this._w * a, this._h * d);
-            a = 1;
-            d = 1;
-            w = this._w * scaleX;
-            h = this._h * scaleY;
-        } else {
-            this._updateSize(this._w, this._h);
-            w = this._w * scaleX;
-            h = this._h * scaleY;
-        }
-
-        let appx = (w * _mat4_temp.m[0]) * node._anchorPoint.x;
-        let appy = (h * _mat4_temp.m[5]) * node._anchorPoint.y;
+        let appx = finalWidth * node._anchorPoint.x;
+        let appy = finalHeight * node._anchorPoint.y;
 
         let viewport = cc.view._viewportRect;
-        offsetX += viewport.x / dpr;
-        offsetY += viewport.y / dpr;
+        let offsetX = viewport.x / dpr,
+            offsetY = viewport.y / dpr;
 
-        let tx = _mat4_temp.m[12] * scaleX - appx + offsetX,
-            ty = _mat4_temp.m[13] * scaleY - appy + offsetY;
+        let tx = _cameraMat.m[12] * viewScaleX - appx + offsetX,
+            ty = _cameraMat.m[13] * viewScaleY - appy + offsetY;
 
         var height = cc.view.getFrameSize().height;
-        this._video.setFrame(tx, height - h - ty, this._w * a, this._h * d)
+        this._video.setFrame(tx, height - finalHeight - ty, finalWidth, finalHeight);
+        this._forceUpdate = false;
     };
 
     _impl.EventType = {

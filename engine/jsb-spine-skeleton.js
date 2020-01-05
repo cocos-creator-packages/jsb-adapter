@@ -65,13 +65,18 @@
     let skeletonCacheMgr = spine.SkeletonCacheMgr.getInstance();
     spine.skeletonCacheMgr = skeletonCacheMgr;
     skeletonDataProto.destroy = function () {
+        this.reset();
+        skeletonCacheMgr.removeSkeletonCache(this._uuid);
+        cc.Asset.prototype.destroy.call(this);
+    };
+
+    skeletonDataProto.reset = function () {
         if (this._skeletonCache) {
             spine.disposeSkeletonData(this._uuid);
             this._jsbTextures = null;
             this._skeletonCache = null;
         }
-        skeletonCacheMgr.removeSkeletonCache(this._uuid);
-        cc.Asset.prototype.destroy.call(this);
+        this._atlasCache = null;
     };
 
     skeletonDataProto.getRuntimeData = function () {
@@ -159,6 +164,15 @@
         this.setCompleteListenerNative(function (trackEntry) {
             let loopCount = Math.floor(trackEntry.trackTime / trackEntry.animationEnd);
             this._compeleteListener && this._compeleteListener(trackEntry, loopCount);
+        });
+    };
+
+    // The methods are added to be compatibility with old versions.
+    animation.setTrackCompleteListener = function (trackEntry, listener) {
+        this._trackCompeleteListener = listener;
+        this.setTrackCompleteListenerNative(trackEntry, function (trackEntryNative) {
+            let loopCount = Math.floor(trackEntryNative.trackTime / trackEntryNative.animationEnd);
+            this._trackCompeleteListener && this._trackCompeleteListener(trackEntryNative, loopCount);
         });
     };
 
@@ -287,12 +301,19 @@
         this.node._proxy.setAssembler(this._assembler);
     };
 
-    let _setMaterial = skeleton.setMaterial;
-    skeleton.setMaterial = function(index, material) {
-        _setMaterial.call(this, index, material);
+    let _updateMaterial = skeleton._updateMaterial;
+    let _materialHashMap = {};
+    let _materialId = 1;
+    skeleton._updateMaterial = function() {
+        _updateMaterial.call(this);
         this._assembler && this._assembler.clearEffect();
-        if (this._nativeSkeleton) {
-            let nativeEffect = material.effect._nativeObj;
+        let baseMaterial = this.getMaterial(0);
+        if (this._nativeSkeleton && baseMaterial) {
+            let originHash = baseMaterial.effect.getHash();
+            let id = _materialHashMap[originHash] || _materialId++;
+            _materialHashMap[originHash] = id;
+            baseMaterial.effect.updateHash(id);
+            let nativeEffect = baseMaterial.effect._nativeObj;
             this._nativeSkeleton.setEffect(nativeEffect);
         }
     };
@@ -343,6 +364,8 @@
         nativeSkeleton.setTimeScale(this.timeScale);
         nativeSkeleton.setBatchEnabled(this.enableBatch);
         nativeSkeleton.bindNodeProxy(this.node._proxy);
+        nativeSkeleton.setColor(this.node.color);
+
         this._skeleton = nativeSkeleton.getSkeleton();
 
         // init skeleton listener
@@ -353,7 +376,14 @@
         this._interruptListener && this.setInterruptListener(this._interruptListener);
         this._disposeListener && this.setDisposeListener(this._disposeListener);
 
-        this._activateMaterial();
+        this._updateMaterial();
+        this.markForRender(true);
+    };
+
+    skeleton._updateColor = function () {
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.setColor(this.node.color);
+        }
     };
 
     skeleton.setAnimationStateData = function (stateData) {
@@ -363,21 +393,11 @@
         }
     };
 
-    skeleton._prepareToRender = function (material) {
-        let texValues = this.skeletonData.textures;
-        material.setProperty('texture', texValues[0]);
-        this.setMaterial(0, material);
-        if (this.node && this.node._renderComponent == this) {
-            this.markForRender(true);
-        }
-    };
-
     skeleton.onEnable = function () {
         renderCompProto.onEnable.call(this);
         if (this._nativeSkeleton) {
             this._nativeSkeleton.onEnable();
         }
-        this._activateMaterial();
     };
 
     skeleton.onDisable = function () {
@@ -399,11 +419,6 @@
 
         let node = this.node;
         if (!node) return;
-
-        if (this.__preColor__ === undefined || !node.color.equals(this.__preColor__)) {
-            nativeSkeleton.setColor(node.color);
-            this.__preColor__ = node.color;
-        }
         
         if (!this.isAnimationCached() && (this.debugBones || this.debugSlots || this.debugMesh) && this._debugRenderer) {
             
@@ -478,19 +493,19 @@
     };
 
     skeleton.setToSetupPose = function () {
-        if (this._nativeSkeleton && !this.isAnimationCached()) {
+        if (this._nativeSkeleton) {
             this._nativeSkeleton.setToSetupPose();
         }
     };
 
     skeleton.setBonesToSetupPose = function () {
-        if (this._nativeSkeleton && !this.isAnimationCached()) {
+        if (this._nativeSkeleton) {
             this._nativeSkeleton.setBonesToSetupPose();
         }
     };
 
     skeleton.setSlotsToSetupPose = function () {
-        if (this._nativeSkeleton && !this.isAnimationCached()) {
+        if (this._nativeSkeleton) {
             this._nativeSkeleton.setSlotsToSetupPose();
         }
     };
@@ -604,7 +619,15 @@
     skeleton.setStartListener = function (listener) {
         this._startListener = listener;
         if (this._nativeSkeleton) {
-            this._nativeSkeleton.setStartListener(listener);
+            if (this.isAnimationCached()) {
+                this._nativeSkeleton.setStartListener(function (animationName) {
+                    let self = this._comp;
+                    self._startEntry.animation.name = animationName;
+                    self._startListener && self._startListener(self._startEntry);
+                });
+            } else {
+                this._nativeSkeleton.setStartListener(listener);
+            }
         }
     };
 
@@ -618,7 +641,15 @@
     skeleton.setEndListener = function (listener) {
         this._endListener = listener;
         if (this._nativeSkeleton) {
-            this._nativeSkeleton.setEndListener(listener);
+            if (this.isAnimationCached()) {
+                this._nativeSkeleton.setEndListener(function (animationName) {
+                    let self = this._comp;
+                    self._endEntry.animation.name = animationName;
+                    self._endListener && self._endListener(self._endEntry);
+                });
+            } else {
+                this._nativeSkeleton.setEndListener(listener);
+            }
         }
     };
 
@@ -632,7 +663,15 @@
     skeleton.setCompleteListener = function (listener) {
         this._completeListener = listener;
         if (this._nativeSkeleton) {
-            this._nativeSkeleton.setCompleteListener(listener);
+            if (this.isAnimationCached()) {
+                this._nativeSkeleton.setCompleteListener(function (animationName) {
+                    let self = this._comp;
+                    self._endEntry.animation.name = animationName;
+                    self._completeListener && self._completeListener(self._endEntry);
+                });
+            } else {
+                this._nativeSkeleton.setCompleteListener(listener);
+            }
         }
     };
 
@@ -693,6 +732,11 @@
         if (this.skeletonData) {
             this.skeletonData.init();
             this.setSkeletonData(this.skeletonData);
+
+            this.attachUtil.init(this);
+            this.attachUtil._associateAttachedNode();
+            this._preCacheMode = this._cacheMode;
+
             this.defaultSkin && this._nativeSkeleton.setSkin(this.defaultSkin);
             this.animation = this.defaultAnimation;
         } else {
@@ -716,4 +760,53 @@
         this._materialCache = null;
     };
 
+
+    ////////////////////////////////////////////////////////////
+    // adapt attach util
+    ////////////////////////////////////////////////////////////
+
+    let attachUtilProto = sp.AttachUtil.prototype;
+
+    let _attachUtilInit = attachUtilProto.init;
+    attachUtilProto.init = function (skeletonComp) {
+        _attachUtilInit.call(this, skeletonComp);
+        this._nativeSkeleton = skeletonComp._nativeSkeleton;
+        this._attachUtilNative = null;
+    };
+
+    let _generateAllAttachedNodes = attachUtilProto.generateAllAttachedNodes;
+    attachUtilProto.generateAllAttachedNodes = function () {
+        let res = _generateAllAttachedNodes.call(this);
+        this._associateAttachedNode();
+        return res;
+    };
+
+    let _generateAttachedNodes = attachUtilProto.generateAttachedNodes;
+    attachUtilProto.generateAttachedNodes = function (boneName) {
+        let res = _generateAttachedNodes.call(this, boneName);
+        this._associateAttachedNode();
+        return res;
+    };
+
+    let _associateAttachedNode = attachUtilProto._associateAttachedNode;
+    attachUtilProto._associateAttachedNode = function () {
+        if (!this._inited) return;
+        
+        let rootNode = this._skeletonNode.getChildByName('ATTACHED_NODE_TREE');
+        if (!rootNode || !rootNode.isValid) return;
+
+        // associate js
+        _associateAttachedNode.call(this);
+
+        // associate native
+        if (!this._attachUtilNative) {
+            if (this._skeletonComp.isAnimationCached()) {
+                this._attachUtilNative = new spine.CacheModeAttachUtil();
+            } else {
+                this._attachUtilNative = new spine.RealTimeAttachUtil();
+            }
+            this._nativeSkeleton.setAttachUtil(this._attachUtilNative);
+        }
+        this._attachUtilNative.associateAttachedNode(this._skeleton, this._skeletonNode._proxy);
+    };
 })();

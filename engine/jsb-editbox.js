@@ -33,6 +33,9 @@
     const InputMode = EditBox.InputMode;
     const InputFlag = EditBox.InputFlag;
 
+    let worldMat = new cc.Mat4(),
+        cameraMat = new cc.Mat4();
+
     function getInputType (type) {
         switch (type) {
             case InputMode.EMAIL_ADDR:
@@ -68,12 +71,12 @@
         return 'done';
     }
 
+    const BaseClass = EditBox._ImplClass;
     function JsbEditBoxImpl () {
-        this._delegate = null;
-        this._editing = false;
+        BaseClass.call(this);
     }
 
-    js.extend(JsbEditBoxImpl, EditBox._ImplClass);
+    js.extend(JsbEditBoxImpl, BaseClass);
     EditBox._ImplClass = JsbEditBoxImpl;
 
     Object.assign(JsbEditBoxImpl.prototype, {
@@ -83,19 +86,6 @@
                 return;
             }
             this._delegate = delegate;
-        },
-
-        setFocus (value) {
-            if (value) {
-                this.beginEditing();
-            }
-            else {
-                this.endEditing();
-            }
-        },
-
-        isFocused () {
-            return this._editing;
         },
 
         beginEditing () {
@@ -163,28 +153,34 @@
 
         _getRect () {
             let node = this._delegate.node,
-                scaleX = cc.view._scaleX, scaleY = cc.view._scaleY;
+                viewScaleX = cc.view._scaleX, viewScaleY = cc.view._scaleY;
             let dpr = cc.view._devicePixelRatio;
+            node.getWorldMatrix(worldMat);
 
-            let matrix = cc.mat4();
-            node.getWorldMatrix(matrix);
+            let camera = cc.Camera.findCamera(node);
+            camera.getWorldToScreenMatrix2D(cameraMat);
+            cc.Mat4.multiply(cameraMat, cameraMat, worldMat);
+
             let contentSize = node._contentSize;
             let vec3 = cc.v3();
             vec3.x = -node._anchorPoint.x * contentSize.width;
             vec3.y = -node._anchorPoint.y * contentSize.height;
 
-            cc.Mat4.translate(matrix, matrix, vec3);
 
-            scaleX /= dpr;
-            scaleY /= dpr;
+            cc.Mat4.translate(cameraMat, cameraMat, vec3);
 
-            let finalScaleX = matrix.m[0] * scaleX;
-            let finaleScaleY = matrix.m[5] * scaleY;
+            viewScaleX /= dpr;
+            viewScaleY /= dpr;
+
+            let finalScaleX = cameraMat.m[0] * viewScaleX;
+            let finaleScaleY = cameraMat.m[5] * viewScaleY;
 
             let viewportRect = cc.view._viewportRect;
+            let offsetX = viewportRect.x / dpr,
+                offsetY = viewportRect.y / dpr;
             return {
-                x: matrix.m[12] * finalScaleX + viewportRect.x,
-                y: matrix.m[13] * finaleScaleY + viewportRect.y,
+                x: cameraMat.m[12] * viewScaleX + offsetX,
+                y: cameraMat.m[13] * viewScaleY + offsetY,
                 width: contentSize.width * finalScaleX,
                 height: contentSize.height * finaleScaleY
             };

@@ -1,3 +1,5 @@
+import { RSA_NO_PADDING } from "constants";
+
 /****************************************************************************
  Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
 
@@ -147,9 +149,10 @@
 
     nativeArmatureDisplayProto.convertToWorldSpace = function (point) {
         let newPos = this.convertToRootSpace(point);
+        newPos = cc.v2(newPos.x, newPos.y);
         let ccNode = this.getRootNode();
         if (!ccNode) return newPos;
-        let finalPos = ccNode.convertToWorldSpace(newPos);
+        let finalPos = ccNode.convertToWorldSpaceAR(newPos);
         return finalPos;
     };
 
@@ -327,6 +330,55 @@
     };
 
     ////////////////////////////////////////////////////////////
+    // adapt attach util
+    ////////////////////////////////////////////////////////////
+
+    let attachUtilProto = dragonBones.AttachUtil.prototype;
+
+    let _attachUtilInit = attachUtilProto.init;
+    attachUtilProto.init = function (armatureDisplay) {
+        _attachUtilInit.call(this, armatureDisplay);
+        this._nativeDisplay = armatureDisplay._nativeDisplay;
+        this._attachUtilNative = null;
+    };
+
+    let _generateAllAttachedNodes = attachUtilProto.generateAllAttachedNodes;
+    attachUtilProto.generateAllAttachedNodes = function () {
+        let res = _generateAllAttachedNodes.call(this);
+        this._associateAttachedNode();
+        return res;
+    };
+
+    let _generateAttachedNodes = attachUtilProto.generateAttachedNodes;
+    attachUtilProto.generateAttachedNodes = function (boneName) {
+        let res = _generateAttachedNodes.call(this, boneName);
+        this._associateAttachedNode();
+        return res;
+    };
+
+    let _associateAttachedNode = attachUtilProto._associateAttachedNode;
+    attachUtilProto._associateAttachedNode = function () {
+        if (!this._inited) return;
+
+        let rootNode = this._armatureNode.getChildByName('ATTACHED_NODE_TREE');
+        if (!rootNode || !rootNode.isValid) return;
+
+        // associate js
+        _associateAttachedNode.call(this);
+
+        // associate native
+        if (!this._attachUtilNative) {
+            if (this._armatureDisplay.isAnimationCached()) {
+                this._attachUtilNative = new dragonBones.CacheModeAttachUtil();
+            } else {
+                this._attachUtilNative = new dragonBones.RealTimeAttachUtil();
+            }
+            this._nativeDisplay.setAttachUtil(this._attachUtilNative);
+        }
+        this._attachUtilNative.associateAttachedNode(this._armature, this._armatureNode._proxy);
+    };
+
+    ////////////////////////////////////////////////////////////
     // override ArmatureDisplay
     ////////////////////////////////////////////////////////////
     dragonBones.ArmatureDisplay._assembler = null;
@@ -404,12 +456,19 @@
         this.node._proxy.setAssembler(this._assembler);
     };
 
-    let _setMaterial = armatureDisplayProto.setMaterial;
-    armatureDisplayProto.setMaterial = function(index, material) {
-        _setMaterial.call(this, index, material);
+    let _updateMaterial = armatureDisplayProto._updateMaterial;
+    let _materialHash2IDMap = {};
+    let _materialId = 1;
+    armatureDisplayProto._updateMaterial = function() {
+        _updateMaterial.call(this);
         this._assembler && this._assembler.clearEffect();
-        if (this._nativeDisplay) {
-            let nativeEffect = material.effect._nativeObj;
+        let baseMaterial = this.getMaterial(0);
+        if (this._nativeDisplay && baseMaterial) {
+            let originHash = baseMaterial.effect.getHash();
+            let id = _materialHash2IDMap[originHash] || _materialId++;
+            _materialHash2IDMap[originHash] = id;
+            baseMaterial.effect.updateHash(id);
+            let nativeEffect = baseMaterial.effect._nativeObj;
             this._nativeDisplay.setEffect(nativeEffect);
         }
     };
@@ -442,6 +501,7 @@
             this._nativeDisplay.setDebugBonesEnabled(this.debugBones);
             this._armature = this._nativeDisplay.armature();
             this._armature.animation.timeScale = this.timeScale;
+            this._factory.add(this._armature);
         }
 
         // add all event into native display
@@ -450,7 +510,7 @@
         let emptyHandle = function () {};
         for (let key in callbackTable) {
             let list = callbackTable[key];
-            if (!list || !list.callbacks || !list.callbacks.length) continue;
+            if (!list || !list.callbackInfos || !list.callbackInfos.length) continue;
             if (this.isAnimationCached()) {
                 this._nativeDisplay.addDBEventListener(key);
             } else {
@@ -458,6 +518,7 @@
             }
         }
 
+        this._preCacheMode = this._cacheMode;
         this._nativeDisplay._ccNode = this.node;
         this._nativeDisplay._comp = this;
         this._nativeDisplay._eventTarget = this._eventTarget;
@@ -465,14 +526,26 @@
         this._nativeDisplay.bindNodeProxy(this.node._proxy);
         this._nativeDisplay.setOpacityModifyRGB(this.premultipliedAlpha);
         this._nativeDisplay.setBatchEnabled(this.enableBatch);
+        this._nativeDisplay.setColor(this.node.color);
+        
         this._nativeDisplay.setDBEventCallback(function(eventObject) {
             this._eventTarget.emit(eventObject.type, eventObject);
         });
 
-        this._activateMaterial();
-        
+        this.attachUtil.init(this);
+        this.attachUtil._associateAttachedNode();
+
         if (this.animationName) {
             this.playAnimation(this.animationName, this.playTimes);
+        }
+
+        this._updateMaterial();
+        this.markForRender(true);
+    };
+
+    armatureDisplayProto._updateColor = function () {
+        if (this._nativeDisplay) {
+            this._nativeDisplay.setColor(this.node.color);
         }
     };
 
@@ -515,7 +588,6 @@
         if (this._armature && !this.isAnimationCached()) {
             this._factory.add(this._armature);
         }
-        this._activateMaterial();
     };
 
     armatureDisplayProto.onDisable = function () {
@@ -583,11 +655,6 @@
 
         let node = this.node;
         if (!node) return;
-
-        if (this.__preColor__ === undefined || !node.color.equals(this.__preColor__)) {
-            nativeDisplay.setColor(node.color);
-            this.__preColor__ = node.color;
-        }
 
         if (!this.isAnimationCached() && this._debugDraw && this.debugBones) {
 

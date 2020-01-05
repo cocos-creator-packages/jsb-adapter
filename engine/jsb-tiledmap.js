@@ -36,7 +36,7 @@
         let result = _addUserNode.call(this, node);
         if (result) {
             let proxy = node._proxy;
-            proxy && proxy.disableVisit();
+            proxy && proxy.enableVisit(false);
         }
     };
 
@@ -45,7 +45,18 @@
         let result = _removeUserNode.call(this, node);
         if (result) {
             let proxy = node._proxy;
-            proxy && proxy.enableVisit();
+            proxy && proxy.enableVisit(true);
+        }
+    };
+
+    // override _activateMaterial to upload hash value to native
+    let _activateMaterial = TiledLayer._activateMaterial;
+    TiledLayer._activateMaterial = function () {
+        _activateMaterial.call(this);
+        let materials = this._materials;
+        for (let i = 0; i < materials.length; i++) {
+            let m = materials[i];
+            if (m) m.getHash();
         }
     };
 
@@ -153,12 +164,6 @@
 
         updateRenderData (comp) {
             if (!comp._modelBatcherDelegate) {
-                let materials = this._renderComp.sharedMaterials;
-                for (let i = 0; i < materials.length; i++) {
-                    let m = materials[i];
-                    if (m) m.getHash();
-                }
-
                 comp._buffer = new cc.TiledMapBuffer(null, cc.gfx.VertexFormat.XY_UV_Color);
                 comp._renderDataList = new cc.TiledMapRenderDataList();
                 comp._modelBatcherDelegate = new ModelBatcherDelegate();

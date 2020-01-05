@@ -70,7 +70,7 @@ let Assembler = {
         if (!this._renderComp || !this._renderComp.isValid) return;
         this.updateRenderData(this._renderComp);
 
-        let materials = this._renderComp.sharedMaterials;
+        let materials = this._renderComp._materials;
         for (let i = 0; i < materials.length; i++) {
             let m = materials[i];
             // TODO: find why material can be null
@@ -81,7 +81,7 @@ let Assembler = {
     },
 
     updateRenderData (comp) {
-        comp._assembler.updateMaterial(0, comp.sharedMaterials[0]);
+        comp._assembler.updateMaterial(0, comp._materials[0]);
     },
 
     updateMaterial (iaIndex, material) {
