@@ -88,12 +88,12 @@ Object.assign(EffectBase.prototype, {
         this._nativeObj.updateHash(hash);
     },
 
-    setProperty (name, val, passIdx) {
+    setProperty (name, val, passIdx, directly) {
         _setProperty.call(this, name, val, passIdx);
 
         let prop = this.getProperty(name);
         if (prop !== undefined) {
-            this._nativeObj.setProperty(name, prop, passIdx === undefined ? -1 : passIdx);
+            this._nativeObj.setProperty(name, prop, passIdx === undefined ? -1 : passIdx, directly);
         }
     }
 })
