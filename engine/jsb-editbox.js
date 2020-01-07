@@ -32,6 +32,7 @@
     const KeyboardReturnType = EditBox.KeyboardReturnType;
     const InputMode = EditBox.InputMode;
     const InputFlag = EditBox.InputFlag;
+    const MAX_VALUE = 65535;
 
     let worldMat = new cc.Mat4(),
         cameraMat = new cc.Mat4();
@@ -93,7 +94,7 @@
             let delegate = this._delegate;
             let multiline = (delegate.inputMode === InputMode.ANY);
             let rect = this._getRect();
-
+            let maxLength = (delegate.maxLength < 0 ? MAX_VALUE : delegate.maxLength)
             let inputTypeString = getInputType(delegate.inputMode);
             if (delegate.inputFlag === InputFlag.PASSWORD) {
                 inputTypeString = 'password';
@@ -125,7 +126,7 @@
             }
             jsb.inputBox.show({
                 defaultValue: delegate._string,
-                maxLength: delegate.maxLength,
+                maxLength: maxLength,
                 multiple: multiline,
                 confirmHold: false,
                 confirmType: getKeyboardReturnType(delegate.returnType),
