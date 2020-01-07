@@ -63,12 +63,12 @@ function isObject(x) {
 
 /**
  * EventTarget.
- * 
+ *
  * - This is constructor if no arguments.
  * - This is a function which returns a CustomEventTarget constructor if there are arguments.
- * 
+ *
  * For example:
- * 
+ *
  *     class A extends EventTarget {}
  */
 class EventTarget {
@@ -237,7 +237,7 @@ class EventTarget {
 
         // If listeners aren't registered, terminate.
         const listeners = this._listeners
-        
+
         let node = listeners.get(eventName)
         if (!node) {
             return true
@@ -322,7 +322,7 @@ function mouseEventHandlerFactory(type) {
         const mouseEvent = new MouseEvent(type, {
             button: button,
             which: button + 1,
-            wheelDelta: event.wheelDeltaY,
+            wheelDelta: event.wheelDeltaY * 120, // scale up to match the web interface
             clientX: x,
             clientY: y,
             screenX: x,
@@ -330,7 +330,7 @@ function mouseEventHandlerFactory(type) {
             pageX: x,
             pageY: y
         });
-        
+
         var target;
         var mouseListenerMap = __listenerMap.mouse;
         for (let key in mouseListenerMap) {
@@ -378,4 +378,3 @@ jsb.device.dispatchDeviceMotionEvent = function(event) {
 };
 
 module.exports = EventTarget
-

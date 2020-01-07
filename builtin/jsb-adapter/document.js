@@ -114,6 +114,10 @@ class Document extends Node {
       }
       return null;
   }
+
+  exitPointerLock() {
+    jsb.setCursorEnabled(true);
+  }
 }
 
 let document = new Document()

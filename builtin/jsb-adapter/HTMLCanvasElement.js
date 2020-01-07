@@ -111,12 +111,16 @@ class HTMLCanvasElement extends HTMLElement {
     get data() {
         if (this._data) {
             return this._data.data;
-        } 
+        }
         return null;
     }
 
     getBoundingClientRect() {
         return new DOMRect(0, 0, this._width, this._height);
+    }
+
+    requestPointerLock() {
+        jsb.setCursorEnabled(false);
     }
 }
 
@@ -194,4 +198,3 @@ ctx2DProto.getImageData = function (sx, sy, sw, sh) {
 }
 
 module.exports = HTMLCanvasElement;
-
