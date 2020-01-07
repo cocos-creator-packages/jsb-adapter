@@ -1,3 +1,8 @@
+/**
+ * API for jsb module
+ * Author: haroel
+ * Homepage: https://github.com/haroel/creatorexDTS
+ */
 declare namespace jsb{
     export module reflection{
         /**
