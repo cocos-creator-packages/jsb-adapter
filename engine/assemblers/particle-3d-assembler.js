@@ -52,6 +52,11 @@
             if (subdatas[1] && subdatas[1].enable) {
                 this.setTrailVertexFormat(subdatas[1].vfm._nativeObj);
             }
+        },
+
+        updateIA (index, count, vDirty, iDirty) {
+            this.updateIndicesRange(index, 0, count);
         }
+
     }, renderer.Particle3DAssembler.prototype);
 })();
