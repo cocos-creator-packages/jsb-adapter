@@ -27,12 +27,12 @@ cc.game.restart = function () {
     __restartVM();
 };
 
-jsb.onPause = function () {
-    cc.game.emit(cc.game.EVENT_HIDE);
+jsb.onHide = function () {
+    cc.game.emit(cc.Game.EVENT_HIDE);
 };
 
-jsb.onResume = function () {
-    cc.game.emit(cc.game.EVENT_SHOW);
+jsb.onShow = function () {
+    cc.game.emit(cc.Game.EVENT_SHOW);
 };
 
 jsb.onResize = function (size) {
