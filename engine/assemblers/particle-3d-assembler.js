@@ -19,6 +19,7 @@
             this.setRenderDataList(this._renderDataList);
             this.ignoreOpacityFlag();
             this.updateMeshData();
+            this.setUseModel(true);
         },
 
         updateRenderData (comp) {   
@@ -48,10 +49,20 @@
             }
 
             this.setVertexFormat(subdatas[0].vfm._nativeObj);
+            this.setSimulationSpace(this._particleSystem.simulationSpace);
 
             if (subdatas[1] && subdatas[1].enable) {
                 this.setTrailVertexFormat(subdatas[1].vfm._nativeObj);
+                this.setTrailModuleSpace(this._particleSystem.trailModule.space);
             }
+        },
+
+        setSimulationSpace (space) {
+            this.setParticleSpace(space);
+        },
+
+        setTrailModuleSpace (space) {
+            this.setTrailSpace(space);
         },
 
         updateIA (index, count, vDirty, iDirty) {
