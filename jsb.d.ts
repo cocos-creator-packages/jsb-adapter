@@ -9,14 +9,17 @@ declare namespace jsb{
          * https://docs.cocos.com/creator/manual/zh/advanced-topics/java-reflection.html
          * call OBJC/Java static methods
          * 
-         * @param args 
+         * @param className 
+         * @param methodName 
+         * @param methodSignature 
+         * @param parameters 
          */
-        export function callStaticMethod(...args):any;
+        export function callStaticMethod(className: string, methodName: string, methodSignature: string, ...parameters:any): any;
     }
     /**
      * 下载任务对象
      */
-    export type DownloaderTask = {requestURL:string,storagePath:string,identifier:string};
+    export type DownloaderTask = { requestURL: string, storagePath: string, identifier: string };
 
     /**
      * Http file downloader for jsb！
@@ -24,20 +27,20 @@ declare namespace jsb{
     export class Downloader{
         /**
          * create a download task
-         * @param url 
+         * @param requestURL 
          * @param storagePath 
          * @param identifier 
          */
-        createDownloadFileTask(url:string,storagePath:string,identifier?:string):DownloaderTask;
+        createDownloadFileTask(requestURL:string, storagePath:string, identifier?:string): DownloaderTask;
 
-        setOnFileTaskSuccess(task:DownloaderTask):void;
+        setOnFileTaskSuccess(onSucceed: (task: DownloaderTask) => void): void;
 
-        setOnTaskProgress(task:DownloaderTask,bytesReceived:number,totalBytesReceived:number, totalBytesExpected:number):void;
+        setOnTaskProgress(onProgress: (task: DownloaderTask, bytesReceived: number, totalBytesReceived: number, totalBytesExpected: number) => void): void;
 
-        setOnTaskError(task:DownloaderTask, errorCode, errorCodeInternal, errorStr):void;
+        setOnTaskError(onError: (task: DownloaderTask, errorCode: number, errorCodeInternal: number, errorStr: string) => void): void;
 
     }
-    
+
     /**
      * FileUtils  Helper class to handle file operations.
      */
