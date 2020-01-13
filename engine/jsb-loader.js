@@ -94,9 +94,12 @@ function loadAudio (item, callback) {
 function downloadImage(item, callback) {
     let img = new Image();
     img.src = item.url;
-    img.onload = function(info) {
+    img.onload = function (info) {
         callback(null, img);
-    }
+    };
+    img.onerror = function (event) {
+        callback(event, null);
+    };
     // Don't return anything to use async loading.
 }
 

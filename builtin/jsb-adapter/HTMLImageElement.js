@@ -23,10 +23,14 @@ class HTMLImageElement extends HTMLElement {
         jsb.loadImage(src, (info) => {
             if (!info) {
                 this._data = null;
+                return;
+            } else if (info && info.errorMsg) {
+                this._data = null;
                 var event = new Event('error');
                 this.dispatchEvent(event);
                 return;
             }
+
             this.width = this.naturalWidth = info.width;
             this.height = this.naturalHeight = info.height;
             this._data = info.data;
