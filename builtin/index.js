@@ -12,7 +12,7 @@ window.URL = URL;
 window.DOMParser = require('./xmldom/dom-parser').DOMParser;
 
 require('./jsb_prepare');
-require('./jsb_opengl');
+// require('./jsb_opengl');
 require('./jsb-adapter');
 require('./jsb_audioengine');
 require('./jsb_input');
@@ -32,10 +32,10 @@ window.cancelAnimationFrame = function(id) {
     delete _requestAnimationFrameCallbacks[id];
 };
 
-const {disableBatchGLCommandsToNative, flushCommands} = require('./glOptMode');
-window.optConfig = {
-    disableBatchGLCommandsToNative: disableBatchGLCommandsToNative
-};
+// const {disableBatchGLCommandsToNative, flushCommands} = require('./glOptMode');
+// window.optConfig = {
+//     disableBatchGLCommandsToNative: disableBatchGLCommandsToNative
+// };
 
 function tick(nowMilliSeconds) {
     if (_firstTick) {
@@ -55,7 +55,7 @@ function tick(nowMilliSeconds) {
             _oldRequestFrameCallback(nowMilliSeconds);
         }
     }
-    flushCommands();
+    // flushCommands();
 }
 
 let _timeoutIDIndex = 0;
