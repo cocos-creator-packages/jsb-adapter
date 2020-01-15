@@ -105,9 +105,6 @@
             }
 
             function onInput (res) {
-                if (res.value.length > delegate.maxLength) {
-                    res.value = res.value.slice(0, delegate.maxLength);
-                }
                 if (delegate._string !== res.value) {
                     delegate.editBoxTextChanged(res.value);
                 }
