@@ -98,7 +98,7 @@ function downloadImage(item, callback) {
         callback(null, img);
     };
     img.onerror = function (event) {
-        callback(event, null);
+        callback(new Error('load image fail:' + img.src), null);
     };
     // Don't return anything to use async loading.
 }
