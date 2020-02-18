@@ -136,7 +136,7 @@
         if (this.skeletonJsonStr) {
             filePath = this.skeletonJsonStr;
         } else {
-            filePath = cc.loader.md5Pipe ? cc.loader.md5Pipe.transformURL(this.nativeUrl) : this.nativeUrl;
+            filePath = this.nativeUrl;
         }
         this._skeletonCache = spine.initSkeletonData(uuid, filePath, atlasText, jsbTextures, this.scale);
     };
