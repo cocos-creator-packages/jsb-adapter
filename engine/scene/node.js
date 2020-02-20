@@ -62,4 +62,4 @@ cc.PrivateNode.prototype._posDirty = function (sendEvent) {
     if (sendEvent === true && (this._eventMask & POSITION_ON)) {
         this.emit(cc.Node.EventType.POSITION_CHANGED);
     }
-}
+};
