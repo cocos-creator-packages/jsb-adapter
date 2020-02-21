@@ -42,7 +42,7 @@ function downloadScript (url, options, onComplete) {
         onComplete && onComplete(new Error('Native does not support loading remote scripts'));
     }
     else {
-        require(url);
+        window.require(url);
         onComplete && onComplete(null);
     }
 }
@@ -240,8 +240,8 @@ downloader.register({
 
 parser.register({
     // compressed texture
-    'pvr': loadCompressedTex,
-    'pkm': loadCompressedTex,
+    '.pvr': parsePVRTex,
+    '.pkm': parsePKMTex,
 });
 
 var originInit = cc.assetManager.init;
