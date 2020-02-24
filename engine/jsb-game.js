@@ -37,6 +37,8 @@ jsb.onResume = function () {
 
 jsb.onResize = function (size) {
     if (size.width === 0 || size.height === 0) return;
+    size.width /= cc.view._devicePixelRatio;
+    size.height /= cc.view._devicePixelRatio;
     window.resize(size.width, size.height);
     cc.view.setCanvasSize(window.innerWidth, window.innerHeight);
 };
