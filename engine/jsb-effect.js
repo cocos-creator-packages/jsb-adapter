@@ -6,6 +6,7 @@ const gfx = window.gfx;
 let Effect = cc.Effect;
 let _init = Effect.prototype.init;
 let _clone = Effect.prototype.clone;
+let _switchTechnique = Effect.prototype.switchTechnique;
 
 Object.assign(Effect.prototype, {
     init (name, techniques, techniqueIndex, asset, createNative) {
@@ -24,6 +25,11 @@ Object.assign(Effect.prototype, {
         effect._nativeObj.copy(this._nativeObj);
         effect._nativePtr = effect._nativeObj.self();
         return effect;
+    },
+
+    switchTechnique: function switchTechnique(techniqueIndex) {
+        _switchTechnique.call(this, techniqueIndex);
+        this._nativeObj.switchTechnique(techniqueIndex);
     }
 });
 
