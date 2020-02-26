@@ -49,15 +49,11 @@
         }
     };
 
-    // override _activateMaterial to upload hash value to native
-    let _activateMaterial = TiledLayer._activateMaterial;
-    TiledLayer._activateMaterial = function () {
-        _activateMaterial.call(this);
-        let materials = this._materials;
-        for (let i = 0; i < materials.length; i++) {
-            let m = materials[i];
-            if (m) m.getHash();
-        }
+    // override _buildMaterial to upload hash value to native
+    let _buildMaterial = TiledLayer._buildMaterial;
+    TiledLayer._buildMaterial = function (tilesetIdx) {
+        let material = _buildMaterial.call(this, tilesetIdx);
+        if (material) material.getHash();
     };
 
     // tiledmap buffer
