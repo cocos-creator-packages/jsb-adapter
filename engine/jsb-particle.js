@@ -261,6 +261,8 @@
         
         let material = this._materials[0];
         material && this._simulator.setEffect(material.effect._nativeObj);
+        // upload hash value to native
+        material && material.getHash();
     };
 
     let _initWithDictionary = PSProto._initWithDictionary;
