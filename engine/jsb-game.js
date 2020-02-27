@@ -47,7 +47,7 @@ jsb.onResize = function (size) {
     if (size.width === 0 || size.height === 0) return;
 
     // getSafeAreaEdge is asynchronous on iOS, so callback later is required
-    if (cc.sys.isNative && cc.sys.os === cc.sys.OS_IOS) {
+    if (CC_JSB && cc.sys.os === cc.sys.OS_IOS) {
         let edges = jsb.Device.getSafeAreaEdge();
         let hasSafeArea = (edges.x > 0 || edges.y > 0 || edges.z > 0 || edges.w > 0);
         if (hasSafeArea) {
