@@ -243,7 +243,7 @@ function replaceFunction (jsbFunc, ...converters) {
         return function (param0) {
             // Convert parameters one by one
             let _jsbParam0 = converters[0](param0);
-            this[jsbFunc](_jsbParam0);
+            return this[jsbFunc](_jsbParam0);
         }
     }
     else if (l === 2) {
@@ -251,7 +251,7 @@ function replaceFunction (jsbFunc, ...converters) {
             // Convert parameters one by one
             let _jsbParam0 = converters[0](param0);
             let _jsbParam1 = converters[1](param1);
-            this[jsbFunc](_jsbParam0, _jsbParam1);
+            return this[jsbFunc](_jsbParam0, _jsbParam1);
         }
     }
     else if (l === 3) {
@@ -260,7 +260,7 @@ function replaceFunction (jsbFunc, ...converters) {
             let _jsbParam0 = converters[0](param0);
             let _jsbParam1 = converters[1](param1);
             let _jsbParam2 = converters[2](param2);
-            this[jsbFunc](_jsbParam0, _jsbParam1, _jsbParam2);
+            return this[jsbFunc](_jsbParam0, _jsbParam1, _jsbParam2);
         }
     }
     else return null;
