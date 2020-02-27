@@ -25,6 +25,9 @@
 
 // Converters for converting js objects to jsb struct objects
 let _converters = {
+    origin: function (arg) {
+        return arg;
+    },
     GFXOffset: function (offset) {
         return new gfx.GFXOffset(offset.x, offset.y, offset.z);
     },
@@ -38,7 +41,19 @@ let _converters = {
         return new gfx.GFXTextureSubres(res.base_mip_level, res.level_count, res.base_array_layer, res.layer_count);
     },
     // GFXTextureCopy,
-    // GFXBufferTextureCopy,
+    GFXBufferTextureCopy: function (obj) {
+        let jsbOffset = _converters.GFXOffset(obj.texOffset);
+        let jsbExtent = _converters.GFXExtent(obj.texExtent);
+        let jsbSubres = _converters.GFXTextureSubres(obj.texSubres);
+        return new gfx.GFXBufferTextureCopy(obj.buffOffset, obj.buffStride, obj.buffTexHeight, jsbOffset, jsbExtent, jsbSubres);
+    },
+    GFXBufferTextureCopyList: function (list) {
+        let jsbList = [];
+        for (let i = 0; i < list.length; ++i) {
+            jsbList.push(_converters.GFXBufferTextureCopy(list[i]));
+        }
+        return jsbList;
+    },
     GFXViewport: function (vp) {
         return new gfx.GFXViewport(vp.left, vp.top, vp.width, vp.height, vp.minDepth, vp.maxDepth);
     },
@@ -297,6 +312,7 @@ replace(deviceProto, {
     createBindingLayout: replaceFunction('_createBindingLayout', _converters.GFXBindingLayoutInfo),
     createPipelineState: replaceFunction('_createPipelineState', _converters.GFXPipelineStateInfo),
     createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.GFXPipelineLayoutInfo),
+    copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.)
 });
 
 let bindingLayoutProto = gfx.GFXBindingLayout.prototype;
