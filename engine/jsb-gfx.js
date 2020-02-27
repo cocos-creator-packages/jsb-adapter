@@ -312,7 +312,7 @@ replace(deviceProto, {
     createBindingLayout: replaceFunction('_createBindingLayout', _converters.GFXBindingLayoutInfo),
     createPipelineState: replaceFunction('_createPipelineState', _converters.GFXPipelineStateInfo),
     createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.GFXPipelineLayoutInfo),
-    copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.)
+    copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.GFXBufferTextureCopyList)
 });
 
 let bindingLayoutProto = gfx.GFXBindingLayout.prototype;
