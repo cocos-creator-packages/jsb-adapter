@@ -38,7 +38,7 @@ let _converters = {
         return new gfx.GFXExtent(extent.width, extent.height, extent.depth);
     },
     GFXTextureSubres: function (res) {
-        return new gfx.GFXTextureSubres(res.base_mip_level, res.level_count, res.base_array_layer, res.layer_count);
+        return new gfx.GFXTextureSubres(res.baseMipLevel, res.levelCount, res.baseArrayLayer, res.layerCount);
     },
     // GFXTextureCopy,
     GFXBufferTextureCopy: function (obj) {
