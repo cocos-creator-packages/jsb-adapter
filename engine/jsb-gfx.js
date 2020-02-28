@@ -71,6 +71,17 @@ let _converters = {
     GFXBufferInfo: function (info) {
         return new gfx.GFXBufferInfo(info.usage, info.memUsage, info.stride, info.size, info.flags);
     },
+    TypedArrayVectorToGFXBuffer: function (buffers) {
+        // Only handle the first buffer to match native API
+        let buffer = buffers[0];
+        // assume it's uint8 array
+        let stride = 1;
+        let size = buffer.length;
+        let bufferInfo = new gfx.GFXBufferInfo(cc.GFXBufferUsageBit.TRANSFER_SRC, cc.GFXMemoryUsageBit.DEVICE, stride, size, cc.GFXBufferFlagBit.NONE);
+        let jsbBuffer = cc.game._gfxDevice.createBuffer(bufferInfo);
+        jsbBuffer.update(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+        return jsbBuffer;
+    },
     // GFXDrawInfo,
     // GFXIndirectBuffer,
     GFXTextureInfo: function (info) {
@@ -312,7 +323,7 @@ replace(deviceProto, {
     createBindingLayout: replaceFunction('_createBindingLayout', _converters.GFXBindingLayoutInfo),
     createPipelineState: replaceFunction('_createPipelineState', _converters.GFXPipelineStateInfo),
     createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.GFXPipelineLayoutInfo),
-    copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.GFXBufferTextureCopyList)
+    copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.TypedArrayVectorToGFXBuffer, _converters.origin, _converters.GFXBufferTextureCopyList),
 });
 
 let bindingLayoutProto = gfx.GFXBindingLayout.prototype;
