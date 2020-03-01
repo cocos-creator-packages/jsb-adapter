@@ -28,6 +28,25 @@ let _converters = {
     origin: function (arg) {
         return arg;
     },
+    texImagesToBuffers: function (texImages) {
+        let buffers = [];
+        for (let i = 0; i < texImages.length; ++i) {
+            let texImage = texImages[i];
+            if (texImage instanceof HTMLCanvasElement) {
+                // Refer to HTMLCanvasElement and ImageData implementation
+                buffers.push(texImage._data.data);
+            }
+            else if (texImage instanceof HTMLImageElement) {
+                // Refer to HTMLImageElement implementation
+                buffers.push(texImage._data);
+            }
+            else {
+                console.log('copyTexImagesToTexture: Convert texImages to data buffers failed');
+                return null;
+            }
+        }
+        return buffers;
+    },
     GFXOffset: function (offset) {
         return new gfx.GFXOffset(offset.x, offset.y, offset.z);
     },
@@ -69,7 +88,7 @@ let _converters = {
     // GFXWindowInfo,
     // GFXContextInfo,
     GFXBufferInfo: function (info) {
-        return new gfx.GFXBufferInfo(info.usage, info.memUsage, info.stride, info.size, info.flags);
+        return new gfx.GFXBufferInfo(info);
     },
     // GFXDrawInfo,
     // GFXIndirectBuffer,
@@ -80,7 +99,7 @@ let _converters = {
         return new gfx.GFXTextureViewInfo(info);
     },
     GFXSamplerInfo: function (info) {
-        info.border_color = _converters.GFXColor(info.borderColor);
+        info.borderColor = _converters.GFXColor(info.borderColor);
         return new gfx.GFXSamplerInfo(info);
     },
     GFXShaderMacro: function (macro) {
@@ -313,6 +332,7 @@ replace(deviceProto, {
     createPipelineState: replaceFunction('_createPipelineState', _converters.GFXPipelineStateInfo),
     createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.GFXPipelineLayoutInfo),
     copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.GFXBufferTextureCopyList),
+    copyTexImagesToTexture: replaceFunction('_copyTexImagesToTexture', _converters.texImagesToBuffers, _converters.origin, _converters.GFXBufferTextureCopyList),
 });
 
 let bindingLayoutProto = gfx.GFXBindingLayout.prototype;
