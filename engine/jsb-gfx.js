@@ -29,35 +29,37 @@ let _converters = {
         return arg;
     },
     texImagesToBuffers: function (texImages) {
-        let buffers = [];
-        for (let i = 0; i < texImages.length; ++i) {
-            let texImage = texImages[i];
-            if (texImage instanceof HTMLCanvasElement) {
-                // Refer to HTMLCanvasElement and ImageData implementation
-                buffers.push(texImage._data.data);
+        if (texImages) {
+            let buffers = [];
+            for (let i = 0; i < texImages.length; ++i) {
+                let texImage = texImages[i];
+                if (texImage instanceof HTMLCanvasElement) {
+                    // Refer to HTMLCanvasElement and ImageData implementation
+                    buffers.push(texImage._data.data);
+                }
+                else if (texImage instanceof HTMLImageElement) {
+                    // Refer to HTMLImageElement implementation
+                    buffers.push(texImage._data);
+                }
+                else {
+                    console.log('copyTexImagesToTexture: Convert texImages to data buffers failed');
+                    return null;
+                }
             }
-            else if (texImage instanceof HTMLImageElement) {
-                // Refer to HTMLImageElement implementation
-                buffers.push(texImage._data);
-            }
-            else {
-                console.log('copyTexImagesToTexture: Convert texImages to data buffers failed');
-                return null;
-            }
+            return buffers;
         }
-        return buffers;
     },
     GFXOffset: function (offset) {
-        return new gfx.GFXOffset(offset.x, offset.y, offset.z);
+        return offset && new gfx.GFXOffset(offset.x, offset.y, offset.z);
     },
     GFXRect: function (rect) {
-        return new gfx.GFXRect(rect.x, rect.y, rect.width, rect.height);
+        return rect && new gfx.GFXRect(rect.x, rect.y, rect.width, rect.height);
     },
     GFXExtent: function (extent) {
-        return new gfx.GFXExtent(extent.width, extent.height, extent.depth);
+        return extent && new gfx.GFXExtent(extent.width, extent.height, extent.depth);
     },
     GFXTextureSubres: function (res) {
-        return new gfx.GFXTextureSubres(res.baseMipLevel, res.levelCount, res.baseArrayLayer, res.layerCount);
+        return res && new gfx.GFXTextureSubres(res.baseMipLevel, res.levelCount, res.baseArrayLayer, res.layerCount);
     },
     // GFXTextureCopy,
     GFXBufferTextureCopy: function (obj) {
@@ -67,17 +69,19 @@ let _converters = {
         return new gfx.GFXBufferTextureCopy(obj.buffOffset, obj.buffStride, obj.buffTexHeight, jsbOffset, jsbExtent, jsbSubres);
     },
     GFXBufferTextureCopyList: function (list) {
-        let jsbList = [];
-        for (let i = 0; i < list.length; ++i) {
-            jsbList.push(_converters.GFXBufferTextureCopy(list[i]));
+        if (list) {
+            let jsbList = [];
+            for (let i = 0; i < list.length; ++i) {
+                jsbList.push(_converters.GFXBufferTextureCopy(list[i]));
+            }
+            return jsbList;
         }
-        return jsbList;
     },
     GFXViewport: function (vp) {
-        return new gfx.GFXViewport(vp.left, vp.top, vp.width, vp.height, vp.minDepth, vp.maxDepth);
+        return vp && new gfx.GFXViewport(vp.left, vp.top, vp.width, vp.height, vp.minDepth, vp.maxDepth);
     },
     GFXColor: function (color) {
-        return new gfx.GFXColor(color.r, color.g, color.b, color.a);
+        return color && new gfx.GFXColor(color.r, color.g, color.b, color.a);
     },
     GFXDeviceInfo: function (info) {
         let width = cc.game.canvas.width,
@@ -110,9 +114,12 @@ let _converters = {
     },
     GFXUniformBlock: function (block) {
         let uniforms = block.uniforms;
-        let jsbUniforms = [];
-        for (let i = 0; i < uniforms.length; ++i) {
-            jsbUniforms.push(_converters.GFXUniform(uniforms[i]));
+        let jsbUniforms;
+        if (uniforms) {
+            jsbUniforms = [];
+            for (let i = 0; i < uniforms.length; ++i) {
+                jsbUniforms.push(_converters.GFXUniform(uniforms[i]));
+            }
         }
         return new gfx.GFXUniformBlock(block.binding, block.name, jsbUniforms);
     },
@@ -121,9 +128,12 @@ let _converters = {
     },
     GFXShaderStage: function (stage) {
         let macros = stage.macros;
-        let jsbMacros = [];
-        for (let i = 0; i < macros.length; ++i) {
-            jsbMacros.push(_converters.GFXShaderMacro(macros[i]));
+        let jsbMacros;
+        if (macros) {
+            jsbMacros = [];
+            for (let i = 0; i < macros.length; ++i) {
+                jsbMacros.push(_converters.GFXShaderMacro(macros[i]));
+            }
         }
         return new gfx.GFXShaderStage(stage.type, stage.source, jsbMacros);
     },
@@ -131,15 +141,24 @@ let _converters = {
         let stages = info.stages,
             blocks = info.blocks,
             samplers = info.samplers;
-        let jsbStages = [], jsbBlocks = [], jsbSamplers = [];
-        for (let i = 0; i < stages.length; ++i) {
-            jsbStages.push(_converters.GFXShaderStage(stages[i]));
+        let jsbStages, jsbBlocks, jsbSamplers;
+        if (stages) {
+            jsbStages = [];
+            for (let i = 0; i < stages.length; ++i) {
+                jsbStages.push(_converters.GFXShaderStage(stages[i]));
+            }
         }
-        for (let i = 0; i < blocks.length; ++i) {
-            jsbBlocks.push(_converters.GFXUniformBlock(blocks[i]));
+        if (blocks) {
+            jsbBlocks = [];
+            for (let i = 0; i < blocks.length; ++i) {
+                jsbBlocks.push(_converters.GFXUniformBlock(blocks[i]));
+            }
         }
-        for (let i = 0; i < samplers.length; ++i) {
-            jsbSamplers.push(_converters.GFXUniformSampler(samplers[i]));
+        if (samplers) {
+            jsbSamplers = [];
+            for (let i = 0; i < samplers.length; ++i) {
+                jsbSamplers.push(_converters.GFXUniformSampler(samplers[i]));
+            }
         }
         return new gfx.GFXShaderInfo(info.name, jsbStages, jsbBlocks, jsbSamplers);
     },
@@ -148,9 +167,12 @@ let _converters = {
     },
     GFXInputAssemblerInfo: function (info) {
         let attrs = info.attributes;
-        let jsbAttrs = [];
-        for (let i = 0; i < attrs.length; ++i) {
-            jsbAttrs.push(_converters.GFXAttribute(attrs[i]));
+        let jsbAttrs;
+        if (attrs) {
+            jsbAttrs = [];
+            for (let i = 0; i < attrs.length; ++i) {
+                jsbAttrs.push(_converters.GFXAttribute(attrs[i]));
+            }
         }
         return new gfx.GFXInputAssemblerInfo(jsbAttrs, info.vertexBuffers, info.indexBuffer, info.indirectBuffer);
     },
@@ -166,14 +188,21 @@ let _converters = {
     GFXRenderPassInfo: function (info) {
         let colors = info.colorAttachments,
             subPasses = info.subPasses;
-        let jsbColors = [], jsbSubPasses = [];
-        for (let i = 0; i < colors.length; ++i) {
-            jsbColors.push(_converters.GFXColorAttachment(colors[i]));
+        let jsbColors, jsbSubPasses;
+        if (colors) {
+            jsbColors = [];
+            for (let i = 0; i < colors.length; ++i) {
+                jsbColors.push(_converters.GFXColorAttachment(colors[i]));
+            }
         }
-        for (let i = 0; i < subPasses.length; ++i) {
-            jsbSubPasses.push(_converters.GFXSubPass(subPasses[i]));
+        if (subPasses) {
+            jsbSubPasses = [];
+            for (let i = 0; i < subPasses.length; ++i) {
+                jsbSubPasses.push(_converters.GFXSubPass(subPasses[i]));
+            }
         }
-        return new gfx.GFXRenderPassInfo(jsbColors, info.depthStencilAttachment, jsbSubPasses);
+        let jsbDSAttachment = _converters.GFXDepthStencilAttachment(info.depthStencilAttachment);
+        return new gfx.GFXRenderPassInfo(jsbColors, jsbDSAttachment, jsbSubPasses);
     },
     GFXFramebufferInfo: function (info) {
         return new gfx.GFXFramebufferInfo(info);
@@ -183,9 +212,12 @@ let _converters = {
     },
     GFXBindingLayoutInfo: function (info) {
         let bindings = info.bindings;
-        let jsbBindings = [];
-        for (let i = 0; i < bindings.length; ++i) {
-            jsbBindings.push(_converters.GFXBinding(bindings[i]));
+        let jsbBindings;
+        if (bindings) {
+            jsbBindings = [];
+            for (let i = 0; i < bindings.length; ++i) {
+                jsbBindings.push(_converters.GFXBinding(bindings[i]));
+            }
         }
         return new gfx.GFXBindingLayoutInfo(jsbBindings);
     },
@@ -198,21 +230,27 @@ let _converters = {
     GFXPipelineLayoutInfo: function (info) {
         let ranges = info.pushConstantRanges,
             layouts = info.layouts;
-        let jsbRanges = [], jsbLayouts = [];
-        for (let i = 0; i < ranges.length; ++i) {
-            jsbRanges.push(_converters.GFXPushConstantRange(ranges[i]));
+        let jsbRanges;
+        if (ranges) {
+            jsbRanges = [];
+            for (let i = 0; i < ranges.length; ++i) {
+                jsbRanges.push(_converters.GFXPushConstantRange(ranges[i]));
+            }
         }
         // for (let i = 0; i < layouts.length; ++i) {
         //     jsbLayouts.push(_converters.GFXBindingLayout(layouts[i]));
         // }
         // Layouts are pointers which should be passing through directly
-        return new gfx.GFXPipelineLayoutInfo(jsbRanges, info.layouts);
+        return new gfx.GFXPipelineLayoutInfo(jsbRanges, layouts);
     },
     GFXInputState: function (info) {
         let attrs = info.attributes;
-        let jsbAttrs = [];
-        for (let i = 0; i < attrs.length; ++i) {
-            jsbAttrs.push(_converters.GFXAttribute(attrs[i]));
+        let jsbAttrs;
+        if (attrs) {
+            jsbAttrs = [];
+            for (let i = 0; i < attrs.length; ++i) {
+                jsbAttrs.push(_converters.GFXAttribute(attrs[i]));
+            }
         }
         return new gfx.GFXInputState(jsbAttrs);
     },
@@ -227,9 +265,12 @@ let _converters = {
     },
     GFXBlendState: function (state) {
         let targets = state.targets;
-        let jsbTargets = [];
-        for (let i = 0; i < targets.length; ++i) {
-            jsbTargets.push(_converters.GFXBlendTarget(targets[i]));
+        let jsbTargets;
+        if (targets) {
+            jsbTargets = [];
+            for (let i = 0; i < targets.length; ++i) {
+                jsbTargets.push(_converters.GFXBlendTarget(targets[i]));
+            }
         }
         let color = _converters.GFXColor(state.blendColor);
         return new gfx.GFXBlendState(state.isA2c, state.isIndepend, color, jsbTargets);
