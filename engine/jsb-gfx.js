@@ -208,7 +208,7 @@ let _converters = {
         return new gfx.GFXFramebufferInfo(info);
     },
     GFXBinding: function (binding) {
-        return new gfx.GFXBinding(binding.binding, binding.type, binding.name);
+        return new gfx.GFXBinding(binding.binding, binding.bindingType, binding.name);
     },
     GFXBindingLayoutInfo: function (info) {
         let bindings = info.bindings;
