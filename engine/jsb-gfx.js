@@ -376,6 +376,23 @@ replace(deviceProto, {
     copyTexImagesToTexture: replaceFunction('_copyTexImagesToTexture', _converters.texImagesToBuffers, _converters.origin, _converters.GFXBufferTextureCopyList),
 });
 
+deviceProto.getWidth = deviceProto.width;
+deviceProto.getHeight = deviceProto.height;
+deviceProto.getNativeWidth = deviceProto.nativeWidth;
+deviceProto.getNativeHeight = deviceProto.nativeHeight;
+cc.js.get(deviceProto, 'width', function () {
+    return this.getWidth();
+});
+cc.js.get(deviceProto, 'height', function () {
+    return this.getHeight();
+});
+cc.js.get(deviceProto, 'nativeWidth', function () {
+    return this.getNativeWidth();
+});
+cc.js.get(deviceProto, 'nativeHeight', function () {
+    return this.getNativeHeight();
+});
+
 let bindingLayoutProto = gfx.GFXBindingLayout.prototype;
 replace(bindingLayoutProto, {
     initialize: replaceFunction('_initialize', _converters.GFXBindingLayoutInfo),
