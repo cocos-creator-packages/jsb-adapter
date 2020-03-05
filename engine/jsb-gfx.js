@@ -83,6 +83,15 @@ let _converters = {
     GFXColor: function (color) {
         return color && new gfx.GFXColor(color.r, color.g, color.b, color.a);
     },
+    GFXColorArray: function (colors) {
+        if (colors) {
+            let jsbColors = [];
+            for (let i = 0; i < colors.length; ++i) {
+                jsbColors.push(_converters.GFXColor(colors[i]));
+            }
+            return jsbColors;
+        }
+    },
     GFXDeviceInfo: function (info) {
         let width = cc.game.canvas.width,
             height = cc.game.canvas.height,
@@ -338,7 +347,18 @@ function replaceFunction (jsbFunc, ...converters) {
             return this[jsbFunc](_jsbParam0, _jsbParam1, _jsbParam2);
         }
     }
-    else return null;
+    else {
+        return function (...params) {
+            if (l !== params.length) {
+                throw new Error(jsbFunc + ': The parameters length don\'t match the converters length');
+            }
+            let jsbParams = new Array(l);
+            for (let i = 0; i < l; ++i) {
+                jsbParams[i] = converters[i](params[i]);
+            }
+            return this[jsbFunc].apply(this, jsbParams);
+        }
+    };
 }
 
 // Replace all given functions to the wrapper function provided
@@ -397,6 +417,13 @@ replace(commandBufferProto, {
     setViewport: replaceFunction('_setViewport', _converters.GFXViewport),
     setScissor: replaceFunction('_setScissor', _converters.GFXRect),
     setBlendConstants: replaceFunction('_setBlendConstants', _converters.GFXColor),
+    beginRenderPass: replaceFunction('_beginRenderPass', 
+        _converters.origin,
+        _converters.GFXRect,
+        _converters.origin,
+        _converters.GFXColorArray,
+        _converters.origin,
+        _converters.origin),
 });
 
 // let contextProto = gfx.GFXContext.prototype;
@@ -503,7 +530,7 @@ fixProperties(textureProto, ['type', 'usage', 'format', 'width', 'height', 'dept
 fixProperties(bindingLayoutProto, ['device', 'bindingUnits']);
 fixProperties(queueProto, ['device', 'type']);
 fixProperties(renderPassProto, ['device', 'colorAttachments', 'depthStencilAttachment', 'subPasses']);
-fixProperties(pipelineLayoutProto, ['device', 'pushConstantsRanges', 'layouts']);
+fixProperties(pipelineLayoutProto, ['device']);
 fixProperties(pipelineStateProto, ['device', 'shader', 'primitive', 'inputState', 'rasterizerState', 'depthStencilState', 'blendState', 'dynamicStats', 'pipelineLayout', 'renderPass']);
 fixProperties(iaProto, ['device', 'attributes', 'vertexBuffers', 'indexBuffer', 'indirectBuffer', 'vertexCount', 'firstVertex', 'indexCount', 'firstIndex', 'vertexOffset', 'instanceCount', 'firstInstance']);
 fixProperties(commandBufferProto, ['device', 'allocator', 'type', 'numDrawCalls', 'numTris']);
