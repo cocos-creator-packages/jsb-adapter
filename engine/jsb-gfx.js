@@ -470,6 +470,9 @@ let shaderProto = gfx.GFXShader.prototype;
 replace(shaderProto, {
     initialize: replaceFunction('_initialize', _converters.GFXShaderInfo),
 });
+cc.js.get(shaderProto, 'id', function () {
+    return this.hash;
+});
 
 let textureProto = gfx.GFXTexture.prototype;
 replace(textureProto, {
@@ -485,56 +488,3 @@ let windowProto = gfx.GFXWindow.prototype;
 replace(windowProto, {
     initialize: replaceFunction('_initialize', _converters.GFXWindowInfo),
 });
-
-function fixProperty (proto, prop) {
-    let getter = 'get' + prop;
-    proto[getter] = proto[prop];
-    cc.js.get(proto, prop, function () {
-        return this[getter]();
-    });
-}
-function fixProperties (proto, props) {
-    for (let i = 0; i < props.length; ++i) {
-        fixProperty(proto, props[i]);
-    }
-}
-
-fixProperties(deviceProto, [
-    'width', 'height',
-    'nativeWidth', 'nativeHeight',
-    'memoryStatus',
-    'context',
-    'mainWindow',
-    'queue',
-    'commandAllocator',
-    'renderer',
-    'vendor',
-    'numDrawCalls', 'numTris',
-]);
-fixProperties(windowProto, [
-    'device',
-    'title',
-    'left', 'top',
-    'width', 'height',
-    'nativeWidth', 'nativeHeight',
-    'colorFormat', 'depthStencilFormat',
-    'isOffscreen', 'renderPass',
-    'colorTexture', 'colorTexView',
-    'depthStencilTexture', 'depthStencilTexView',
-    'framebuffer'
-]);
-fixProperties(shaderProto, ['device', 'name', 'hash', 'stages', 'blocks', 'samplers']);
-// fixProperties(commandAllocatorProto, ['device']);
-fixProperties(textureViewProto, ['device', 'texture', 'type', 'format', 'baseLevel', 'levelCount', 'baseLayer', 'layerCount']);
-fixProperties(textureProto, ['type', 'usage', 'format', 'width', 'height', 'depth', 'arrayLayer', 'mipLevel', 'size', 'samples', 'flags', 'buffer']);
-fixProperties(bindingLayoutProto, ['device', 'bindingUnits']);
-fixProperties(queueProto, ['device', 'type']);
-fixProperties(renderPassProto, ['device', 'colorAttachments', 'depthStencilAttachment', 'subPasses']);
-fixProperties(pipelineLayoutProto, ['device']);
-fixProperties(pipelineStateProto, ['device', 'shader', 'primitive', 'inputState', 'rasterizerState', 'depthStencilState', 'blendState', 'dynamicStats', 'pipelineLayout', 'renderPass']);
-fixProperties(iaProto, ['device', 'attributes', 'vertexBuffers', 'indexBuffer', 'indirectBuffer', 'vertexCount', 'firstVertex', 'indexCount', 'firstIndex', 'vertexOffset', 'instanceCount', 'firstInstance']);
-fixProperties(commandBufferProto, ['device', 'allocator', 'type', 'numDrawCalls', 'numTris']);
-// fixProperties(contextProto, ['device', 'sharedContext', 'vsyncMode', 'colorFormat', 'depthStencilFormat']);
-fixProperties(framebufferProto, ['device', 'renderPass', 'colorViews', 'depthStencilView', 'isOffscreen']);
-fixProperties(bufferProto, ['device', 'usage', 'memUsage', 'stride', 'count', 'size', 'flags', 'bufferView']);
-fixProperties(samplerProto, ['device', 'name', 'minFilter', 'magFilter', 'mipFilter', 'addressU', 'addressV', 'addressW', 'maxAnisotropy', 'cmpFunc', 'borderColor', 'minLOD', 'maxLOD', 'mipLODBias']);
