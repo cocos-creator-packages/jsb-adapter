@@ -34,7 +34,7 @@ let _dirtyWaiting = [];
 let _rendering = false;
 
 var director = cc.director;
-RenderFlow.render = function (scene) {
+RenderFlow.render = function (scene, dt) {
     _rendering = true;
 
     RenderFlow.validateRenderers();
@@ -63,7 +63,8 @@ RenderFlow.render = function (scene) {
 
     _dirtyTargets.length = 0;
 
-    this._nativeFlow.render(scene._proxy, director._deltaTime);
+    dt = dt || 0;
+    this._nativeFlow.render(scene._proxy, dt);
 
     _dirtyTargets = _dirtyWaiting.slice(0);
     _dirtyWaiting.length = 0;
