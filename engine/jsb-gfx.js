@@ -122,7 +122,7 @@ let _converters = {
         return new gfx.GFXUniform(u.name, u.type, u.count);
     },
     GFXUniformBlock: function (block) {
-        let uniforms = block.uniforms;
+        let uniforms = block.members;
         let jsbUniforms;
         if (uniforms) {
             jsbUniforms = [];
