@@ -22,7 +22,6 @@ function inject () {
     window.__canvas = new HTMLCanvasElement();
     window.__canvas._width = window.innerWidth;
     window.__canvas._height = window.innerHeight;
-    window.__gl.canvas = window.__canvas;
     window.navigator = require('./navigator');
     window.Image = require('./Image');
     window.FileReader = require('./FileReader');
