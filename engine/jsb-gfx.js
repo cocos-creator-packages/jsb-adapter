@@ -420,6 +420,37 @@ replace(bufferProto, {
     initialize: replaceFunction('_initialize', _converters.GFXBufferInfo),
 });
 
+let oldUpdate = bufferProto.update;
+bufferProto.update = function(buffer, offset, size) {
+    let buffSize;
+    if (size !== undefined ) {
+        buffSize = size;
+    } else if (this.usage & 0x40) { // GFXBufferUsageBit.INDIRECT
+        // It is a IGFXIndirectBuffer object.
+        let drawInfos = buffer.drawInfos;
+        buffer = new Uint32Array(drawInfos.length * 7);
+        let baseIndex = 0;
+        let drawInfo;
+        for (let i = 0; i < drawInfos.length; ++i) {
+            baseIndex = i * 7;
+            drawInfo = drawInfos[i];
+            buffer[baseIndex] = drawInfo.vertexCount;
+            buffer[baseIndex + 1] = drawInfo.firstVertex;
+            buffer[baseIndex + 2] = drawInfo.indexCount;
+            buffer[baseIndex + 3] = drawInfo.firstIndex;
+            buffer[baseIndex + 4] = drawInfo.vertexOffset;
+            buffer[baseIndex + 5] = drawInfo.instanceCount;
+            buffer[baseIndex + 6] = drawInfo.firstInstance;
+        }
+
+        buffSize = buffer.byteLength;
+    } else {
+        buffSize = buffer.byteLength;
+    }
+
+    oldUpdate.call(this, buffer, offset || 0, buffSize);
+}
+
 // let commandAllocProto = gfx.GFXCommandAllocator.prototype;
 // replace(commandAllocProto, {
 //     initialize: replaceFunction('_initialize', _converters.GFXCommandAllocatorInfo),
