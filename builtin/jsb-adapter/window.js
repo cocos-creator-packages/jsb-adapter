@@ -9,6 +9,8 @@ function inject () {
     window.pageXOffset = window.pageYOffset = window.clientTop = window.clientLeft = 0;
     window.outerWidth = window.innerWidth;
     window.outerHeight = window.innerHeight;
+    window.clientWidth = window.innerWidth;
+    window.clientHeight = window.innerHeight;
 
     window.location = require('./location');
     window.document = require('./document');
@@ -123,6 +125,8 @@ function inject () {
         window.screen.availHeight = window.innerHeight;
         window.screen.width = window.innerWidth;
         window.screen.height = window.innerHeight;
+        window.clientWidth = window.innerWidth;
+        window.clientHeight = window.innerHeight;
     };
 
     window.focus = function() {};
