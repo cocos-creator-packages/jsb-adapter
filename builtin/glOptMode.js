@@ -100,6 +100,7 @@ var GL_COMMAND_BIND_VERTEX_ARRAY = 98;
 var GL_COMMAND_VERTEX_ATTRIB_DIVISOR = 99;
 var GL_COMMAND_DRAW_ARRAYS_INSTANCED = 100;
 var GL_COMMAND_DRAW_ELEMENTS_INSTANCED = 101;
+var GL_COMMAND_DELETE_VERTEX_ARRAY = 102;
 
 const gl = __gl;
 
@@ -139,7 +140,10 @@ function disableBatchGLCommandsToNative() {
     }
     // Reset extension references.
     const vao = gl.getExtension('OES_vertex_array_object');
-    if (vao) vao.bindVertexArrayOES = _gl.bindVertexArray;
+    if (vao) {
+        vao.bindVertexArrayOES = _gl.bindVertexArray;
+        vao.deleteVertexArray = _gl.deleteVertexArray;
+    }
     const ia = gl.getExtension('ANGLE_instanced_arrays');
     if (ia) {
         ia.vertexAttribDivisorANGLE = _gl.vertexAttribDivisor;
@@ -493,6 +497,17 @@ function cullFaceOpt(mode) {
     }
     buffer_data[next_index] = GL_COMMAND_CULL_FACE;
     buffer_data[next_index + 1] = mode;
+    next_index += 2;
+    ++commandCount;
+}
+
+function deleteVertexArrayOpt(vao) {
+    // console.log('GLOpt: deleteBuffer');
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DELETE_VERTEX_ARRAY;
+    buffer_data[next_index + 1] = vao ? vao._id : 0;
     next_index += 2;
     ++commandCount;
 }
@@ -1626,9 +1641,6 @@ function attachMethodOpt() {
     gl.activeTexture = activeTextureOpt;
     gl.attachShader = attachShaderOpt;
     gl.bindAttribLocation = bindAttribLocationOpt;
-    gl.bindVertexArray = bindVertexArrayOpt;
-    const vao = gl.getExtension('OES_vertex_array_object');
-    if (vao) vao.bindVertexArrayOES = bindVertexArrayOpt;
     gl.bindBuffer = bindBufferOpt;
     gl.bindFramebuffer = bindFramebufferOpt;
     gl.bindRenderbuffer = bindRenderbufferOpt;
@@ -1757,6 +1769,18 @@ function attachMethodOpt() {
     gl.vertexAttrib3fv = vertexAttrib3fvOpt;
     gl.vertexAttrib4fv = vertexAttrib4fvOpt;
     gl.vertexAttribPointer = vertexAttribPointerOpt;
+    gl.viewport = viewportOpt;
+
+    // extensions
+
+    gl.bindVertexArray = bindVertexArrayOpt;
+    gl.deleteVertexArray = deleteVertexArrayOpt;
+    const vao = gl.getExtension('OES_vertex_array_object');
+    if (vao) {
+        vao.bindVertexArrayOES = bindVertexArrayOpt;
+        vao.deleteVertexArray = deleteVertexArrayOpt;
+    }
+
     gl.vertexAttribDivisor = vertexAttribDivisorOpt;
     gl.drawArraysInstanced = drawArraysInstancedOpt;
     gl.drawElementsInstanced = drawElementsInstancedOpt;
@@ -1766,7 +1790,6 @@ function attachMethodOpt() {
         ia.drawArraysInstancedANGLE = drawArraysInstancedOpt;
         ia.drawElementsInstancedANGLE = drawElementsInstancedOpt;
     }
-    gl.viewport = viewportOpt;
 }
 
 batchGLCommandsToNative();
