@@ -27,12 +27,28 @@ const WebGLCompressedTexturePVRTC = {
     COMPRESSED_RGBA_PVRTC_2BPPV1_IMG: 0x8C03 //  RGBA compression in 2-bit mode. One block for each 8×4 pixe
 };
 
+const OESVertexArrayObject = {
+    createVertexArrayOES: gl.createVertexArray,
+    deleteVertexArrayOES: gl.deleteVertexArray,
+    bindVertexArrayOES: gl.bindVertexArray,
+    isVertexArrayOES: gl.isVertexArray,
+};
+
+const ANGLEInstancedArrays = {
+    VERTEX_ATTRIB_ARRAY_DIVISOR_ANGLE: 0x88FE,
+    drawArraysInstancedANGLE: gl.drawArraysInstanced,
+    drawElementsInstancedANGLE: gl.drawElementsInstanced,
+    vertexAttribDivisorANGLE: gl.vertexAttribDivisor,
+};
+
 var extensionPrefixArr = ['MOZ_', 'WEBKIT_'];
 
 var extensionMap = {
     WEBGL_compressed_texture_s3tc: WebGLCompressedTextureS3TC,
     WEBGL_compressed_texture_pvrtc: WebGLCompressedTexturePVRTC,
-    WEBGL_compressed_texture_etc1: WebGLCompressedTextureETC1
+    WEBGL_compressed_texture_etc1: WebGLCompressedTextureETC1,
+    ANGLE_instanced_arrays: ANGLEInstancedArrays,
+    OES_vertex_array_object: OESVertexArrayObject,
 };
 
 // From the WebGL spec:
@@ -82,7 +98,7 @@ void gl.texImage2D(target, level, internalformat, format, type, ImageBitmap? pix
 gl.texImage2D = function(target, level, internalformat, width, height, border, format, type, pixels) {
     let argCount = arguments.length;
     if (argCount == 6) {
-        
+
         var image = border;
         type = height;
         format = width;
@@ -99,7 +115,7 @@ gl.texImage2D = function(target, level, internalformat, width, height, border, f
         }
         else {
             console.error("Invalid pixel argument passed to gl.texImage2D!");
-        } 
+        }
     }
     else if (argCount == 9) {
         _glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels, 0);
@@ -152,13 +168,13 @@ gl.texSubImage2D = function(target, level, xoffset, yoffset, width, height, form
 //REFINE:cjh get the real value
 gl.getContextAttributes = function() {
     return {
-      alpha: true, 
-      antialias: false, 
-      depth: true, 
-      failIfMajorPerformanceCaveat: false, 
-      premultipliedAlpha: true, 
-      preserveDrawingBuffer: false, 
-      stencil: true 
+      alpha: true,
+      antialias: false,
+      depth: true,
+      failIfMajorPerformanceCaveat: false,
+      premultipliedAlpha: true,
+      preserveDrawingBuffer: false,
+      stencil: true
     }
 }
 

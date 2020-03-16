@@ -96,6 +96,10 @@ var GL_COMMAND_VERTEX_ATTRIB_3FV = 94;
 var GL_COMMAND_VERTEX_ATTRIB_4FV = 95;
 var GL_COMMAND_VERTEX_ATTRIB_POINTER = 96;
 var GL_COMMAND_VIEW_PORT = 97;
+var GL_COMMAND_BIND_VERTEX_ARRAY = 98;
+var GL_COMMAND_VERTEX_ATTRIB_DIVISOR = 99;
+var GL_COMMAND_DRAW_ARRAYS_INSTANCED = 100;
+var GL_COMMAND_DRAW_ELEMENTS_INSTANCED = 101;
 
 const gl = __gl;
 
@@ -133,6 +137,16 @@ function disableBatchGLCommandsToNative() {
     for (var k in _gl) {
         __gl[k] = _gl[k];
     }
+    // Reset extension references.
+    const vao = gl.getExtension('OES_vertex_array_object');
+    if (vao) vao.bindVertexArrayOES = _gl.bindVertexArray;
+    const ia = gl.getExtension('ANGLE_instanced_arrays');
+    if (ia) {
+        ia.vertexAttribDivisorANGLE = _gl.vertexAttribDivisor;
+        ia.drawArraysInstancedANGLE = _gl.drawArraysInstanced;
+        ia.drawElementsInstancedANGLE = _gl.drawElementsInstanced;
+    }
+
     console.log('Disable batch GL commands optimization！');
     jsb.disableBatchGLCommandsToNative();
 }
@@ -172,6 +186,17 @@ function bindAttribLocationOpt(program, index, name) {
     // console.log('GLOpt: bindAttribLocation');
     flushCommands();
     _gl.bindAttribLocation(program, index, name);
+}
+
+function bindVertexArrayOpt(vao) {
+    // console.log('GLOpt: bindVertexArray: ' + (vao? vao._id : null));
+    if (next_index + 2 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_BIND_VERTEX_ARRAY;
+    buffer_data[next_index + 1] = vao ? vao._id : 0;
+    next_index += 2;
+    ++commandCount;
 }
 
 function bindBufferOpt(target, buffer) {
@@ -630,6 +655,35 @@ function drawElementsOpt(mode, count, type, offset) {
     buffer_data[next_index + 3] = type;
     buffer_data[next_index + 4] = offset ? offset : 0;
     next_index += 5;
+    ++commandCount;
+}
+
+function drawArraysInstancedOpt(mode, first, count, instanceCount) {
+    // console.log('GLOpt: drawArrays');
+    if (next_index + 5 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DRAW_ARRAYS_INSTANCED;
+    buffer_data[next_index + 1] = mode;
+    buffer_data[next_index + 2] = first;
+    buffer_data[next_index + 3] = count;
+    buffer_data[next_index + 4] = instanceCount;
+    next_index += 5;
+    ++commandCount;
+}
+
+function drawElementsInstancedOpt(mode, count, type, offset, instanceCount) {
+    // console.log('GLOpt: drawElements');
+    if (next_index + 6 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DRAW_ELEMENTS_INSTANCED;
+    buffer_data[next_index + 1] = mode;
+    buffer_data[next_index + 2] = count;
+    buffer_data[next_index + 3] = type;
+    buffer_data[next_index + 4] = offset ? offset : 0;
+    buffer_data[next_index + 5] = instanceCount;
+    next_index += 6;
     ++commandCount;
 }
 
@@ -1529,6 +1583,18 @@ function vertexAttribPointerOpt(index, size, type, normalized, stride, offset) {
     ++commandCount;
 }
 
+function vertexAttribDivisorOpt(glLoc, divisor) {
+    // console.log('GLOpt: vertexAttribDivisor');
+    if (next_index + 3 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_DIVISOR;
+    buffer_data[next_index + 1] = glLoc;
+    buffer_data[next_index + 2] = divisor;
+    next_index += 3;
+    ++commandCount;
+}
+
 function viewportOpt(x, y, width, height) {
     // console.log('GLOpt: viewport');
     if (next_index + 5 >= total_size) {
@@ -1560,6 +1626,9 @@ function attachMethodOpt() {
     gl.activeTexture = activeTextureOpt;
     gl.attachShader = attachShaderOpt;
     gl.bindAttribLocation = bindAttribLocationOpt;
+    gl.bindVertexArray = bindVertexArrayOpt;
+    const vao = gl.getExtension('OES_vertex_array_object');
+    if (vao) vao.bindVertexArrayOES = bindVertexArrayOpt;
     gl.bindBuffer = bindBufferOpt;
     gl.bindFramebuffer = bindFramebufferOpt;
     gl.bindRenderbuffer = bindRenderbufferOpt;
@@ -1688,6 +1757,15 @@ function attachMethodOpt() {
     gl.vertexAttrib3fv = vertexAttrib3fvOpt;
     gl.vertexAttrib4fv = vertexAttrib4fvOpt;
     gl.vertexAttribPointer = vertexAttribPointerOpt;
+    gl.vertexAttribDivisor = vertexAttribDivisorOpt;
+    gl.drawArraysInstanced = drawArraysInstancedOpt;
+    gl.drawElementsInstanced = drawElementsInstancedOpt;
+    const ia = gl.getExtension('ANGLE_instanced_arrays');
+    if (ia) {
+        ia.vertexAttribDivisorANGLE = vertexAttribDivisorOpt;
+        ia.drawArraysInstancedANGLE = drawArraysInstancedOpt;
+        ia.drawElementsInstancedANGLE = drawElementsInstancedOpt;
+    }
     gl.viewport = viewportOpt;
 }
 
