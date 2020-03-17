@@ -29,9 +29,11 @@
         return;
     }
 
-    var math = cc.vmath;
-    var _worldMat = math.mat4.create();
-    var _cameraMat = math.mat4.create();
+    var vec3 = cc.Vec3;
+    var _worldMat = new cc.Mat4();
+
+    var _topLeft = new vec3();
+    var _bottomRight = new vec3();
 
     cc.WebView.Impl = cc.Class({
         extends: cc.WebView.Impl,
@@ -266,34 +268,23 @@
         this._w = node._contentSize.width;
         this._h = node._contentSize.height;
 
-        let camera = cc.Camera.findCamera(node);
-        camera.getWorldToScreenMatrix2D(_cameraMat);
-        math.mat4.mul(_cameraMat, _cameraMat, _worldMat);
+        let camera = cc.Camera.findCamera(node)._camera;
 
-        let viewScaleX = cc.view._scaleX,
-            viewScaleY = cc.view._scaleY;
-        let dpr = cc.view._devicePixelRatio;
-        viewScaleX /= dpr;
-        viewScaleY /= dpr;
+        let canvas_width = cc.game.canvas.width;
+        let canvas_height = cc.game.canvas.height;
+        let ap = node._anchorPoint;
+        // Vectors in node space
+        vec3.set(_topLeft, - ap.x * this._w, (1.0 - ap.y) * this._h, 0);
+        vec3.set(_bottomRight, (1 - ap.x) * this._w, - ap.y * this._h, 0);
+        // Convert to world space
+        vec3.transformMat4(_topLeft, _topLeft, _worldMat);
+        vec3.transformMat4(_bottomRight, _bottomRight, _worldMat);
+        // Convert to screen space
+        camera.worldToScreen(_topLeft, _topLeft, canvas_width, canvas_height);
+        camera.worldToScreen(_bottomRight, _bottomRight, canvas_width, canvas_height);
 
-        let finalScaleX = _cameraMat.m[0] * viewScaleX,
-            finalScaleY = _cameraMat.m[5] * viewScaleY;
-
-        let finalWidth = this._w * finalScaleX,
-            finalHeight = this._h * finalScaleY;
-
-        let appx = finalWidth * node._anchorPoint.x;
-        let appy = finalHeight * node._anchorPoint.y;
-
-        let viewport = cc.view._viewportRect;
-        let offsetX = viewport.x / dpr,
-            offsetY = viewport.y / dpr;
-
-        let tx = _cameraMat.m[12] * viewScaleX - appx + offsetX,
-            ty = _cameraMat.m[13] * viewScaleY - appy + offsetY;
-
-        var height = cc.view.getFrameSize().height;
-        // set webview rect
-        this._iframe.setFrame(tx, height - finalHeight - ty, finalWidth, finalHeight);
+        let finalWidth = _bottomRight.x - _topLeft.x;
+        let finalHeight = _topLeft.y - _bottomRight.y;
+        this._iframe.setFrame(_topLeft.x, canvas_height - _topLeft.y, finalWidth, finalHeight);
     }
 })();

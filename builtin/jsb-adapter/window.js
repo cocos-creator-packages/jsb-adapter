@@ -9,6 +9,8 @@ function inject () {
     window.pageXOffset = window.pageYOffset = window.clientTop = window.clientLeft = 0;
     window.outerWidth = window.innerWidth;
     window.outerHeight = window.innerHeight;
+    window.clientWidth = window.innerWidth;
+    window.clientHeight = window.innerHeight;
 
     window.location = require('./location');
     window.document = require('./document');
@@ -65,7 +67,16 @@ function inject () {
     //FIXME: The value needs to be updated when device orientation changes.
     window.orientation = orientation;
 
-    window.devicePixelRatio = 1.0;
+    // window.devicePixelRatio is readonly
+    Object.defineProperty(window, "devicePixelRatio", {
+        get: function() {
+            return jsb.device.getDevicePixelRatio ? jsb.device.getDevicePixelRatio() : 1;
+        },
+        set: function(_dpr) {/* ignore */},
+        enumerable: true,
+        configurable: true
+    });
+
     window.screen = {
         availTop: 0,
         availLeft: 0,
@@ -115,6 +126,8 @@ function inject () {
         window.screen.availHeight = window.innerHeight;
         window.screen.width = window.innerWidth;
         window.screen.height = window.innerHeight;
+        window.clientWidth = window.innerWidth;
+        window.clientHeight = window.innerHeight;
     };
 
     window.focus = function() {};
