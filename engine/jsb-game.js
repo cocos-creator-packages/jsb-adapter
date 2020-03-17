@@ -45,6 +45,5 @@ jsb.onResize = function (size) {
     size.width /= cc.view._devicePixelRatio;
     size.height /= cc.view._devicePixelRatio;
     window.resize(size.width, size.height);
-    cc.view.setCanvasSize(window.innerWidth, window.innerHeight);
 };
 
