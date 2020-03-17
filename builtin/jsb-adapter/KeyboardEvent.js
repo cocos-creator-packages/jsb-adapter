@@ -51,7 +51,13 @@ class KeyboardEvent extends Event {
         else if (keyCode >= 65 && keyCode <= 90) { // A ~ Z
             var charCode = String.fromCharCode(keyCode);
             this._code = 'Key' + charCode;
-            this._key = (this._shiftKeyActive || __capsLockActive) ? charCode : charCode.toLowerCase();
+            this._key = (this._shiftKeyActive ^ __capsLockActive) ? charCode : charCode.toLowerCase();
+        }
+        else if (keyCode >= 97 && keyCode <= 122) { // a ~ z
+            var charCode = String.fromCharCode(keyCode);
+            this._keyCode = keyCode - (97 - 65); // always return uppercase keycode for backward-compatibility
+            this._code = 'Key' + charCode;
+            this._key = (this._shiftKeyActive ^ __capsLockActive) ? charCode.toUpperCase() : charCode;
         }
         else if (keyCode >= 112 && keyCode <= 123) { // F1 ~ F12
             this._code = this._key = 'F' + (keyCode - 111);
