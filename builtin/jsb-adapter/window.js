@@ -117,6 +117,10 @@ function inject () {
         window.screen.availHeight = window.innerHeight;
         window.screen.width = window.innerWidth;
         window.screen.height = window.innerHeight;
+        // emit resize consistent with web behavior
+        let resizeEvent = new Event('resize');
+        resizeEvent._target = window;
+        window.dispatchEvent(resizeEvent);
     };
 
     window.focus = function() {};
