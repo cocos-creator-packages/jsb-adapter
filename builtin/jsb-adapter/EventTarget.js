@@ -322,7 +322,7 @@ function mouseEventHandlerFactory(type) {
         const mouseEvent = new MouseEvent(type, {
             button: button,
             which: button + 1,
-            wheelDelta: event.wheelDeltaY * 120, // scale up to match the web interface
+            wheelDelta: event.wheelDeltaY && event.wheelDeltaY * 120, // scale up to match the web interface
             clientX: x,
             clientY: y,
             screenX: x,
