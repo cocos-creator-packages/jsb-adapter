@@ -32,3 +32,11 @@ proto.fill = function (graphics) {
     let buffer = this._buffer;
     buffer.meshbuffer.used(buffer.vertexStart, buffer.indiceStart);
 }
+
+let _updateIADatas = proto.updateIADatas;
+proto.updateIADatas = function (iaIndex, meshIndex) {
+    _updateIADatas.call(this, iaIndex, meshIndex);
+    // Reset vertexStart and indiceStart when buffer is switched.
+    this._buffer.vertexStart = 0;
+    this._buffer.indiceStart = 0;
+}
