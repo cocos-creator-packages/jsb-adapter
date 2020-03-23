@@ -388,26 +388,31 @@ function replace (proto, replacements) {
     }
 }
 
-let deviceProto = gfx.GLES2Device.prototype;
-replace(deviceProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXDeviceInfo),
-    createWindow: replaceFunction('_createWindow', _converters.GFXWindowInfo),
-    createQueue: replaceFunction('_createQueue', _converters.GFXQueueInfo),
-    // createCommandAllocator: replaceFunction('_createCommandAllocator', _converters.GFXCommandAllocatorInfo),
-    createCommandBuffer: replaceFunction('_createCommandBuffer', _converters.GFXCommandBufferInfo),
-    createBuffer: replaceFunction('_createBuffer', _converters.GFXBufferInfo),
-    createTexture: replaceFunction('_createTexture', _converters.GFXTextureInfo),
-    createTextureView: replaceFunction('_createTextureView', _converters.GFXTextureViewInfo),
-    createSampler: replaceFunction('_createSampler', _converters.GFXSamplerInfo),
-    createShader: replaceFunction('_createShader', _converters.GFXShaderInfo),
-    createInputAssembler: replaceFunction('_createInputAssembler', _converters.GFXInputAssemblerInfo),
-    createRenderPass: replaceFunction('_createRenderPass', _converters.GFXRenderPassInfo),
-    createFramebuffer: replaceFunction('_createFramebuffer', _converters.GFXFramebufferInfo),
-    createBindingLayout: replaceFunction('_createBindingLayout', _converters.GFXBindingLayoutInfo),
-    createPipelineState: replaceFunction('_createPipelineState', _converters.GFXPipelineStateInfo),
-    createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.GFXPipelineLayoutInfo),
-    copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.GFXBufferTextureCopyList),
-    copyTexImagesToTexture: replaceFunction('_copyTexImagesToTexture', _converters.texImagesToBuffers, _converters.origin, _converters.GFXBufferTextureCopyList),
+let deviceProtos = [gfx.GLES3Device && gfx.GLES3Device.prototype, 
+                    gfx.GLES2Device &&gfx.GLES2Device.prototype];
+deviceProtos.forEach(function(item, index) {
+    if (item !== undefined) {
+        replace(item, {
+            initialize: replaceFunction('_initialize', _converters.GFXDeviceInfo),
+            createWindow: replaceFunction('_createWindow', _converters.GFXWindowInfo),
+            createQueue: replaceFunction('_createQueue', _converters.GFXQueueInfo),
+            // createCommandAllocator: replaceFunction('_createCommandAllocator', _converters.GFXCommandAllocatorInfo),
+            createCommandBuffer: replaceFunction('_createCommandBuffer', _converters.GFXCommandBufferInfo),
+            createBuffer: replaceFunction('_createBuffer', _converters.GFXBufferInfo),
+            createTexture: replaceFunction('_createTexture', _converters.GFXTextureInfo),
+            createTextureView: replaceFunction('_createTextureView', _converters.GFXTextureViewInfo),
+            createSampler: replaceFunction('_createSampler', _converters.GFXSamplerInfo),
+            createShader: replaceFunction('_createShader', _converters.GFXShaderInfo),
+            createInputAssembler: replaceFunction('_createInputAssembler', _converters.GFXInputAssemblerInfo),
+            createRenderPass: replaceFunction('_createRenderPass', _converters.GFXRenderPassInfo),
+            createFramebuffer: replaceFunction('_createFramebuffer', _converters.GFXFramebufferInfo),
+            createBindingLayout: replaceFunction('_createBindingLayout', _converters.GFXBindingLayoutInfo),
+            createPipelineState: replaceFunction('_createPipelineState', _converters.GFXPipelineStateInfo),
+            createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.GFXPipelineLayoutInfo),
+            copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.GFXBufferTextureCopyList),
+            copyTexImagesToTexture: replaceFunction('_copyTexImagesToTexture', _converters.texImagesToBuffers, _converters.origin, _converters.GFXBufferTextureCopyList),
+        });
+    }
 });
 
 let bindingLayoutProto = gfx.GFXBindingLayout.prototype;
