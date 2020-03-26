@@ -32,6 +32,7 @@ const { downloadFile, readText, readArrayBuffer, readJson } = require('./jsb-fs-
 const REGEX = /^\w+:\/\/.*/;
 const downloader = cc.assetManager.downloader;
 const parser = cc.assetManager.parser;
+const suffix = 0;
 
 function downloadScript (url, options, onComplete) {
     if (typeof options === 'function') {
@@ -59,7 +60,7 @@ function download (url, func, options, onProgress, onComplete) {
     }
     else {
         var time = Date.now();
-        var storagePath = cacheManager.cacheDir + '/' + time + cc.path.extname(url);
+        var storagePath = cacheManager.cacheDir + '/' + time + (suffix++) + cc.path.extname(url);
         downloadFile(url, storagePath, options.header, onProgress, function (err, path) {
             if (err) {
                 onComplete(err, null);
@@ -235,7 +236,9 @@ downloader.register({
     '.ttf' : downloadFont,
     '.woff' : downloadFont,
     '.svg' : downloadFont,
-    '.ttc' : downloadFont
+    '.ttc' : downloadFont,
+
+    'default': downloadText
 });
 
 parser.register({
