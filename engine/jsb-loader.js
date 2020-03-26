@@ -60,7 +60,7 @@ function download (url, func, options, onProgress, onComplete) {
     }
     else {
         var time = Date.now().toString();
-        var storagePath = cacheManager.cacheDir + '/' + time + String(suffix++) + cc.path.extname(url);
+        var storagePath = cacheManager.cacheDir + '/' + time + (suffix++) + cc.path.extname(url);
         downloadFile(url, storagePath, options.header, onProgress, function (err, path) {
             if (err) {
                 onComplete(err, null);
