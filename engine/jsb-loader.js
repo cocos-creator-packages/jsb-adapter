@@ -59,7 +59,7 @@ function download (url, func, options, onProgress, onComplete) {
         func(result.url, options, onComplete);
     }
     else {
-        var time = Date.now().toString();
+        var time = Date.now();
         var storagePath = cacheManager.cacheDir + '/' + time + (suffix++) + cc.path.extname(url);
         downloadFile(url, storagePath, options.header, onProgress, function (err, path) {
             if (err) {
