@@ -31,11 +31,11 @@ function downloadScript (item, callback) {
     return null;
 }
 
-let audioDownloader = new jsb.Downloader();
-let audioUrlMap = {};  // key: url, value: { loadingItem, callback }
+let mediaDownloader = new jsb.Downloader();
+let mediaUrlMap = {};  // key: url, value: { loadingItem, callback }
 
-audioDownloader.setOnFileTaskSuccess(task => {
-    let { item, callback } = audioUrlMap[task.requestURL];
+mediaDownloader.setOnFileTaskSuccess(task => {
+    let { item, callback } = mediaUrlMap[task.requestURL];
     if (!(item && callback)) {
         return;
     }
@@ -44,16 +44,16 @@ audioDownloader.setOnFileTaskSuccess(task => {
     item.rawUrl = task.storagePath;
     
     callback(null, item);
-    delete audioUrlMap[task.requestURL];
+    delete mediaUrlMap[task.requestURL];
 });
 
-audioDownloader.setOnTaskError((task, errorCode, errorCodeInternal, errorStr) => {
-    let { callback } = audioUrlMap[task.requestURL];
+mediaDownloader.setOnTaskError((task, errorCode, errorCodeInternal, errorStr) => {
+    let { callback } = mediaUrlMap[task.requestURL];
     callback && callback(errorStr, null);
-    delete audioUrlMap[task.requestURL];
+    delete mediaUrlMap[task.requestURL];
 });
 
-function downloadAudio (item, callback) {
+function downloadMedia (item, callback) {
     if (/^http/.test(item.url)) {
         let fileName = jsbUtils.murmurhash2_32_gc(item.url) + cc.path.extname(item.url);
         let storagePath = jsb.fileUtils.getWritablePath() + fileName;
@@ -64,10 +64,10 @@ function downloadAudio (item, callback) {
             item.rawUrl = storagePath;
             callback && callback(null, item);
         }
-        // download remote audio
+        // download remote media file
         else {
-            audioUrlMap[item.url] = { item, callback };
-            audioDownloader.createDownloadFileTask(item.url, storagePath);
+            mediaUrlMap[item.url] = { item, callback };
+            mediaDownloader.createDownloadFileTask(item.url, storagePath);
         }
         // Don't return anything to use async loading.
     }
@@ -183,11 +183,19 @@ cc.loader.addDownloadHandlers({
     'pkm' : downloadImage,
 
     // Audio
-    'mp3' : downloadAudio,
-    'ogg' : downloadAudio,
-    'wav' : downloadAudio,
-    'mp4' : downloadAudio,
-    'm4a' : downloadAudio,
+    'mp3' : downloadMedia,
+    'ogg' : downloadMedia,
+    'wav' : downloadMedia,
+    'm4a' : downloadMedia,
+
+    // Video
+    'mp4': downloadMedia,
+    'avi': downloadMedia,
+    'mov': downloadMedia,
+    'mpg': downloadMedia,
+    'mpeg': downloadMedia,
+    'rm': downloadMedia,
+    'rmvb': downloadMedia,
 
     // Text
     'txt' : downloadText,
@@ -226,7 +234,6 @@ cc.loader.addLoadHandlers({
     'mp3' : loadAudio,
     'ogg' : loadAudio,
     'wav' : loadAudio,
-    'mp4' : loadAudio,
     'm4a' : loadAudio,
 
     // compressed texture
