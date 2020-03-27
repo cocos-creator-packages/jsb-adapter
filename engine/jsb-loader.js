@@ -186,7 +186,6 @@ cc.loader.addDownloadHandlers({
     'mp3' : downloadAudio,
     'ogg' : downloadAudio,
     'wav' : downloadAudio,
-    'mp4' : downloadAudio,
     'm4a' : downloadAudio,
 
     // Text
@@ -226,7 +225,6 @@ cc.loader.addLoadHandlers({
     'mp3' : loadAudio,
     'ogg' : loadAudio,
     'wav' : loadAudio,
-    'mp4' : loadAudio,
     'm4a' : loadAudio,
 
     // compressed texture
