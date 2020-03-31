@@ -139,6 +139,10 @@
             filePath = cc.loader.md5Pipe ? cc.loader.md5Pipe.transformURL(this.nativeUrl) : this.nativeUrl;
         }
         this._skeletonCache = spine.initSkeletonData(uuid, filePath, atlasText, jsbTextures, this.scale);
+        if (this._skeletonCache) {
+            this.width = this._skeletonCache.getWidth()
+            this.height = this._skeletonCache.getHeight()
+        }        
     };
 
     skeletonDataProto.recordTexture = function (texture) {
