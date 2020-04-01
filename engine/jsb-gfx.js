@@ -538,3 +538,45 @@ let windowProto = gfx.GFXWindow.prototype;
 replace(windowProto, {
     initialize: replaceFunction('_initialize', _converters.GFXWindowInfo),
 });
+
+let _tmpGetSetDesc = {
+    get: undefined,
+    set: undefined,
+    enumerable: true,
+    configurable: true
+};
+function defineProperty(proto) {
+    let keys = Object.keys(proto);
+    keys.forEach((item) => {
+        let oldProperty = item;
+        if (oldProperty.indexOf('__') === 0) {
+            let newProperty = oldProperty.substring(2);
+            let cachedProperty = oldProperty + '_cached';
+            _tmpGetSetDesc.get = function() {
+                if (this[cachedProperty] !== undefined) {
+                    return this[cachedProperty];
+                }
+                this[cachedProperty] = this[oldProperty];
+                return this[cachedProperty];
+            };
+            _tmpGetSetDesc.set = function(newProperty) {
+                this[cachedProperty] = newProperty;
+                this[oldProperty] = newProperty;
+            };
+            Object.defineProperty(proto, newProperty, _tmpGetSetDesc);
+        }
+    });
+}
+
+let gfxClass = Object.keys(gfx);
+gfxClass.forEach((item) => {
+    let gfxFunc = gfx[item];
+    if (gfxFunc === undefined) {
+        return;
+    }
+    let gfxFuncName = gfxFunc.name || gfxFunc.toString().match(/function\s*([^(]*)\(/)[1];
+    if (gfxFuncName.indexOf('GFX') !== 0) {
+        return;
+    }
+    defineProperty(gfxFunc.prototype);
+});
