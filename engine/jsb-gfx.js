@@ -22,6 +22,9 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
+let gfxRect = new gfx.GFXRect();
+let gfxColor = new gfx.GFXColor();
+let gfxColorArray = [];
 
 // Converters for converting js objects to jsb struct objects
 let _converters = {
@@ -52,8 +55,11 @@ let _converters = {
     GFXOffset: function (offset) {
         return offset && new gfx.GFXOffset(offset.x, offset.y, offset.z);
     },
-    GFXRect: function (rect) {
-        return rect && new gfx.GFXRect(rect.x, rect.y, rect.width, rect.height);
+    GFXRect: function(rect) {
+        if (rect) {
+            Object.assign(gfxRect, rect);
+        }
+        return gfxRect;
     },
     GFXExtent: function (extent) {
         return extent && new gfx.GFXExtent(extent.width, extent.height, extent.depth);
@@ -80,17 +86,18 @@ let _converters = {
     GFXViewport: function (vp) {
         return vp && new gfx.GFXViewport(vp.left, vp.top, vp.width, vp.height, vp.minDepth, vp.maxDepth);
     },
-    GFXColor: function (color) {
-        return color && new gfx.GFXColor(color.r, color.g, color.b, color.a);
-    },
-    GFXColorArray: function (colors) {
-        if (colors) {
-            let jsbColors = [];
-            for (let i = 0; i < colors.length; ++i) {
-                jsbColors.push(_converters.GFXColor(colors[i]));
-            }
-            return jsbColors;
+    GFXColor: function(color) {
+        if (color) {
+            Object.assign(gfxColor, color);
         }
+        return gfxColor;
+    },
+    GFXColorArray: function(colors) {
+        if (colors) {
+            colors.forEach((t, i) => Object.assign(
+                gfxColorArray[i] || (gfxColorArray[i] = new gfx.GFXColor()), t));
+        }
+        return gfxColorArray;
     },
     GFXDeviceInfo: function (info) {
         let width = cc.game.canvas.width,
