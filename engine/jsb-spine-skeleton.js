@@ -140,8 +140,8 @@
         }
         this._skeletonCache = spine.initSkeletonData(uuid, filePath, atlasText, jsbTextures, this.scale);
         if (this._skeletonCache) {
-            this.width = this._skeletonCache.getWidth()
-            this.height = this._skeletonCache.getHeight()
+            this.width = this._skeletonCache.getWidth();
+            this.height = this._skeletonCache.getHeight();
         }        
     };
 
