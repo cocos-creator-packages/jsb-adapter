@@ -396,7 +396,8 @@ function replace (proto, replacements) {
 }
 
 let deviceProtos = [gfx.GLES3Device && gfx.GLES3Device.prototype, 
-                    gfx.GLES2Device &&gfx.GLES2Device.prototype];
+                    gfx.GLES2Device && gfx.GLES2Device.prototype,
+                    gfx.CCMTLDevice && gfx.CCMTLDevice.prototype];
 deviceProtos.forEach(function(item, index) {
     if (item !== undefined) {
         replace(item, {
