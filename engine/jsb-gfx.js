@@ -395,7 +395,7 @@ function replace (proto, replacements) {
     }
 }
 
-let deviceProtos = [gfx.GLES3Device && gfx.GLES3Device.prototype, 
+let deviceProtos = [gfx.GLES3Device && gfx.GLES3Device.prototype,
                     gfx.GLES2Device && gfx.GLES2Device.prototype,
                     gfx.CCMTLDevice && gfx.CCMTLDevice.prototype];
 deviceProtos.forEach(function(item, index) {
@@ -475,7 +475,7 @@ replace(commandBufferProto, {
     setViewport: replaceFunction('_setViewport', _converters.GFXViewport),
     setScissor: replaceFunction('_setScissor', _converters.GFXRect),
     setBlendConstants: replaceFunction('_setBlendConstants', _converters.GFXColor),
-    beginRenderPass: replaceFunction('_beginRenderPass', 
+    beginRenderPass: replaceFunction('_beginRenderPass',
         _converters.origin,
         _converters.GFXRect,
         _converters.origin,
@@ -553,29 +553,50 @@ let _tmpGetSetDesc = {
     enumerable: true,
     configurable: true
 };
-function defineProperty(proto) {
+function defineProperty(proto, exceptions) {
     let keys = Object.keys(proto);
     keys.forEach((item) => {
         let oldProperty = item;
         if (oldProperty.indexOf('__') === 0) {
             let newProperty = oldProperty.substring(2);
             let cachedProperty = oldProperty + '_cached';
-            _tmpGetSetDesc.get = function() {
-                if (this[cachedProperty] !== undefined) {
+
+            if (exceptions && exceptions.includes(newProperty)) { // no caching
+                _tmpGetSetDesc.get = function() {
+                    return this[oldProperty];
+                };
+                _tmpGetSetDesc.set = function(newProperty) {
+                    this[oldProperty] = newProperty;
+                };
+            } else {
+                _tmpGetSetDesc.get = function() {
+                    if (this[cachedProperty] !== undefined) {
+                        return this[cachedProperty];
+                    }
+                    this[cachedProperty] = this[oldProperty];
                     return this[cachedProperty];
-                }
-                this[cachedProperty] = this[oldProperty];
-                return this[cachedProperty];
-            };
-            _tmpGetSetDesc.set = function(newProperty) {
-                this[cachedProperty] = newProperty;
-                this[oldProperty] = newProperty;
-            };
+                };
+                _tmpGetSetDesc.set = function(newProperty) {
+                    this[cachedProperty] = newProperty;
+                    this[oldProperty] = newProperty;
+                };
+            }
             Object.defineProperty(proto, newProperty, _tmpGetSetDesc);
         }
     });
 }
 
+let _cacheExceptions = {
+    GFXDevice: [
+        'numDrawCalls',
+        'numInstances',
+        'numTris',
+    ],
+    GFXMemoryStatus: [
+        'textureSize',
+        'bufferSize',
+    ]
+};
 let gfxClass = Object.keys(gfx);
 gfxClass.forEach((item) => {
     let gfxFunc = gfx[item];
@@ -586,5 +607,5 @@ gfxClass.forEach((item) => {
     if (gfxFuncName.indexOf('GFX') !== 0) {
         return;
     }
-    defineProperty(gfxFunc.prototype);
+    defineProperty(gfxFunc.prototype, _cacheExceptions[gfxFuncName]);
 });
