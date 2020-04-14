@@ -34,7 +34,7 @@ let _dirtyWaiting = [];
 let _rendering = false;
 
 var director = cc.director;
-RenderFlow.render = function (scene, dt) {
+RenderFlow.render = function (scene, dt, camera = null) {
     _rendering = true;
 
     RenderFlow.validateRenderers();
@@ -64,13 +64,17 @@ RenderFlow.render = function (scene, dt) {
     _dirtyTargets.length = 0;
 
     dt = dt || 0;
-    this._nativeFlow.render(scene._proxy, dt);
+    this._nativeFlow.render(scene._proxy, dt, camera);
 
     _dirtyTargets = _dirtyWaiting.slice(0);
     _dirtyWaiting.length = 0;
 
     _rendering = false;
 };
+
+RenderFlow.renderCamera = function (camera, scene) {
+    RenderFlow.render(scene, 0, camera);
+}
 
 RenderFlow.init = function (nativeFlow) {
     cc.EventTarget.call(this);
