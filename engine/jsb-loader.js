@@ -24,7 +24,7 @@
  THE SOFTWARE.
  ****************************************************************************/
 
- 'use strict';
+'use strict';
 
 const cacheManager = require('./jsb-cache-manager');
 const { downloadFile, readText, readArrayBuffer, readJson } = require('./jsb-fs-utils');
@@ -39,36 +39,44 @@ function downloadScript (url, options, onComplete) {
         onComplete = options;
         options = null;
     }
-    if (REGEX.test(url)) {
-        onComplete && onComplete(new Error('Native does not support loading remote scripts'));
-    }
-    else {
+
+    download(url, function (url, options, onComplete) {
         window.require(url);
-        onComplete && onComplete(null);
-    }
+        onComplete(null);
+    }, options, options.onFileProgress, onComplete);
 }
 
-
-function download (url, func, options, onProgress, onComplete) {
+function download (url, func, options, onFileProgress, onComplete) {
     var result = transformUrl(url, options);
     if (result.inLocal) {
         func(result.url, options, onComplete);
     }
     else if (result.inCache) {
         cacheManager.updateLastTime(url)
-        func(result.url, options, onComplete);
+        func(result.url, options, function (err, data) {
+            if (err) {
+                cacheManager.removeCache(url);
+            }
+            onComplete(err, data);
+        });
     }
     else {
         var time = Date.now();
-        var storagePath = cacheManager.cacheDir + '/' + time + (suffix++) + cc.path.extname(url);
-        downloadFile(url, storagePath, options.header, onProgress, function (err, path) {
+        var storagePath = '';
+        if (options.__cacheBundleRoot__) {
+            storagePath = `${cacheManager.cacheDir}/${options.__cacheBundleRoot__}/${time}${suffix++}${cc.path.extname(url)}`;
+        }
+        else {
+            storagePath = `${cacheManager.cacheDir}/${time}${suffix++}${cc.path.extname(url)}`;
+        }
+        downloadFile(url, storagePath, options.header, onFileProgress, function (err, path) {
             if (err) {
                 onComplete(err, null);
                 return;
             }
             func(path, options, function (err, data) {
                 if (!err) {
-                    cacheManager.cacheFile(url, storagePath);
+                    cacheManager.cacheFile(url, storagePath, options.__cacheBundleRoot__);
                 }
                 onComplete(err, data);
             });
@@ -100,15 +108,15 @@ function transformUrl (url, options) {
 function downloadAudio (url, options, onComplete) {
     download(url, function (url, options, onComplete) {
         onComplete(null, url);
-    }, options, options.onProgress, onComplete);
+    }, options, options.onFileProgress, onComplete);
 }
 
 function downloadImage (url, options, onComplete) {
-    download(url, downloader.downloadDomImage, options, options.onProgress, onComplete);
+    download(url, downloader.downloadDomImage, options, options.onFileProgress, onComplete);
 }
 
 function downloadFont (url, options, onComplete) {
-    download(url, loadFont, options, options.onProgress, onComplete);
+    download(url, loadFont, options, options.onFileProgress, onComplete);
 }
 
 function _getFontFamily (fontHandle) {
@@ -144,18 +152,50 @@ function readFile(filePath, options, onComplete) {
 
 function downloadText (url, options, onComplete) {
     options.responseType = "text";
-    download(url, readFile, options, options.onProgress, onComplete);
+    download(url, readFile, options, options.onFileProgress, onComplete);
 }
 
 function downloadArrayBuffer (url, options, onComplete) {
     options.responseType = "arraybuffer";
-    download(url, readFile, options, options.onProgress, onComplete);
+    download(url, readFile, options, options.onFileProgress, onComplete);
 }
 
 function downloadJson (url, options, onComplete) {
     options.responseType = "json";
-    download(url, readFile, options, options.onProgress, onComplete);
+    download(url, readFile, options, options.onFileProgress, onComplete);
 } 
+
+function downloadBundle (url, options, onComplete) {
+    let bundleName = cc.path.basename(url);
+    var version = options.version || cc.assetManager.downloader.bundleVers[bundleName];
+    var count = 0;
+    var config = version ?  `${url}/config.${version}.json` : `${url}/config.json`;
+    let out = null;
+    cacheManager.makeBundleFolder(bundleName);
+    downloadJson(config, options, function (err, response) {
+        if (err) {
+            onComplete(err);
+            return;
+        }
+        out = response;
+        count++;
+        if (count === 2) {
+            onComplete(null, out);
+        }
+    });
+
+    var js = version ?  `${url}/index.${version}.js` : `${url}/index.js`;
+    downloadScript(js, options, function (err) {
+        if (err) {
+            onComplete(err);
+            return;
+        }
+        count++;
+        if (count === 2) {
+            onComplete(null, out);
+        }
+    });
+};
 
 function loadFont (url, options, onComplete) {
     let fontFamilyName = _getFontFamily(url);
@@ -238,6 +278,8 @@ downloader.register({
     '.svg' : downloadFont,
     '.ttc' : downloadFont,
 
+    'bundle': downloadBundle,
+
     'default': downloadText
 });
 
@@ -245,6 +287,16 @@ parser.register({
     // compressed texture
     '.pvr': parsePVRTex,
     '.pkm': parsePKMTex,
+});
+
+cc.assetManager.transformPipeline.append(function (task) {
+    var input = task.output = task.input;
+    for (var i = 0, l = input.length; i < l; i++) {
+        var item = input[i];
+        if (item.config) {
+            item.options.__cacheBundleRoot__ = item.config.name;
+        }
+    }
 });
 
 var originInit = cc.assetManager.init;
