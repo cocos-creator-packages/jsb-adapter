@@ -97,7 +97,7 @@ function transformUrl (url, options) {
     return { url, inLocal, inCache };
 }
 
-function downloadAudio (url, options, onComplete) {
+function downloadMedia (url, options, onComplete) {
     download(url, function (url, options, onComplete) {
         onComplete(null, url);
     }, options, options.onProgress, onComplete);
@@ -189,13 +189,6 @@ downloader.register({
     '.js' : downloadScript,
     '.jsc' : downloadScript,
 
-    // Audio
-    '.mp3' : downloadAudio,
-    '.ogg' : downloadAudio,
-    '.wav' : downloadAudio,
-    '.mp4' : downloadAudio,
-    '.m4a' : downloadAudio,
-
     // Images
     '.png' : downloadImage,
     '.jpg' : downloadImage,
@@ -209,19 +202,20 @@ downloader.register({
     '.pvr' : downloadImage,
     '.pkm' : downloadImage,
 
-    'mp3' : downloadMedia,
-    'ogg' : downloadMedia,
-    'wav' : downloadMedia,
-    'm4a' : downloadMedia,
+    // Audio
+    '.mp3' : downloadMedia,
+    '.ogg' : downloadMedia,
+    '.wav' : downloadMedia,
+    '.m4a' : downloadMedia,
 
     // Video
-    'mp4': downloadMedia,
-    'avi': downloadMedia,
-    'mov': downloadMedia,
-    'mpg': downloadMedia,
-    'mpeg': downloadMedia,
-    'rm': downloadMedia,
-    'rmvb': downloadMedia,
+    '.mp4': downloadMedia,
+    '.avi': downloadMedia,
+    '.mov': downloadMedia,
+    '.mpg': downloadMedia,
+    '.mpeg': downloadMedia,
+    '.rm': downloadMedia,
+    '.rmvb': downloadMedia,
     // Text
     '.txt' : downloadText,
     '.xml' : downloadText,
