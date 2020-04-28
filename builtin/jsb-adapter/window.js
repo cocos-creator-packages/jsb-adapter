@@ -75,6 +75,7 @@ function inject () {
         enumerable: true,
         configurable: true
     });
+
     window.screen = {
         availTop: 0,
         availLeft: 0,

@@ -90,11 +90,11 @@ class HTMLCanvasElement extends HTMLElement {
     }
 
     get clientWidth() {
-        return this._width / window.devicePixelRatio;
+        return window.innerWidth;
     }
 
     get clientHeight() {
-        return this._height / window.devicePixelRatio;
+        return window.innerHeight;
     }
 
     get data() {
@@ -105,7 +105,7 @@ class HTMLCanvasElement extends HTMLElement {
     }
 
     getBoundingClientRect() {
-        return new DOMRect(0, 0, this._width / window.devicePixelRatio, this._height / window.devicePixelRatio);
+        return new DOMRect(0, 0, window.innerWidth, window.innerHeight);
     }
 
     requestPointerLock() {
