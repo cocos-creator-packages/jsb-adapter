@@ -32,7 +32,12 @@ const { downloadFile, readText, readArrayBuffer, readJson } = require('./jsb-fs-
 const REGEX = /^\w+:\/\/.*/;
 const downloader = cc.assetManager.downloader;
 const parser = cc.assetManager.parser;
-const suffix = 0;
+const presets = cc.assetManager.presets;
+downloader.maxConcurrent = 8;
+downloader.maxRequestsPerFrame = 64;
+presets['scene'].maxConcurrent = 10;
+presets['scene'].maxRequestsPerFrame = 64;
+let suffix = 0;
 
 function downloadScript (url, options, onComplete) {
     if (typeof options === 'function') {
@@ -172,6 +177,7 @@ function downloadBundle (url, options, onComplete) {
     var config = version ?  `${url}/config.${version}.json` : `${url}/config.json`;
     let out = null;
     cacheManager.makeBundleFolder(bundleName);
+    options.__cacheBundleRoot__ = bundleName;
     downloadJson(config, options, function (err, response) {
         if (err) {
             onComplete(err);

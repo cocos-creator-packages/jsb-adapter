@@ -54,6 +54,8 @@ var fsUtils = {
 
     fs,
 
+    subpackages: Object.create(null),
+
     getUserDataPath () {
         return fs.getWritablePath();
     },

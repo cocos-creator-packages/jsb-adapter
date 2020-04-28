@@ -22,13 +22,14 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-const { getUserDataPath, readJsonSync, makeDirSync, writeFileSync, writeFile, readDir, deleteFile, rmdirSync } = require('./jsb-fs-utils');
+const { getUserDataPath, readJsonSync, makeDirSync, writeFileSync, writeFile, deleteFile, rmdirSync } = require('./jsb-fs-utils');
 
 var writeCacheFileList = null;
 var startWrite = false;
 var nextCallbacks = [];
 var callbacks = [];
 var cleaning = false;
+const REGEX = /^\w+:\/\/.*/;
 
 var cacheManager = {
 
@@ -115,6 +116,9 @@ var cacheManager = {
         var cacheFilePath = this.cacheDir + '/' + this.cachedFileName;
         this.outOfStorage = false;
         writeFileSync(cacheFilePath, JSON.stringify({ files: this.cachedFiles._map, outOfStorage: false, version: this.version }), 'utf8');
+        cc.assetManager.bundles.forEach(bundle => {
+            if (REGEX.test(bundle.base)) this.makeBundleFolder(bundle.name);
+        });
     },
 
     clearLRU () {
@@ -122,6 +126,7 @@ var cacheManager = {
         cleaning = true;
         var caches = [];
         this.cachedFiles.forEach(function (val, key) {
+            if (val.bundle === 'internal') return;
             caches.push({ originUrl: key, url: val.url, lastTime: val.lastTime });
         });
         caches.sort(function (a, b) {
@@ -149,10 +154,9 @@ var cacheManager = {
 
     removeCache (url) {
         if (this.cachedFiles.has(url)) {
-            var self = this;
             var path = this.cachedFiles.remove(url).url;
             this.writeCacheFile(function () {
-                deleteFile(path, self._deleteFileCB);
+                deleteFile(path);
             });
         }
     },
