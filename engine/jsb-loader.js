@@ -122,6 +122,7 @@ function downloadText (item) {
 
     var result = jsb.fileUtils.getStringFromFile(url);
     if (typeof result === 'string' && result) {
+        result = result.replace(/\\r\\n/g, '\\n');
         return result;
     }
     else {

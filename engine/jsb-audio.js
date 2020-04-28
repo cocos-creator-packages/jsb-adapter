@@ -74,15 +74,19 @@ class AudioPlayerJSB extends AudioPlayer {
     getCurrentTime () {
         if (this._state !== PlayingState.PLAYING) { return this._offset / 1000; }
         let current = (performance.now() - this._startTime + this._offset) / 1000;
-        if (current > this._duration) { current -= this._duration; this._startTime += this._duration * 1000; }
+        while (current > this._duration) {
+            if (this._loop) { current -= this._duration; this._startTime += this._duration * 1000; }
+            else current = 0; // onEnded callback may lag behind a few frames
+        }
         return current;
     }
 
     setCurrentTime (val) {
         if (this._audio < 0) { return; }
-        this._offset = cc.math.clamp(val, 0, this._duration) * 1000;
-        this._startTime = performance.now();
+        val = cc.math.clamp(val, 0, this._duration);
         jsb.AudioEngine.setCurrentTime(this._audio, val);
+        this._offset = val * 1000;
+        this._startTime = performance.now();
     }
 
     getVolume () {
