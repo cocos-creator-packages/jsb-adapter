@@ -44,7 +44,6 @@ function resize (size) {
     size.width /= cc.view._devicePixelRatio;
     size.height /= cc.view._devicePixelRatio;
     window.resize(size.width, size.height);
-    cc.view.setCanvasSize(window.innerWidth, window.innerHeight);
 }
 
 jsb.onResize = function (size) {
@@ -67,4 +66,3 @@ jsb.onResize = function (size) {
     }
     resize(size);
 };
-
