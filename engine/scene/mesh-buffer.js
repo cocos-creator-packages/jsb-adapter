@@ -100,8 +100,6 @@
     MeshBuffer.checkAndSwitchBuffer = function(vertexCount) {
         if (this.vertexOffset + vertexCount > 65535) {
             this.switchBuffer();
-            if (!this._nativeAssembler) return;
-            this._nativeAssembler.updateIADatas && this._nativeAssembler.updateIADatas(this._arrOffset, this._arrOffset);
         }
     };
 
@@ -163,12 +161,7 @@
         this.indiceOffset = 0;
         this.vertexOffset = 0;
 
-        if (!this._nativeAssembler) return;
-
-        for (let i = 0, len = this._vDatas.length; i < len; i++) {
-            this._nativeAssembler.updateVerticesRange(i, 0, 0);
-            this._nativeAssembler.updateIndicesRange(i, 0, 0);
-        }
+        this.used(0, 0);
     };
 
     MeshBuffer.destroy = function() {
