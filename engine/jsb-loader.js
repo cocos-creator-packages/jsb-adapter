@@ -209,6 +209,19 @@ downloader.register({
     '.pvr' : downloadImage,
     '.pkm' : downloadImage,
 
+    'mp3' : downloadMedia,
+    'ogg' : downloadMedia,
+    'wav' : downloadMedia,
+    'm4a' : downloadMedia,
+
+    // Video
+    'mp4': downloadMedia,
+    'avi': downloadMedia,
+    'mov': downloadMedia,
+    'mpg': downloadMedia,
+    'mpeg': downloadMedia,
+    'rm': downloadMedia,
+    'rmvb': downloadMedia,
     // Text
     '.txt' : downloadText,
     '.xml' : downloadText,
