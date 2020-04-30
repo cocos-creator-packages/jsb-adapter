@@ -23,7 +23,12 @@
  THE SOFTWARE.
  ****************************************************************************/
 var fs = jsb.fileUtils;
-let jsb_downloader = new jsb.Downloader();
+let jsb_downloader = new jsb.Downloader({
+    countOfMaxProcessingTasks: 32,
+    timeoutInSeconds: 10,
+    tempFileNameSuffix: '.tmp'
+});
+
 let downloading = new cc.AssetManager.Cache();
 
 let tempDir = fs.getWritablePath() + '/temp';
