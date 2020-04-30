@@ -39,7 +39,7 @@ jsb_downloader.setOnFileTaskSuccess(task => {
 jsb_downloader.setOnTaskError((task, errorCode, errorCodeInternal, errorStr) => {
     if (!downloading.has(task.requestURL)) return;
     let { onComplete } = downloading.remove(task.requestURL);
-
+    cc.error(errorStr, errorCode);
     onComplete(new Error(errorStr), null);
 });
 
@@ -53,6 +53,8 @@ jsb_downloader.setOnTaskProgress((task, bytesReceived, totalBytesReceived, total
 var fsUtils = {
 
     fs,
+
+    subpackages: Object.create(null),
 
     getUserDataPath () {
         return fs.getWritablePath();
