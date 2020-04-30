@@ -97,6 +97,9 @@ jsb.inputBox = {
 	hide: function() {
 		jsb.hideInputBox();
 	},
+	updateRect (x, y, width, height) {
+		jsb.updateInputBoxRect(x, y, width, height);
+	},
 };
 
 jsb.onTextInput = function(eventName, text) {
