@@ -33,13 +33,13 @@ const REGEX = /^\w+:\/\/.*/;
 const downloader = cc.assetManager.downloader;
 const parser = cc.assetManager.parser;
 const presets = cc.assetManager.presets;
-downloader.maxConcurrent = 30;
+downloader.maxConcurrency = 30;
 downloader.maxRequestsPerFrame = 60;
-presets['preload'].maxConcurrent = 15;
+presets['preload'].maxConcurrency = 15;
 presets['preload'].maxRequestsPerFrame = 30;
-presets['scene'].maxConcurrent = 32;
+presets['scene'].maxConcurrency = 32;
 presets['scene'].maxRequestsPerFrame = 64;
-presets['bundle'].maxConcurrent = 32;
+presets['bundle'].maxConcurrency = 32;
 presets['bundle'].maxRequestsPerFrame = 64;
 let suffix = 0;
 
