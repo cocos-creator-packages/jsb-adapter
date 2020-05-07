@@ -125,6 +125,7 @@ var cacheManager = {
         if (cleaning) return;
         cleaning = true;
         var caches = [];
+        var self = this;
         this.cachedFiles.forEach(function (val, key) {
             if (val.bundle === 'internal') return;
             caches.push({ originUrl: key, url: val.url, lastTime: val.lastTime });
