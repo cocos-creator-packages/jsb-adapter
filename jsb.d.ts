@@ -41,6 +41,125 @@ declare namespace jsb{
 
     }
 
+    export interface ManifestAsset {
+        md5: string;
+        path: string;
+        compressed: boolean;
+        size: number;
+        downloadState: number;
+    }
+
+    export class Manifest {
+        constructor (manifestUrl: string);
+        constructor (content: string, manifestRoot: string);
+        parseFile (manifestUrl: string): void;
+        parseJSONString (content: string, manifestRoot: string): void;
+
+        getManifestRoot (): string;
+        getManifestFileUrl (): string;
+        getVersionFileUrl (): string;
+        getSearchPaths (): [string];
+        getVersion (): string;
+        getPackageUrl (): boolean;
+
+        setUpdating (isUpdating: boolean): void;
+        isUpdating (): boolean;
+        isVersionLoaded (): boolean;
+        isLoaded (): boolean;
+    }
+
+    export class EventAssetsManager {
+        // EventCode
+        static ERROR_NO_LOCAL_MANIFEST: number;
+        static ERROR_DOWNLOAD_MANIFEST: number;
+        static ERROR_PARSE_MANIFEST: number;
+        static NEW_VERSION_FOUND: number;
+        static ALREADY_UP_TO_DATE: number;
+        static UPDATE_PROGRESSION: number;
+        static ASSET_UPDATED: number;
+        static ERROR_UPDATING: number;
+        static UPDATE_FINISHED: number;
+        static UPDATE_FAILED: number;
+        static ERROR_DECOMPRES: number;
+
+        constructor (eventName: string, manager: AssetsManager, eventCode: number, 
+                    assetId?: string, message?: string, curle_code?: number, curlm_code?: number);
+        getAssetsManagerEx (): AssetsManager;
+        isResuming (): boolean;
+
+        getDownloadedFiles (): number;
+        getDownloadedBytes (): number;
+        getTotalFiles (): number;
+        getTotalBytes (): number;
+        getPercent (): number;
+        getPercentByFile (): number;
+
+        getEventCode (): number;
+        getMessage (): string;
+        getAssetId (): string;
+        getCURLECode (): number;
+        getCURLMCode (): number;
+    }
+
+    export module AssetsManager {
+        export enum State {
+            UNINITED,
+            UNCHECKED,
+            PREDOWNLOAD_VERSION,
+            DOWNLOADING_VERSION,
+            VERSION_LOADED,
+            PREDOWNLOAD_MANIFEST,
+            DOWNLOADING_MANIFEST,
+            MANIFEST_LOADED,
+            NEED_UPDATE,
+            READY_TO_UPDATE,
+            UPDATING,
+            UNZIPPING,
+            UP_TO_DATE,
+            FAIL_TO_UPDATE,
+        }
+    }
+
+    export class AssetsManager {
+        constructor (manifestUrl: string, storagePath: string, versionCompareHandle?: (versionA: string, versionB: string) => number);
+        static create (manifestUrl: string, storagePath: string): AssetsManager;
+
+        getState (): AssetsManager.State;
+        getStoragePath (): string
+        getMaxConcurrentTask (): number;
+        // setMaxConcurrentTask (max: number): void;  // actually not supported
+
+        checkUpdate (): void;
+        prepareUpdate (): void;
+        update (): void;
+        isResuming (): boolean;
+
+        getDownloadedFiles (): number;
+        getDownloadedBytes (): number;
+        getTotalFiles (): number;
+        getTotalBytes (): number;
+        downloadFailedAssets (): void;
+
+        getLocalManifest (): Manifest;
+        loadLocalManifest (manifestUrl: string): boolean;
+        loadLocalManifest (localManifest: Manifest, storagePath: string): boolean;
+        getRemoteManifest (): Manifest;
+        loadRemoteManifest (remoteManifest: Manifest): boolean;
+
+        /**
+         * Setup your own version compare handler, versionA and B is versions in string.  
+         * if the return value greater than 0, versionA is greater than B,  
+         * if the return value equals 0, versionA equals to B,  
+         * if the return value smaller than 0, versionA is smaller than B.  
+         */
+        setVersionCompareHandle (versionCompareHandle?: (versionA: string, versionB: string) => number): void;
+        /**
+         * Setup the verification callback, Return true if the verification passed, otherwise return false
+         */
+        setVerifyCallback (verifyCallback: (path: string, asset: ManifestAsset) => boolean): void;
+        setEventCallback (eventCallback: (event: EventAssetsManager) => void): void;
+    }
+
     /**
      * FileUtils  Helper class to handle file operations.
      */
@@ -184,7 +303,7 @@ declare namespace jsb{
          *  @see fullPathForFilename(const char*).
          *  @lua NA
          */
-        export function getSearchPaths(filepath:string):Array<string>;
+        export function getSearchPaths():Array<string>;
         /**
          * 
          * @param filepath 
