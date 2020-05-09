@@ -14,7 +14,7 @@ declare namespace jsb{
          * @param methodSignature 
          * @param parameters 
          */
-        export function callStaticMethod(className: string, methodName: string, methodSignature: string, ...parameters:any): any;
+        export function callStaticMethod (className: string, methodName: string, methodSignature: string, ...parameters:any): any;
     }
     /**
      * 下载任务对象
@@ -31,13 +31,13 @@ declare namespace jsb{
          * @param storagePath 
          * @param identifier 
          */
-        createDownloadFileTask(requestURL:string, storagePath:string, identifier?:string): DownloaderTask;
+        createDownloadFileTask (requestURL:string, storagePath:string, identifier?:string): DownloaderTask;
 
-        setOnFileTaskSuccess(onSucceed: (task: DownloaderTask) => void): void;
+        setOnFileTaskSuccess (onSucceed: (task: DownloaderTask) => void): void;
 
-        setOnTaskProgress(onProgress: (task: DownloaderTask, bytesReceived: number, totalBytesReceived: number, totalBytesExpected: number) => void): void;
+        setOnTaskProgress (onProgress: (task: DownloaderTask, bytesReceived: number, totalBytesReceived: number, totalBytesExpected: number) => void): void;
 
-        setOnTaskError(onError: (task: DownloaderTask, errorCode: number, errorCodeInternal: number, errorStr: string) => void): void;
+        setOnTaskError (onError: (task: DownloaderTask, errorCode: number, errorCodeInternal: number, errorStr: string) => void): void;
 
     }
 
@@ -83,7 +83,7 @@ declare namespace jsb{
         static ERROR_DECOMPRES: number;
 
         constructor (eventName: string, manager: AssetsManager, eventCode: number, 
-                    assetId?: string, message?: string, curle_code?: number, curlm_code?: number);
+                    assetId?: string, message?: string, curleCode?: number, curlmCode?: number);
         getAssetsManagerEx (): AssetsManager;
         isResuming (): boolean;
 
@@ -173,7 +173,7 @@ declare namespace jsb{
          *  @param path The path that needs to be checked.
          *  @return True if it's an absolute path, false if not.
          */
-        export function isAbsolutePath(path:string):boolean;
+        export function isAbsolutePath (path:string):boolean;
         /** Returns the fullpath for a given filename.
 
         First it will try to get a new filename from the "filenameLookup" dictionary.
@@ -219,34 +219,34 @@ declare namespace jsb{
 
         @since v2.1
         */
-        export function fullPathForFilename(filename:string):string;
+        export function fullPathForFilename (filename:string):string;
         /**
          *  Gets string from a file.
         */
-        export function getStringFromFile(filename:string):string;
+        export function getStringFromFile (filename:string):string;
         /**
          *  Removes a file.
          *
          *  @param filepath The full path of the file, it must be an absolute path.
          *  @return True if the file have been removed successfully, false if not.
          */
-        export function removeFile(filepath:string):boolean;
+        export function removeFile (filepath:string):boolean;
         /**
          *  Checks whether the path is a directory.
          *
          *  @param dirPath The path of the directory, it could be a relative or an absolute path.
          *  @return True if the directory exists, false if not.
          */
-        export function isDirectoryExist(dirPath:string):boolean;
+        export function isDirectoryExist (dirPath:string):boolean;
         /**
          * Normalize: remove . and ..
          * @param filepath 
          */
-        export function normalizePath(filepath:string):string;
+        export function normalizePath (filepath:string):string;
         /**
          * Get default resource root path.
          */
-        export function getDefaultResourceRootPath():string;
+        export function getDefaultResourceRootPath ():string;
         /**
          * Loads the filenameLookup dictionary from the contents of a filename.
          *
@@ -280,19 +280,19 @@ declare namespace jsb{
         * @js loadFilenameLookup
         * @lua loadFilenameLookup
         */
-        export function loadFilenameLookup(filepath:string):void;
+        export function loadFilenameLookup (filepath:string):void;
         /** Checks whether to pop up a message box when failed to load an image.
          *  @return True if pop up a message box when failed to load an image, false if not.
          */
-        export function isPopupNotify():boolean;
+        export function isPopupNotify ():boolean;
         /**
          *  Sets whether to pop-up a message box when failed to load an image.
          */
-        export function setPopupNotify(notify:boolean):void;
+        export function setPopupNotify (notify:boolean):void;
 
         // Converts the contents of a file to a ValueVector.
         // This method is used internally.
-        export function getValueVectorFromFile(filepath:string):Array<any>;
+        export function getValueVectorFromFile (filepath:string):Array<any>;
         /**
          *  Gets the array of search paths.
          *
@@ -303,12 +303,12 @@ declare namespace jsb{
          *  @see fullPathForFilename(const char*).
          *  @lua NA
          */
-        export function getSearchPaths():Array<string>;
+        export function getSearchPaths ():Array<string>;
         /**
          * 
          * @param filepath 
          */
-        export function getFileDir(filepath:string):string;
+        export function getFileDir (filepath:string):string;
         /**
         * write a ValueMap into a plist file
         *
@@ -316,26 +316,26 @@ declare namespace jsb{
         *@param fullPath The full path to the file you want to save a string
         *@return bool
         */
-        export function writeToFile( valueMap:any ):boolean;
+        export function writeToFile ( valueMap:any ):boolean;
         /**
          *  Gets the original search path array set by 'setSearchPaths' or 'addSearchPath'.
          *  @return The array of the original search paths
          */
-        export function getOriginalSearchPaths():Array<string>;
+        export function getOriginalSearchPaths ():Array<string>;
         /**
          *  List all files in a directory.
          *
          *  @param dirPath The path of the directory, it could be a relative or an absolute path.
          *  @return File paths in a string vector
          */
-        export function listFiles(filepath:string):Array<string>;
+        export function listFiles (filepath:string):Array<string>;
         /**
          *  Converts the contents of a file to a ValueMap.
          *  @param filename The filename of the file to gets content.
          *  @return ValueMap of the file contents.
          *  @note This method is used internally.
          */
-        export function getValueMapFromFile(filepath:string):any;
+        export function getValueMapFromFile (filepath:string):any;
         /**
          *  Retrieve the file size.
          *
@@ -343,19 +343,19 @@ declare namespace jsb{
          *  @param filepath The path of the file, it could be a relative or absolute path.
          *  @return The file size.
          */
-        export function getFileSize(filepath:string):number;
+        export function getFileSize (filepath:string):number;
 
         /** Converts the contents of a file to a ValueMap.
          *  This method is used internally.
          */
-        export function getValueMapFromData(filedata:string,filesize:number):any;
+        export function getValueMapFromData (filedata:string,filesize:number):any;
         /**
          *  Removes a directory.
          *
          *  @param dirPath  The full path of the directory, it must be an absolute path.
          *  @return True if the directory have been removed successfully, false if not.
          */
-        export function removeDirectory(dirPath:string):boolean;
+        export function removeDirectory (dirPath:string):boolean;
         /**
          *  Sets the array of search paths.
          *
@@ -375,7 +375,7 @@ declare namespace jsb{
          *  In js:var setSearchPaths(var jsval);
          *  @lua NA
          */
-        export function setSearchPaths( searchPath:Array<string>):void;
+        export function setSearchPaths ( searchPath:Array<string>):void;
         /**
          *  write a string into a file
          *
@@ -383,7 +383,7 @@ declare namespace jsb{
          * @param fullPath The full path to the file you want to save a string
          * @return bool True if write success
          */
-        export function writeStringToFile(dataStr:string,fullPath:string):boolean;
+        export function writeStringToFile (dataStr:string,fullPath:string):boolean;
         /**
          *  Sets the array that contains the search order of the resources.
          *
@@ -393,20 +393,20 @@ declare namespace jsb{
          *  In js:var setSearchResolutionsOrder(var jsval)
          *  @lua NA
          */
-        export function setSearchResolutionsOrder(searchResolutionsOrder:Array<string>):void;
+        export function setSearchResolutionsOrder (searchResolutionsOrder:Array<string>):void;
         /**
          * Append search order of the resources.
          *
          * @see setSearchResolutionsOrder(), fullPathForFilename().
          * @since v2.1
          */
-        export function addSearchResolutionsOrder(order:string,front:boolean):void;
+        export function addSearchResolutionsOrder (order:string,front:boolean):void;
         /**
          * Add search path.
          *
          * @since v2.1
          */
-        export function addSearchPath(path:string,front:boolean):void;
+        export function addSearchPath (path:string,front:boolean):void;
         /**
         * write ValueVector into a plist file
         *
@@ -414,7 +414,7 @@ declare namespace jsb{
         *@param fullPath The full path to the file you want to save a string
         *@return bool
         */
-        export function writeValueVectorToFile(vecData:Array<any>,fullPath:string):boolean;
+        export function writeValueVectorToFile (vecData:Array<any>,fullPath:string):boolean;
         /**
          *  Checks whether a file exists.
          *
@@ -422,11 +422,11 @@ declare namespace jsb{
          *  @param filename The path of the file, it could be a relative or absolute path.
          *  @return True if the file exists, false if not.
          */
-        export function isFileExist(filename:string):boolean;
+        export function isFileExist (filename:string):boolean;
         /**©∫
          *  Purges full path caches.
          */
-        export function purgeCachedEntries():void;
+        export function purgeCachedEntries ():void;
             /**
          *  Gets full path from a file name and the path of the relative file.
          *  @param filename The file name.
@@ -436,7 +436,7 @@ declare namespace jsb{
          *               Return: /User/path1/path2/hello.pvr (If there a a key(hello.png)-value(hello.pvr) in FilenameLookup dictionary. )
          *
          */
-        export function fullPathFromRelativeFile(filename:string,relativeFile:string):string;
+        export function fullPathFromRelativeFile (filename:string,relativeFile:string):string;
         /**
         * Windows fopen can't support UTF-8 filename
         * Need convert all parameters fopen and other 3rd-party libs
@@ -444,7 +444,7 @@ declare namespace jsb{
         * @param filenameUtf8 std::string name file for conversion from utf-8
         * @return std::string ansi filename in current locale
         */
-        export function getSuitableFOpen(filenameUtf8:string):string;
+        export function getSuitableFOpen (filenameUtf8:string):string;
         /**
         * write ValueMap into a plist file
         *
@@ -452,22 +452,22 @@ declare namespace jsb{
         *@param fullPath The full path to the file you want to save a string
         *@return bool
         */
-        export function writeValueMapToFile(dict:any,fullPath:string):string;
+        export function writeValueMapToFile (dict:any,fullPath:string):string;
         /**
         *  Gets filename extension is a suffix (separated from the base filename by a dot) in lower case.
         *  Examples of filename extensions are .png, .jpeg, .exe, .dmg and .txt.
         *  @param filePath The path of the file, it could be a relative or absolute path.
         *  @return suffix for filename in lower case or empty if a dot not found.
         */
-        export function getFileExtension(filePath:string):string;
+        export function getFileExtension (filePath:string):string;
         /**
          *  Sets writable path.
          */
-        export function setWritablePath(writablePath:string):void;
+        export function setWritablePath (writablePath:string):void;
         /**
          * Set default resource root path.
          */
-        export function setDefaultResourceRootPath(filepath:string):void;
+        export function setDefaultResourceRootPath (filepath:string):void;
 
         /**
          *  Gets the array that contains the search order of the resources.
@@ -476,25 +476,25 @@ declare namespace jsb{
          *  @since v2.1
          *  @lua NA
          */
-        export function getSearchResolutionsOrder():Array<string>;
+        export function getSearchResolutionsOrder ():Array<string>;
         /**
          *  Creates a directory.
          *
          *  @param dirPath The path of the directory, it must be an absolute path.
          *  @return True if the directory have been created successfully, false if not.
          */
-        export function createDirectory(dirPath:string):string;
+        export function createDirectory (dirPath:string):string;
         /**
          *  List all files recursively in a directory.
          *
          *  @param dirPath The path of the directory, it could be a relative or an absolute path.
          *  @return File paths in a string vector
          */
-        export function listFilesRecursively(dirPath:string, files:Array<string>):void;
+        export function listFilesRecursively (dirPath:string, files:Array<string>):void;
         /**
          *  Gets the writable path.
          *  @return  The path that can be write/read a file in
          */
-        export function getWritablePath():string;
+        export function getWritablePath ():string;
     }
 }
