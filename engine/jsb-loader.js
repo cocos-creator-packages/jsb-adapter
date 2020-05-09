@@ -51,11 +51,12 @@ function downloadScript (url, options, onComplete) {
         options = null;
     }
 
-    if (loadedScripts[url]) return onComplete();
-    
-    download(url, function (url, options, onComplete) {
-        window.require(url);
-        onComplete(null);
+    if (loadedScripts[url]) return onComplete && onComplete();
+
+    download(url, function (src, options, onComplete) {
+        window.require(src);
+        loadedScripts[url] = true;
+        onComplete && onComplete(null);
     }, options, options.onFileProgress, onComplete);
 }
 
