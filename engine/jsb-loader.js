@@ -43,12 +43,16 @@ presets['bundle'].maxConcurrency = 32;
 presets['bundle'].maxRequestsPerFrame = 64;
 let suffix = 0;
 
+const loadedScripts = {};
+
 function downloadScript (url, options, onComplete) {
     if (typeof options === 'function') {
         onComplete = options;
         options = null;
     }
 
+    if (loadedScripts[url]) return onComplete();
+    
     download(url, function (url, options, onComplete) {
         window.require(url);
         onComplete(null);
