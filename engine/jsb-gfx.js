@@ -151,10 +151,10 @@ let _converters = {
                 jsbUniforms.push(_converters.GFXUniform(uniforms[i]));
             }
         }
-        return new gfx.GFXUniformBlock(block.binding, block.name, jsbUniforms);
+        return new gfx.GFXUniformBlock(block.shaderStages, block.binding, block.name, jsbUniforms);
     },
     GFXUniformSampler: function (sampler) {
-        return new gfx.GFXUniformSampler(sampler.binding, sampler.name, sampler.type, sampler.count);
+        return new gfx.GFXUniformSampler(sampler.shaderStages, sampler.binding, sampler.name, sampler.type, sampler.count);
     },
     GFXShaderStage: function (stage) {
         let macros = stage.macros;
@@ -238,7 +238,7 @@ let _converters = {
         return new gfx.GFXFramebufferInfo(info);
     },
     GFXBinding: function (binding) {
-        return new gfx.GFXBinding(binding.binding, binding.bindingType, binding.name);
+        return new gfx.GFXBinding(binding.shaderStages, binding.binding, binding.bindingType, binding.name);
     },
     GFXBindingLayoutInfo: function (info) {
         let bindings = info.bindings;
