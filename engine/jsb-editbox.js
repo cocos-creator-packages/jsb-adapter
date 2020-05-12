@@ -89,6 +89,11 @@
             this._delegate = delegate;
         },
 
+        _onResize () {
+            let { x, y, width, height } = this._getRect();
+            jsb.inputBox.updateRect(x, y, width, height);
+        },
+
         beginEditing () {
             let self = this;
             let delegate = this._delegate;
@@ -135,6 +140,9 @@
             });
             this._editing = true;
             delegate.editBoxEditingDidBegan();
+            if (!cc.sys.isMobile) {
+                cc.view.on('canvas-resize', this._onResize, this);
+            }
         },
 
         endEditing () {
@@ -147,6 +155,9 @@
             }
             jsb.inputBox.hide();
             this._delegate.editBoxEditingDidEnded();
+            if (!cc.sys.isMobile) {
+                cc.view.off('canvas-resize', this._onResize, this);
+            }
         },
 
         _getRect () {
