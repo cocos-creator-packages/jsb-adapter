@@ -27,7 +27,7 @@
 'use strict';
 
 const cacheManager = require('./jsb-cache-manager');
-const { downloadFile, readText, readArrayBuffer, readJson } = require('./jsb-fs-utils');
+const { downloadFile, readText, readArrayBuffer, readJson, remoteBundles } = require('./jsb-fs-utils');
 
 const REGEX = /^\w+:\/\/.*/;
 const downloader = cc.assetManager.downloader;
@@ -324,5 +324,6 @@ cc.assetManager.transformPipeline.append(function (task) {
 var originInit = cc.assetManager.init;
 cc.assetManager.init = function (options) {
     originInit.call(cc.assetManager, options);
+    options.remoteBundles && options.remoteBundles.forEach(x => remoteBundles[x] = true);
     cacheManager.init();
 };
