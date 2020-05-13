@@ -80,7 +80,7 @@ declare namespace jsb{
         static ERROR_UPDATING: number;
         static UPDATE_FINISHED: number;
         static UPDATE_FAILED: number;
-        static ERROR_DECOMPRES: number;
+        static ERROR_DECOMPRESS: number;
 
         constructor (eventName: string, manager: AssetsManager, eventCode: number, 
                     assetId?: string, message?: string, curleCode?: number, curlmCode?: number);
