@@ -65,14 +65,14 @@ let _converters = {
         return extent && new gfx.GFXExtent(extent.width, extent.height, extent.depth);
     },
     GFXTextureSubres: function (res) {
-        return res && new gfx.GFXTextureSubres(res.baseMipLevel, res.levelCount, res.baseArrayLayer, res.layerCount);
+        return res && new gfx.GFXTextureSubres(res.mipLevel, res.baseArrayLayer, res.layerCount);
     },
     // GFXTextureCopy,
     GFXBufferTextureCopy: function (obj) {
         let jsbOffset = _converters.GFXOffset(obj.texOffset);
         let jsbExtent = _converters.GFXExtent(obj.texExtent);
         let jsbSubres = _converters.GFXTextureSubres(obj.texSubres);
-        return new gfx.GFXBufferTextureCopy(obj.buffOffset, obj.buffStride, obj.buffTexHeight, jsbOffset, jsbExtent, jsbSubres);
+        return new gfx.GFXBufferTextureCopy(obj.buffStride, obj.buffTexHeight, jsbOffset, jsbExtent, jsbSubres);
     },
     GFXBufferTextureCopyList: function (list) {
         if (list) {
@@ -151,10 +151,10 @@ let _converters = {
                 jsbUniforms.push(_converters.GFXUniform(uniforms[i]));
             }
         }
-        return new gfx.GFXUniformBlock(block.binding, block.name, jsbUniforms);
+        return new gfx.GFXUniformBlock(block.shaderStages, block.binding, block.name, jsbUniforms);
     },
     GFXUniformSampler: function (sampler) {
-        return new gfx.GFXUniformSampler(sampler.binding, sampler.name, sampler.type, sampler.count);
+        return new gfx.GFXUniformSampler(sampler.shaderStages, sampler.binding, sampler.name, sampler.type, sampler.count);
     },
     GFXShaderStage: function (stage) {
         let macros = stage.macros;
@@ -238,7 +238,7 @@ let _converters = {
         return new gfx.GFXFramebufferInfo(info);
     },
     GFXBinding: function (binding) {
-        return new gfx.GFXBinding(binding.binding, binding.bindingType, binding.name);
+        return new gfx.GFXBinding(binding.shaderStages, binding.binding, binding.bindingType, binding.name, binding.count);
     },
     GFXBindingLayoutInfo: function (info) {
         let bindings = info.bindings;
@@ -395,9 +395,12 @@ function replace (proto, replacements) {
     }
 }
 
-let deviceProtos = [gfx.GLES3Device && gfx.GLES3Device.prototype,
-                    gfx.GLES2Device && gfx.GLES2Device.prototype,
-                    gfx.CCMTLDevice && gfx.CCMTLDevice.prototype];
+let deviceProtos = [
+    gfx.CCVKDevice && gfx.CCVKDevice.prototype,
+    gfx.CCMTLDevice && gfx.CCMTLDevice.prototype,
+    gfx.GLES3Device && gfx.GLES3Device.prototype,
+    gfx.GLES2Device && gfx.GLES2Device.prototype,
+];
 deviceProtos.forEach(function(item, index) {
     if (item !== undefined) {
         replace(item, {
