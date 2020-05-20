@@ -193,7 +193,7 @@ let _converters = {
         return new gfx.GFXShaderInfo(info.name, jsbStages, jsbBlocks, jsbSamplers);
     },
     GFXAttribute: function (attr) {
-        return new gfx.GFXAttribute(attr);
+        return new gfx.GFXAttribute(attr.name, attr.format, attr.isNormalized, attr.stream, attr.isInstanced, attr.location);
     },
     GFXInputAssemblerInfo: function (info) {
         let attrs = info.attributes;
