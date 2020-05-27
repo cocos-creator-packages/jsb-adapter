@@ -62,10 +62,6 @@ var fsUtils = {
 
     fs,
 
-    subpackages: Object.create(null),
-
-    remoteBundles: Object.create(null),
-
     getUserDataPath () {
         return fs.getWritablePath();
     },

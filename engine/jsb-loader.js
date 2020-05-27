@@ -27,7 +27,7 @@
 'use strict';
 
 const cacheManager = require('./jsb-cache-manager');
-const { downloadFile, readText, readArrayBuffer, readJson, remoteBundles } = require('./jsb-fs-utils');
+const { downloadFile, readText, readArrayBuffer, readJson } = require('./jsb-fs-utils');
 
 const REGEX = /^\w+:\/\/.*/;
 const downloader = cc.assetManager.downloader;
@@ -42,6 +42,9 @@ presets['scene'].maxRequestsPerFrame = 64;
 presets['bundle'].maxConcurrency = 32;
 presets['bundle'].maxRequestsPerFrame = 64;
 let suffix = 0;
+
+let REMOTE_SERVER_ROOT = '';
+let remoteBundles = {};
 
 const loadedScripts = {};
 
@@ -179,35 +182,47 @@ function downloadJson (url, options, onComplete) {
     download(url, readFile, options, options.onFileProgress, onComplete);
 } 
 
-function downloadBundle (url, options, onComplete) {
-    let bundleName = cc.path.basename(url);
+function downloadBundle (nameOrUrl, options, onComplete) {
+    let bundleName = cc.path.basename(nameOrUrl);
     var version = options.version || cc.assetManager.downloader.bundleVers[bundleName];
+    let url;
+    if (REGEX.test(nameOrUrl)) {
+        url = nameOrUrl;
+        cacheManager.makeBundleFolder(bundleName);
+    }
+    else {
+        if (remoteBundles[bundleName]) {
+            url = `${REMOTE_SERVER_ROOT}remote/${bundleName}`;
+            cacheManager.makeBundleFolder(bundleName);
+        }
+        else {
+            url = `assets/${bundleName}`;
+        }
+    }
     var count = 0;
-    var config = version ?  `${url}/config.${version}.json` : `${url}/config.json`;
-    let out = null;
-    cacheManager.makeBundleFolder(bundleName);
+    var config = `${url}/config.${version ? version + '.': ''}json`;
+    let error = null, out = null;
     options.__cacheBundleRoot__ = bundleName;
     downloadJson(config, options, function (err, response) {
         if (err) {
-            onComplete(err);
-            return;
+            error = err;
         }
         out = response;
+        out && (out.base = url + '/');
         count++;
         if (count === 2) {
-            onComplete(null, out);
+            onComplete(error, out);
         }
     });
 
-    var js = version ?  `${url}/index.${version}.js` : `${url}/index.js`;
+    var js = `${url}/index.${version ? version + '.' : ''}js`;
     downloadScript(js, options, function (err) {
         if (err) {
-            onComplete(err);
-            return;
+            error = err;
         }
         count++;
         if (count === 2) {
-            onComplete(null, out);
+            onComplete(error, out);
         }
     });
 };
@@ -325,5 +340,7 @@ var originInit = cc.assetManager.init;
 cc.assetManager.init = function (options) {
     originInit.call(cc.assetManager, options);
     options.remoteBundles && options.remoteBundles.forEach(x => remoteBundles[x] = true);
+    REMOTE_SERVER_ROOT = options.server || '';
+    if (REMOTE_SERVER_ROOT && !REMOTE_SERVER_ROOT.endsWith('/')) REMOTE_SERVER_ROOT += '/';
     cacheManager.init();
 };
