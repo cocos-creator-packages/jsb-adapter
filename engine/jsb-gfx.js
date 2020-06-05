@@ -410,8 +410,6 @@ deviceProtos.forEach(function(item, index) {
             // createCommandAllocator: replaceFunction('_createCommandAllocator', _converters.GFXCommandAllocatorInfo),
             createCommandBuffer: replaceFunction('_createCommandBuffer', _converters.GFXCommandBufferInfo),
             createBuffer: replaceFunction('_createBuffer', _converters.GFXBufferInfo),
-            createTexture: replaceFunction('_createTexture', _converters.GFXTextureInfo),
-            createTextureView: replaceFunction('_createTextureView', _converters.GFXTextureViewInfo),
             createSampler: replaceFunction('_createSampler', _converters.GFXSamplerInfo),
             createShader: replaceFunction('_createShader', _converters.GFXShaderInfo),
             createInputAssembler: replaceFunction('_createInputAssembler', _converters.GFXInputAssemblerInfo),
@@ -423,6 +421,15 @@ deviceProtos.forEach(function(item, index) {
             copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.GFXBufferTextureCopyList),
             copyTexImagesToTexture: replaceFunction('_copyTexImagesToTexture', _converters.texImagesToBuffers, _converters.origin, _converters.GFXBufferTextureCopyList),
         });
+
+        let oldDeviceCreatTextureFun = item.createTexture;
+        item.createTexture = function(info) {
+            if (info.texture) {
+                return oldDeviceCreatTextureFun.call(this, _converters.GFXTextureViewInfo(info), true);
+            } else {
+                return oldDeviceCreatTextureFun.call(this, _converters.GFXTextureInfo(info), false);
+            }
+        }
     }
 });
 
@@ -536,14 +543,14 @@ cc.js.get(shaderProto, 'id', function () {
 });
 
 let textureProto = gfx.GFXTexture.prototype;
-replace(textureProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXTextureInfo),
-});
-
-let textureViewProto = gfx.GFXTextureView.prototype;
-replace(textureViewProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXTextureViewInfo),
-});
+let oldTextureInitializeFunc = textureProto.initialize;
+textureProto.initialize = function(info) {
+    if (info.texture) {
+        oldTextureInitializeFunc.call(this, _converters.GFXTextureViewInfo(info), true);
+    } else {
+        oldTextureInitializeFunc.call(this, _converters.GFXTextureInfo(info), false);
+    }
+}
 
 let windowProto = gfx.GFXWindow.prototype;
 replace(windowProto, {
