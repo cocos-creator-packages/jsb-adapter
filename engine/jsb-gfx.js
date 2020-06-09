@@ -117,7 +117,8 @@ let _converters = {
             info.isOffscreen,
             false, // isFullscreen
             0, // GFXVsyncMode::OFF
-            window.windowHandler
+            window.windowHandler,
+            info.renderPass
         );
     },
     // GFXContextInfo,
