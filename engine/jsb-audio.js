@@ -24,7 +24,7 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-cc.Audio = function (src) {
+let Audio = cc._Audio = function (src) {
     this.src = src;
     this.volume = 1;
     this.loop = false;
@@ -49,7 +49,7 @@ let handleVolume  = function (volume) {
     cc.audioEngine = audioEngine;
     audioEngine.setMaxWebAudioSize = function () { };
 
-    cc.Audio.State = audioEngine.AudioState;
+    Audio.State = audioEngine.AudioState;
 
     proto.play = function () {
         audioEngine.stop(this.id);
@@ -243,4 +243,4 @@ let handleVolume  = function (volume) {
         audioEngine._preload(filePath, callback);
     };
 
-})(cc.Audio.prototype, jsb.AudioEngine);
+})(Audio.prototype, jsb.AudioEngine);
