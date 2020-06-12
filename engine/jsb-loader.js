@@ -199,31 +199,22 @@ function downloadBundle (nameOrUrl, options, onComplete) {
             url = `assets/${bundleName}`;
         }
     }
-    var count = 0;
     var config = `${url}/config.${version ? version + '.': ''}json`;
-    let error = null, out = null;
     options.__cacheBundleRoot__ = bundleName;
     downloadJson(config, options, function (err, response) {
         if (err) {
-            error = err;
+            return onComplete(err, null);
         }
-        out = response;
+        let out = response;
         out && (out.base = url + '/');
-        count++;
-        if (count === 2) {
-            onComplete(error, out);
-        }
-    });
 
-    var js = `${url}/index.${version ? version + '.' : ''}js`;
-    downloadScript(js, options, function (err) {
-        if (err) {
-            error = err;
-        }
-        count++;
-        if (count === 2) {
-            onComplete(error, out);
-        }
+        var js = `${url}/index.${version ? version + '.' : ''}${out.encrypted ? 'jsc' : `js`}`;
+        downloadScript(js, options, function (err) {
+            if (err) {
+                return onComplete(err, null);
+            }
+            onComplete(err, out);
+        });
     });
 };
 
