@@ -105,21 +105,6 @@ let _converters = {
             handler = window.windowHandler;
         return new gfx.GFXDeviceInfo(handler, width, height, info.nativeWidth, info.nativeHeight, null);
     },
-    GFXWindowInfo: function(info) {
-        return new gfx.GFXWindowInfo(
-            info.title,
-            info.left,
-            info.top,
-            info.width,
-            info.height,
-            info.colorFmt,
-            info.depthStencilFmt,
-            info.isOffscreen,
-            false, // isFullscreen
-            0, // GFXVsyncMode::OFF
-            window.windowHandler
-        );
-    },
     // GFXContextInfo,
     GFXBufferInfo: function (info) {
         return new gfx.GFXBufferInfo(info);
@@ -405,7 +390,6 @@ deviceProtos.forEach(function(item, index) {
     if (item !== undefined) {
         replace(item, {
             initialize: replaceFunction('_initialize', _converters.GFXDeviceInfo),
-            createWindow: replaceFunction('_createWindow', _converters.GFXWindowInfo),
             createQueue: replaceFunction('_createQueue', _converters.GFXQueueInfo),
             // createCommandAllocator: replaceFunction('_createCommandAllocator', _converters.GFXCommandAllocatorInfo),
             createCommandBuffer: replaceFunction('_createCommandBuffer', _converters.GFXCommandBufferInfo),
@@ -551,8 +535,3 @@ textureProto.initialize = function(info) {
         oldTextureInitializeFunc.call(this, _converters.GFXTextureInfo(info), false);
     }
 }
-
-let windowProto = gfx.GFXWindow.prototype;
-replace(windowProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXWindowInfo),
-});
