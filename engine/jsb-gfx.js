@@ -154,13 +154,20 @@ let _converters = {
     },
     GFXShaderInfo: function (info) {
         let stages = info.stages,
+            attributes = info.attributes,
             blocks = info.blocks,
             samplers = info.samplers;
-        let jsbStages, jsbBlocks, jsbSamplers;
+        let jsbStages, jsbAttributes, jsbBlocks, jsbSamplers;
         if (stages) {
             jsbStages = [];
             for (let i = 0; i < stages.length; ++i) {
                 jsbStages.push(_converters.GFXShaderStage(stages[i]));
+            }
+        }
+        if (attributes) {
+            jsbAttributes = [];
+            for (let i = 0; i < attributes.length; ++i) {
+                jsbAttributes.push(_converters.GFXAttribute(attributes[i]));
             }
         }
         if (blocks) {
@@ -175,7 +182,7 @@ let _converters = {
                 jsbSamplers.push(_converters.GFXUniformSampler(samplers[i]));
             }
         }
-        return new gfx.GFXShaderInfo(info.name, jsbStages, jsbBlocks, jsbSamplers);
+        return new gfx.GFXShaderInfo(info.name, jsbStages, jsbAttributes, jsbBlocks, jsbSamplers);
     },
     GFXAttribute: function (attr) {
         return new gfx.GFXAttribute(attr.name, attr.format, attr.isNormalized, attr.stream, attr.isInstanced, attr.location);
