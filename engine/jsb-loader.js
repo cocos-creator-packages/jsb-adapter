@@ -122,8 +122,8 @@ function transformUrl (url, options) {
     return { url, inLocal, inCache };
 }
 
-function doNothing (url, options, onComplete) {
-    onComplete(null, url);
+function doNothing (content, options, onComplete) {
+    onComplete(null, content);
 }
 
 function downloadAsset (url, options, onComplete) {
@@ -147,33 +147,20 @@ function _getFontFamily (fontHandle) {
     return fontFamilyName;
 }
 
-function readFile(filePath, options, onComplete) {
-    switch (options.responseType) {
-        case 'json': 
-            readJson(filePath, onComplete);
-            break;
-        case 'arraybuffer':
-            readArrayBuffer(filePath, onComplete);
-            break;
-        default:
-            readText(filePath, onComplete);
-            break;
-    }
+function parseText (url, options, onComplete) {
+    readText(url, onComplete);
 }
 
-function downloadText (url, options, onComplete) {
-    options.responseType = "text";
-    download(url, readFile, options, options.onFileProgress, onComplete);
+function parseJson (url, options, onComplete) {
+    readJson(url, onComplete);
 }
 
-function downloadArrayBuffer (url, options, onComplete) {
-    options.responseType = "arraybuffer";
-    download(url, readFile, options, options.onFileProgress, onComplete);
+function parseArrayBuffer (url, options, onComplete) {
+    readArrayBuffer(url, onComplete);
 }
 
 function downloadJson (url, options, onComplete) {
-    options.responseType = "json";
-    download(url, readFile, options, options.onFileProgress, onComplete);
+    download(url, parseJson, options, options.onFileProgress, onComplete);
 } 
 
 function downloadBundle (nameOrUrl, options, onComplete) {
@@ -227,8 +214,8 @@ function loadFont (url, options, onComplete) {
     });
 }
 
-parser.parsePVRTex = doNothing;
-parser.parsePKMTex = doNothing;
+parser.parsePVRTex = downloader.downloadDomImage;
+parser.parsePKMTex = downloader.downloadDomImage;
 downloader.downloadScript = downloadScript;
 
 downloader.register({
@@ -236,71 +223,20 @@ downloader.register({
     '.js' : downloadScript,
     '.jsc' : downloadScript,
 
-    // Images
-    '.png' : downloadAsset,
-    '.jpg' : downloadAsset,
-    '.bmp' : downloadAsset,
-    '.jpeg' : downloadAsset,
-    '.gif' : downloadAsset,
-    '.ico' : downloadAsset,
-    '.tiff' : downloadAsset,
-    '.webp' : downloadAsset,
-    '.image' : downloadAsset,
-    '.pvr' : downloadAsset,
-    '.pkm' : downloadAsset,
-
-    // Audio
-    '.mp3' : downloadAsset,
-    '.ogg' : downloadAsset,
-    '.wav' : downloadAsset,
-    '.m4a' : downloadAsset,
-
-    // Video
-    '.mp4': downloadAsset,
-    '.avi': downloadAsset,
-    '.mov': downloadAsset,
-    '.mpg': downloadAsset,
-    '.mpeg': downloadAsset,
-    '.rm': downloadAsset,
-    '.rmvb': downloadAsset,
-    // Text
-    '.txt' : downloadText,
-    '.xml' : downloadText,
-    '.vsh' : downloadText,
-    '.fsh' : downloadText,
-    '.atlas' : downloadText,
-
-    '.tmx' : downloadText,
-    '.tsx' : downloadText,
-
     '.json' : downloadJson,
-    '.ExportJson' : downloadJson,
-    '.plist' : downloadText,
-
-    '.fnt' : downloadText,
-
-    '.binary' : downloadArrayBuffer,
-    '.bin' : downloadArrayBuffer,
-    '.dbbin': downloadArrayBuffer,
-    '.skel': downloadArrayBuffer,
-
-    // Font
-    '.font' : downloadAsset,
-    '.eot' : downloadAsset,
-    '.ttf' : downloadAsset,
-    '.woff' : downloadAsset,
-    '.svg' : downloadAsset,
-    '.ttc' : downloadAsset,
 
     'bundle': downloadBundle,
 
-    'default': downloadText
+    'default': downloadAsset
 });
 
 parser.register({
-    // compressed texture
-    '.pvr': downloader.downloadDomImage,
-    '.pkm': downloader.downloadDomImage,
+    // JS
+    '.js' : doNothing,
+    '.jsc' : doNothing,
+
+    '.json' : doNothing,
+
     // Images
     '.png' : downloader.downloadDomImage,
     '.jpg' : downloader.downloadDomImage,
@@ -313,6 +249,26 @@ parser.register({
     '.image' : downloader.downloadDomImage,
     '.pvr' : downloader.downloadDomImage,
     '.pkm' : downloader.downloadDomImage,
+    // compressed texture
+    '.pvr': downloader.downloadDomImage,
+    '.pkm': downloader.downloadDomImage,
+
+    '.binary' : parseArrayBuffer,
+    '.bin' : parseArrayBuffer,
+    '.dbbin': parseArrayBuffer,
+    '.skel': parseArrayBuffer,
+
+    // Text
+    '.txt' : parseText,
+    '.xml' : parseText,
+    '.vsh' : parseText,
+    '.fsh' : parseText,
+    '.atlas' : parseText,
+
+    '.tmx' : parseText,
+    '.tsx' : parseText,
+    '.plist' : parseText,
+    '.fnt' : parseText,
 
     // Font
     '.font' : loadFont,
@@ -321,6 +277,10 @@ parser.register({
     '.woff' : loadFont,
     '.svg' : loadFont,
     '.ttc' : loadFont,
+
+    '.ExportJson' : parseJson,
+    'bundle': doNothing,
+    'default': parseText
 });
 
 cc.assetManager.transformPipeline.append(function (task) {
