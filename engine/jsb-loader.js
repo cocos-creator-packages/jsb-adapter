@@ -299,8 +299,6 @@ parser.register({
     '.tiff' : downloader.downloadDomImage,
     '.webp' : downloader.downloadDomImage,
     '.image' : downloader.downloadDomImage,
-    '.pvr' : downloader.downloadDomImage,
-    '.pkm' : downloader.downloadDomImage,
     // compressed texture
     '.pvr': downloader.downloadDomImage,
     '.pkm': downloader.downloadDomImage,
