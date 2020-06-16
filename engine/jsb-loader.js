@@ -155,6 +155,10 @@ function parseJson (url, options, onComplete) {
     readJson(url, onComplete);
 }
 
+function downloadText (url, options, onComplete) {
+    download(url, parseText, options, options.onFileProgress, onComplete);
+}
+
 function parseArrayBuffer (url, options, onComplete) {
     readArrayBuffer(url, onComplete);
 }
@@ -223,20 +227,68 @@ downloader.register({
     '.js' : downloadScript,
     '.jsc' : downloadScript,
 
+    // Images
+    '.png' : downloadAsset,
+    '.jpg' : downloadAsset,
+    '.bmp' : downloadAsset,
+    '.jpeg' : downloadAsset,
+    '.gif' : downloadAsset,
+    '.ico' : downloadAsset,
+    '.tiff' : downloadAsset,
+    '.webp' : downloadAsset,
+    '.image' : downloadAsset,
+    '.pvr' : downloadAsset,
+    '.pkm' : downloadAsset,
+
+    // Audio
+    '.mp3' : downloadAsset,
+    '.ogg' : downloadAsset,
+    '.wav' : downloadAsset,
+    '.m4a' : downloadAsset,
+
+    // Video
+    '.mp4': downloadAsset,
+    '.avi': downloadAsset,
+    '.mov': downloadAsset,
+    '.mpg': downloadAsset,
+    '.mpeg': downloadAsset,
+    '.rm': downloadAsset,
+    '.rmvb': downloadAsset,
+    // Text
+    '.txt' : downloadAsset,
+    '.xml' : downloadAsset,
+    '.vsh' : downloadAsset,
+    '.fsh' : downloadAsset,
+    '.atlas' : downloadAsset,
+
+    '.tmx' : downloadAsset,
+    '.tsx' : downloadAsset,
+    '.fnt' : downloadAsset,
+
     '.json' : downloadJson,
+    '.ExportJson' : downloadAsset,
+
+    '.binary' : downloadAsset,
+    '.bin' : downloadAsset,
+    '.dbbin': downloadAsset,
+    '.skel': downloadAsset,
+
+    // Font
+    '.font' : downloadAsset,
+    '.eot' : downloadAsset,
+    '.ttf' : downloadAsset,
+    '.woff' : downloadAsset,
+    '.svg' : downloadAsset,
+    '.ttc' : downloadAsset,
 
     'bundle': downloadBundle,
 
-    'default': downloadAsset
+    '.plist' : downloadText,
+    'default': downloadText
 });
 
 parser.register({
-    // JS
-    '.js' : doNothing,
-    '.jsc' : doNothing,
-
-    '.json' : doNothing,
-
+    
     // Images
     '.png' : downloader.downloadDomImage,
     '.jpg' : downloader.downloadDomImage,
@@ -264,10 +316,8 @@ parser.register({
     '.vsh' : parseText,
     '.fsh' : parseText,
     '.atlas' : parseText,
-
     '.tmx' : parseText,
     '.tsx' : parseText,
-    '.plist' : parseText,
     '.fnt' : parseText,
 
     // Font
@@ -279,8 +329,6 @@ parser.register({
     '.ttc' : loadFont,
 
     '.ExportJson' : parseJson,
-    'bundle': doNothing,
-    'default': parseText
 });
 
 cc.assetManager.transformPipeline.append(function (task) {
