@@ -218,6 +218,17 @@ function loadFont (url, options, onComplete) {
     });
 }
 
+function parsePlist (url, options, onComplete) {
+    readText(url, function (err, file) {
+        var result = null;
+        if (!err) {
+            result = cc.plistParser.parse(file);
+            if (!result) err = new Error('parse failed');
+        }
+        onComplete && onComplete(err, result);
+    });
+}
+
 parser.parsePVRTex = downloader.downloadDomImage;
 parser.parsePKMTex = downloader.downloadDomImage;
 downloader.downloadScript = downloadScript;
@@ -264,6 +275,7 @@ downloader.register({
     '.tmx' : downloadAsset,
     '.tsx' : downloadAsset,
     '.fnt' : downloadAsset,
+    '.plist' : downloadAsset,
 
     '.json' : downloadJson,
     '.ExportJson' : downloadAsset,
@@ -282,8 +294,6 @@ downloader.register({
     '.ttc' : downloadAsset,
 
     'bundle': downloadBundle,
-
-    '.plist' : downloadText,
     'default': downloadText
 });
 
@@ -317,6 +327,8 @@ parser.register({
     '.tmx' : parseText,
     '.tsx' : parseText,
     '.fnt' : parseText,
+
+    '.plist' : parsePlist,
 
     // Font
     '.font' : loadFont,
