@@ -122,18 +122,12 @@ function transformUrl (url, options) {
     return { url, inLocal, inCache };
 }
 
-function downloadMedia (url, options, onComplete) {
-    download(url, function (url, options, onComplete) {
-        onComplete(null, url);
-    }, options, options.onFileProgress, onComplete);
+function doNothing (url, options, onComplete) {
+    onComplete(null, url);
 }
 
-function downloadImage (url, options, onComplete) {
-    download(url, downloader.downloadDomImage, options, options.onFileProgress, onComplete);
-}
-
-function downloadFont (url, options, onComplete) {
-    download(url, loadFont, options, options.onFileProgress, onComplete);
+function downloadAsset (url, options, onComplete) {
+    download(url, doNothing, options, options.onFileProgress, onComplete);
 }
 
 function _getFontFamily (fontHandle) {
@@ -233,16 +227,8 @@ function loadFont (url, options, onComplete) {
     });
 }
 
-function parsePVRTex (file, options, onComplete) {
-    onComplete && onComplete(null, file);
-}
-
-function parsePKMTex (file, options, onComplete) {
-    onComplete && onComplete(null, file);
-}
-
-parser.parsePVRTex = parsePVRTex;
-parser.parsePKMTex = parsePKMTex;
+parser.parsePVRTex = doNothing;
+parser.parsePKMTex = doNothing;
 downloader.downloadScript = downloadScript;
 
 downloader.register({
@@ -251,32 +237,32 @@ downloader.register({
     '.jsc' : downloadScript,
 
     // Images
-    '.png' : downloadImage,
-    '.jpg' : downloadImage,
-    '.bmp' : downloadImage,
-    '.jpeg' : downloadImage,
-    '.gif' : downloadImage,
-    '.ico' : downloadImage,
-    '.tiff' : downloadImage,
-    '.webp' : downloadImage,
-    '.image' : downloadImage,
-    '.pvr' : downloadImage,
-    '.pkm' : downloadImage,
+    '.png' : downloadAsset,
+    '.jpg' : downloadAsset,
+    '.bmp' : downloadAsset,
+    '.jpeg' : downloadAsset,
+    '.gif' : downloadAsset,
+    '.ico' : downloadAsset,
+    '.tiff' : downloadAsset,
+    '.webp' : downloadAsset,
+    '.image' : downloadAsset,
+    '.pvr' : downloadAsset,
+    '.pkm' : downloadAsset,
 
     // Audio
-    '.mp3' : downloadMedia,
-    '.ogg' : downloadMedia,
-    '.wav' : downloadMedia,
-    '.m4a' : downloadMedia,
+    '.mp3' : downloadAsset,
+    '.ogg' : downloadAsset,
+    '.wav' : downloadAsset,
+    '.m4a' : downloadAsset,
 
     // Video
-    '.mp4': downloadMedia,
-    '.avi': downloadMedia,
-    '.mov': downloadMedia,
-    '.mpg': downloadMedia,
-    '.mpeg': downloadMedia,
-    '.rm': downloadMedia,
-    '.rmvb': downloadMedia,
+    '.mp4': downloadAsset,
+    '.avi': downloadAsset,
+    '.mov': downloadAsset,
+    '.mpg': downloadAsset,
+    '.mpeg': downloadAsset,
+    '.rm': downloadAsset,
+    '.rmvb': downloadAsset,
     // Text
     '.txt' : downloadText,
     '.xml' : downloadText,
@@ -299,12 +285,12 @@ downloader.register({
     '.skel': downloadArrayBuffer,
 
     // Font
-    '.font' : downloadFont,
-    '.eot' : downloadFont,
-    '.ttf' : downloadFont,
-    '.woff' : downloadFont,
-    '.svg' : downloadFont,
-    '.ttc' : downloadFont,
+    '.font' : downloadAsset,
+    '.eot' : downloadAsset,
+    '.ttf' : downloadAsset,
+    '.woff' : downloadAsset,
+    '.svg' : downloadAsset,
+    '.ttc' : downloadAsset,
 
     'bundle': downloadBundle,
 
@@ -313,8 +299,28 @@ downloader.register({
 
 parser.register({
     // compressed texture
-    '.pvr': parsePVRTex,
-    '.pkm': parsePKMTex,
+    '.pvr': downloader.downloadDomImage,
+    '.pkm': downloader.downloadDomImage,
+    // Images
+    '.png' : downloader.downloadDomImage,
+    '.jpg' : downloader.downloadDomImage,
+    '.bmp' : downloader.downloadDomImage,
+    '.jpeg' : downloader.downloadDomImage,
+    '.gif' : downloader.downloadDomImage,
+    '.ico' : downloader.downloadDomImage,
+    '.tiff' : downloader.downloadDomImage,
+    '.webp' : downloader.downloadDomImage,
+    '.image' : downloader.downloadDomImage,
+    '.pvr' : downloader.downloadDomImage,
+    '.pkm' : downloader.downloadDomImage,
+
+    // Font
+    '.font' : loadFont,
+    '.eot' : loadFont,
+    '.ttf' : loadFont,
+    '.woff' : loadFont,
+    '.svg' : loadFont,
+    '.ttc' : loadFont,
 });
 
 cc.assetManager.transformPipeline.append(function (task) {
