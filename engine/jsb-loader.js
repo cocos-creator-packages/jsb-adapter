@@ -122,18 +122,12 @@ function transformUrl (url, options) {
     return { url, inLocal, inCache };
 }
 
-function downloadMedia (url, options, onComplete) {
-    download(url, function (url, options, onComplete) {
-        onComplete(null, url);
-    }, options, options.onFileProgress, onComplete);
+function doNothing (content, options, onComplete) {
+    onComplete(null, content);
 }
 
-function downloadImage (url, options, onComplete) {
-    download(url, downloader.downloadDomImage, options, options.onFileProgress, onComplete);
-}
-
-function downloadFont (url, options, onComplete) {
-    download(url, loadFont, options, options.onFileProgress, onComplete);
+function downloadAsset (url, options, onComplete) {
+    download(url, doNothing, options, options.onFileProgress, onComplete);
 }
 
 function _getFontFamily (fontHandle) {
@@ -153,33 +147,24 @@ function _getFontFamily (fontHandle) {
     return fontFamilyName;
 }
 
-function readFile(filePath, options, onComplete) {
-    switch (options.responseType) {
-        case 'json': 
-            readJson(filePath, onComplete);
-            break;
-        case 'arraybuffer':
-            readArrayBuffer(filePath, onComplete);
-            break;
-        default:
-            readText(filePath, onComplete);
-            break;
-    }
+function parseText (url, options, onComplete) {
+    readText(url, onComplete);
+}
+
+function parseJson (url, options, onComplete) {
+    readJson(url, onComplete);
 }
 
 function downloadText (url, options, onComplete) {
-    options.responseType = "text";
-    download(url, readFile, options, options.onFileProgress, onComplete);
+    download(url, parseText, options, options.onFileProgress, onComplete);
 }
 
-function downloadArrayBuffer (url, options, onComplete) {
-    options.responseType = "arraybuffer";
-    download(url, readFile, options, options.onFileProgress, onComplete);
+function parseArrayBuffer (url, options, onComplete) {
+    readArrayBuffer(url, onComplete);
 }
 
 function downloadJson (url, options, onComplete) {
-    options.responseType = "json";
-    download(url, readFile, options, options.onFileProgress, onComplete);
+    download(url, parseJson, options, options.onFileProgress, onComplete);
 } 
 
 function downloadBundle (nameOrUrl, options, onComplete) {
@@ -233,16 +218,19 @@ function loadFont (url, options, onComplete) {
     });
 }
 
-function parsePVRTex (file, options, onComplete) {
-    onComplete && onComplete(null, file);
+function parsePlist (url, options, onComplete) {
+    readText(url, function (err, file) {
+        var result = null;
+        if (!err) {
+            result = cc.plistParser.parse(file);
+            if (!result) err = new Error('parse failed');
+        }
+        onComplete && onComplete(err, result);
+    });
 }
 
-function parsePKMTex (file, options, onComplete) {
-    onComplete && onComplete(null, file);
-}
-
-parser.parsePVRTex = parsePVRTex;
-parser.parsePKMTex = parsePKMTex;
+parser.parsePVRTex = downloader.downloadDomImage;
+parser.parsePKMTex = downloader.downloadDomImage;
 downloader.downloadScript = downloadScript;
 
 downloader.register({
@@ -251,70 +239,106 @@ downloader.register({
     '.jsc' : downloadScript,
 
     // Images
-    '.png' : downloadImage,
-    '.jpg' : downloadImage,
-    '.bmp' : downloadImage,
-    '.jpeg' : downloadImage,
-    '.gif' : downloadImage,
-    '.ico' : downloadImage,
-    '.tiff' : downloadImage,
-    '.webp' : downloadImage,
-    '.image' : downloadImage,
-    '.pvr' : downloadImage,
-    '.pkm' : downloadImage,
+    '.png' : downloadAsset,
+    '.jpg' : downloadAsset,
+    '.bmp' : downloadAsset,
+    '.jpeg' : downloadAsset,
+    '.gif' : downloadAsset,
+    '.ico' : downloadAsset,
+    '.tiff' : downloadAsset,
+    '.webp' : downloadAsset,
+    '.image' : downloadAsset,
+    '.pvr' : downloadAsset,
+    '.pkm' : downloadAsset,
 
     // Audio
-    '.mp3' : downloadMedia,
-    '.ogg' : downloadMedia,
-    '.wav' : downloadMedia,
-    '.m4a' : downloadMedia,
+    '.mp3' : downloadAsset,
+    '.ogg' : downloadAsset,
+    '.wav' : downloadAsset,
+    '.m4a' : downloadAsset,
 
     // Video
-    '.mp4': downloadMedia,
-    '.avi': downloadMedia,
-    '.mov': downloadMedia,
-    '.mpg': downloadMedia,
-    '.mpeg': downloadMedia,
-    '.rm': downloadMedia,
-    '.rmvb': downloadMedia,
+    '.mp4': downloadAsset,
+    '.avi': downloadAsset,
+    '.mov': downloadAsset,
+    '.mpg': downloadAsset,
+    '.mpeg': downloadAsset,
+    '.rm': downloadAsset,
+    '.rmvb': downloadAsset,
     // Text
-    '.txt' : downloadText,
-    '.xml' : downloadText,
-    '.vsh' : downloadText,
-    '.fsh' : downloadText,
-    '.atlas' : downloadText,
+    '.txt' : downloadAsset,
+    '.xml' : downloadAsset,
+    '.vsh' : downloadAsset,
+    '.fsh' : downloadAsset,
+    '.atlas' : downloadAsset,
 
-    '.tmx' : downloadText,
-    '.tsx' : downloadText,
+    '.tmx' : downloadAsset,
+    '.tsx' : downloadAsset,
+    '.fnt' : downloadAsset,
+    '.plist' : downloadAsset,
 
     '.json' : downloadJson,
-    '.ExportJson' : downloadJson,
-    '.plist' : downloadText,
+    '.ExportJson' : downloadAsset,
 
-    '.fnt' : downloadText,
-
-    '.binary' : downloadArrayBuffer,
-    '.bin' : downloadArrayBuffer,
-    '.dbbin': downloadArrayBuffer,
-    '.skel': downloadArrayBuffer,
+    '.binary' : downloadAsset,
+    '.bin' : downloadAsset,
+    '.dbbin': downloadAsset,
+    '.skel': downloadAsset,
 
     // Font
-    '.font' : downloadFont,
-    '.eot' : downloadFont,
-    '.ttf' : downloadFont,
-    '.woff' : downloadFont,
-    '.svg' : downloadFont,
-    '.ttc' : downloadFont,
+    '.font' : downloadAsset,
+    '.eot' : downloadAsset,
+    '.ttf' : downloadAsset,
+    '.woff' : downloadAsset,
+    '.svg' : downloadAsset,
+    '.ttc' : downloadAsset,
 
     'bundle': downloadBundle,
-
     'default': downloadText
 });
 
 parser.register({
+    
+    // Images
+    '.png' : downloader.downloadDomImage,
+    '.jpg' : downloader.downloadDomImage,
+    '.bmp' : downloader.downloadDomImage,
+    '.jpeg' : downloader.downloadDomImage,
+    '.gif' : downloader.downloadDomImage,
+    '.ico' : downloader.downloadDomImage,
+    '.tiff' : downloader.downloadDomImage,
+    '.webp' : downloader.downloadDomImage,
+    '.image' : downloader.downloadDomImage,
     // compressed texture
-    '.pvr': parsePVRTex,
-    '.pkm': parsePKMTex,
+    '.pvr': downloader.downloadDomImage,
+    '.pkm': downloader.downloadDomImage,
+
+    '.binary' : parseArrayBuffer,
+    '.bin' : parseArrayBuffer,
+    '.dbbin': parseArrayBuffer,
+    '.skel': parseArrayBuffer,
+
+    // Text
+    '.txt' : parseText,
+    '.xml' : parseText,
+    '.vsh' : parseText,
+    '.fsh' : parseText,
+    '.atlas' : parseText,
+    '.tmx' : parseText,
+    '.tsx' : parseText,
+    '.fnt' : parseText,
+
+    '.plist' : parsePlist,
+
+    // Font
+    '.font' : loadFont,
+    '.eot' : loadFont,
+    '.ttf' : loadFont,
+    '.woff' : loadFont,
+    '.svg' : loadFont,
+    '.ttc' : loadFont,
+
+    '.ExportJson' : parseJson,
 });
 
 cc.assetManager.transformPipeline.append(function (task) {
