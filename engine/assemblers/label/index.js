@@ -27,3 +27,4 @@ require('./2d/bmfont.js');
 
 require('./3d/bmfont.js');
 require('./3d/ttf.js');
+require('./3d/letter.js');
