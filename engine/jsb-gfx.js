@@ -315,8 +315,8 @@ let _converters = {
         // not available
         return null;
     },
-    GFXCommandBufferInfo: function (info) {
-        return new gfx.GFXCommandBufferInfo(info);
+    CommandBufferInfo: function (info) {
+        return new gfx.CommandBufferInfo(info);
     },
     GFXQueueInfo: function (info) {
         return new gfx.GFXQueueInfo(info.type);
@@ -399,7 +399,7 @@ deviceProtos.forEach(function(item, index) {
             initialize: replaceFunction('_initialize', _converters.DeviceInfo),
             createQueue: replaceFunction('_createQueue', _converters.GFXQueueInfo),
             // createCommandAllocator: replaceFunction('_createCommandAllocator', _converters.GFXCommandAllocatorInfo),
-            createCommandBuffer: replaceFunction('_createCommandBuffer', _converters.GFXCommandBufferInfo),
+            createCommandBuffer: replaceFunction('_createCommandBuffer', _converters.CommandBufferInfo),
             createBuffer: replaceFunction('_createBuffer', _converters.BufferInfo),
             createSampler: replaceFunction('_createSampler', _converters.GFXSamplerInfo),
             createShader: replaceFunction('_createShader', _converters.GFXShaderInfo),
@@ -470,9 +470,9 @@ bufferProto.update = function(buffer, offset, size) {
 //     initialize: replaceFunction('_initialize', _converters.GFXCommandAllocatorInfo),
 // });
 
-let commandBufferProto = gfx.GFXCommandBuffer.prototype;
+let commandBufferProto = gfx.CommandBuffer.prototype;
 replace(commandBufferProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXCommandBufferInfo),
+    initialize: replaceFunction('_initialize', _converters.CommandBufferInfo),
     setViewport: replaceFunction('_setViewport', _converters.GFXViewport),
     setScissor: replaceFunction('_setScissor', _converters.GFXRect),
     setBlendConstants: replaceFunction('_setBlendConstants', _converters.GFXColor),
