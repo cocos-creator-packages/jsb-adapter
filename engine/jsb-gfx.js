@@ -68,17 +68,17 @@ let _converters = {
         return res && new gfx.GFXTextureSubres(res.mipLevel, res.baseArrayLayer, res.layerCount);
     },
     // GFXTextureCopy,
-    GFXBufferTextureCopy: function (obj) {
+    BufferTextureCopy: function (obj) {
         let jsbOffset = _converters.GFXOffset(obj.texOffset);
         let jsbExtent = _converters.GFXExtent(obj.texExtent);
         let jsbSubres = _converters.GFXTextureSubres(obj.texSubres);
-        return new gfx.GFXBufferTextureCopy(obj.buffStride, obj.buffTexHeight, jsbOffset, jsbExtent, jsbSubres);
+        return new gfx.BufferTextureCopy(obj.buffStride, obj.buffTexHeight, jsbOffset, jsbExtent, jsbSubres);
     },
-    GFXBufferTextureCopyList: function (list) {
+    BufferTextureCopyList: function (list) {
         if (list) {
             let jsbList = [];
             for (let i = 0; i < list.length; ++i) {
-                jsbList.push(_converters.GFXBufferTextureCopy(list[i]));
+                jsbList.push(_converters.BufferTextureCopy(list[i]));
             }
             return jsbList;
         }
@@ -99,15 +99,15 @@ let _converters = {
         }
         return gfxColorArray;
     },
-    GFXDeviceInfo: function (info) {
+    DeviceInfo: function (info) {
         let width = cc.game.canvas.width,
             height = cc.game.canvas.height,
             handler = window.windowHandler;
-        return new gfx.GFXDeviceInfo(handler, width, height, info.nativeWidth, info.nativeHeight, null);
+        return new gfx.DeviceInfo(handler, width, height, info.nativeWidth, info.nativeHeight, null);
     },
     // GFXContextInfo,
-    GFXBufferInfo: function (info) {
-        return new gfx.GFXBufferInfo(info);
+    BufferInfo: function (info) {
+        return new gfx.BufferInfo(info);
     },
     // GFXDrawInfo,
     // GFXIndirectBuffer,
@@ -396,11 +396,11 @@ let deviceProtos = [
 deviceProtos.forEach(function(item, index) {
     if (item !== undefined) {
         replace(item, {
-            initialize: replaceFunction('_initialize', _converters.GFXDeviceInfo),
+            initialize: replaceFunction('_initialize', _converters.DeviceInfo),
             createQueue: replaceFunction('_createQueue', _converters.GFXQueueInfo),
             // createCommandAllocator: replaceFunction('_createCommandAllocator', _converters.GFXCommandAllocatorInfo),
             createCommandBuffer: replaceFunction('_createCommandBuffer', _converters.GFXCommandBufferInfo),
-            createBuffer: replaceFunction('_createBuffer', _converters.GFXBufferInfo),
+            createBuffer: replaceFunction('_createBuffer', _converters.BufferInfo),
             createSampler: replaceFunction('_createSampler', _converters.GFXSamplerInfo),
             createShader: replaceFunction('_createShader', _converters.GFXShaderInfo),
             createInputAssembler: replaceFunction('_createInputAssembler', _converters.GFXInputAssemblerInfo),
@@ -409,8 +409,8 @@ deviceProtos.forEach(function(item, index) {
             createBindingLayout: replaceFunction('_createBindingLayout', _converters.GFXBindingLayoutInfo),
             createPipelineState: replaceFunction('_createPipelineState', _converters.GFXPipelineStateInfo),
             createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.GFXPipelineLayoutInfo),
-            copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.GFXBufferTextureCopyList),
-            copyTexImagesToTexture: replaceFunction('_copyTexImagesToTexture', _converters.texImagesToBuffers, _converters.origin, _converters.GFXBufferTextureCopyList),
+            copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.BufferTextureCopyList),
+            copyTexImagesToTexture: replaceFunction('_copyTexImagesToTexture', _converters.texImagesToBuffers, _converters.origin, _converters.BufferTextureCopyList),
         });
 
         let oldDeviceCreatTextureFun = item.createTexture;
@@ -429,9 +429,9 @@ replace(bindingLayoutProto, {
     initialize: replaceFunction('_initialize', _converters.GFXBindingLayoutInfo),
 });
 
-let bufferProto = gfx.GFXBuffer.prototype;
+let bufferProto = gfx.Buffer.prototype;
 replace(bufferProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXBufferInfo),
+    initialize: replaceFunction('_initialize', _converters.BufferInfo),
 });
 
 let oldUpdate = bufferProto.update;
@@ -439,7 +439,7 @@ bufferProto.update = function(buffer, offset, size) {
     let buffSize;
     if (size !== undefined ) {
         buffSize = size;
-    } else if (this.usage & 0x40) { // GFXBufferUsageBit.INDIRECT
+    } else if (this.usage & 0x40) { // BufferUsageBit.INDIRECT
         // It is a IGFXIndirectBuffer object.
         let drawInfos = buffer.drawInfos;
         buffer = new Uint32Array(drawInfos.length * 7);
