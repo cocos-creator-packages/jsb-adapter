@@ -64,14 +64,14 @@ let _converters = {
     GFXExtent: function (extent) {
         return extent && new gfx.GFXExtent(extent.width, extent.height, extent.depth);
     },
-    GFXTextureSubres: function (res) {
-        return res && new gfx.GFXTextureSubres(res.mipLevel, res.baseArrayLayer, res.layerCount);
+    TextureSubres: function (res) {
+        return res && new gfx.TextureSubres(res.mipLevel, res.baseArrayLayer, res.layerCount);
     },
-    // GFXTextureCopy,
+    // TextureCopy,
     BufferTextureCopy: function (obj) {
         let jsbOffset = _converters.GFXOffset(obj.texOffset);
         let jsbExtent = _converters.GFXExtent(obj.texExtent);
-        let jsbSubres = _converters.GFXTextureSubres(obj.texSubres);
+        let jsbSubres = _converters.TextureSubres(obj.texSubres);
         return new gfx.BufferTextureCopy(obj.buffStride, obj.buffTexHeight, jsbOffset, jsbExtent, jsbSubres);
     },
     BufferTextureCopyList: function (list) {
@@ -111,11 +111,11 @@ let _converters = {
     },
     // GFXDrawInfo,
     // GFXIndirectBuffer,
-    GFXTextureInfo: function (info) {
-        return new gfx.GFXTextureInfo(info);
+    TextureInfo: function (info) {
+        return new gfx.TextureInfo(info);
     },
-    GFXTextureViewInfo: function (info) {
-        return new gfx.GFXTextureViewInfo(info);
+    TextureViewInfo: function (info) {
+        return new gfx.TextureViewInfo(info);
     },
     GFXSamplerInfo: function (info) {
         info.borderColor = _converters.GFXColor(info.borderColor);
@@ -416,9 +416,9 @@ deviceProtos.forEach(function(item, index) {
         let oldDeviceCreatTextureFun = item.createTexture;
         item.createTexture = function(info) {
             if (info.texture) {
-                return oldDeviceCreatTextureFun.call(this, _converters.GFXTextureViewInfo(info), true);
+                return oldDeviceCreatTextureFun.call(this, _converters.TextureViewInfo(info), true);
             } else {
-                return oldDeviceCreatTextureFun.call(this, _converters.GFXTextureInfo(info), false);
+                return oldDeviceCreatTextureFun.call(this, _converters.TextureInfo(info), false);
             }
         }
     }
@@ -533,12 +533,12 @@ cc.js.get(shaderProto, 'id', function () {
     return this.hash;
 });
 
-let textureProto = gfx.GFXTexture.prototype;
+let textureProto = gfx.Texture.prototype;
 let oldTextureInitializeFunc = textureProto.initialize;
 textureProto.initialize = function(info) {
     if (info.texture) {
-        oldTextureInitializeFunc.call(this, _converters.GFXTextureViewInfo(info), true);
+        oldTextureInitializeFunc.call(this, _converters.TextureViewInfo(info), true);
     } else {
-        oldTextureInitializeFunc.call(this, _converters.GFXTextureInfo(info), false);
+        oldTextureInitializeFunc.call(this, _converters.TextureInfo(info), false);
     }
 }
