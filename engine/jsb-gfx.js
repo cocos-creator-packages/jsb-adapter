@@ -232,7 +232,7 @@ let _converters = {
     GFXBinding: function (binding) {
         return new gfx.GFXBinding(binding.shaderStages, binding.binding, binding.bindingType, binding.name, binding.count);
     },
-    GFXBindingLayoutInfo: function (info) {
+    BindingLayoutInfo: function (info) {
         let bindings = info.bindings;
         let jsbBindings;
         if (bindings) {
@@ -241,7 +241,7 @@ let _converters = {
                 jsbBindings.push(_converters.GFXBinding(bindings[i]));
             }
         }
-        return new gfx.GFXBindingLayoutInfo(jsbBindings);
+        return new gfx.BindingLayoutInfo(jsbBindings);
     },
     GFXBindingUnit: function (info) {
         return new gfx.GFXBindingUnit(info);
@@ -260,7 +260,7 @@ let _converters = {
             }
         }
         // for (let i = 0; i < layouts.length; ++i) {
-        //     jsbLayouts.push(_converters.GFXBindingLayout(layouts[i]));
+        //     jsbLayouts.push(_converters.BindingLayout(layouts[i]));
         // }
         // Layouts are pointers which should be passing through directly
         return new gfx.GFXPipelineLayoutInfo(jsbRanges, layouts);
@@ -406,7 +406,7 @@ deviceProtos.forEach(function(item, index) {
             createInputAssembler: replaceFunction('_createInputAssembler', _converters.GFXInputAssemblerInfo),
             createRenderPass: replaceFunction('_createRenderPass', _converters.GFXRenderPassInfo),
             createFramebuffer: replaceFunction('_createFramebuffer', _converters.GFXFramebufferInfo),
-            createBindingLayout: replaceFunction('_createBindingLayout', _converters.GFXBindingLayoutInfo),
+            createBindingLayout: replaceFunction('_createBindingLayout', _converters.BindingLayoutInfo),
             createPipelineState: replaceFunction('_createPipelineState', _converters.GFXPipelineStateInfo),
             createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.GFXPipelineLayoutInfo),
             copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.BufferTextureCopyList),
@@ -424,9 +424,9 @@ deviceProtos.forEach(function(item, index) {
     }
 });
 
-let bindingLayoutProto = gfx.GFXBindingLayout.prototype;
+let bindingLayoutProto = gfx.BindingLayout.prototype;
 replace(bindingLayoutProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXBindingLayoutInfo),
+    initialize: replaceFunction('_initialize', _converters.BindingLayoutInfo),
 });
 
 let bufferProto = gfx.Buffer.prototype;
