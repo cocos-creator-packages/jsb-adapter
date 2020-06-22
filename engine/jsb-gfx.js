@@ -138,8 +138,8 @@ let _converters = {
         }
         return new gfx.UniformBlock(block.shaderStages, block.binding, block.name, jsbUniforms);
     },
-    GFXUniformSampler: function (sampler) {
-        return new gfx.GFXUniformSampler(sampler.shaderStages, sampler.binding, sampler.name, sampler.type, sampler.count);
+    UniformSampler: function (sampler) {
+        return new gfx.UniformSampler(sampler.shaderStages, sampler.binding, sampler.name, sampler.type, sampler.count);
     },
     ShaderStage: function (stage) {
         let macros = stage.macros;
@@ -179,7 +179,7 @@ let _converters = {
         if (samplers) {
             jsbSamplers = [];
             for (let i = 0; i < samplers.length; ++i) {
-                jsbSamplers.push(_converters.GFXUniformSampler(samplers[i]));
+                jsbSamplers.push(_converters.UniformSampler(samplers[i]));
             }
         }
         return new gfx.ShaderInfo(info.name, jsbStages, jsbAttributes, jsbBlocks, jsbSamplers);
