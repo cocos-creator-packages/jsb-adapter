@@ -321,8 +321,8 @@ let _converters = {
     QueueInfo: function (info) {
         return new gfx.QueueInfo(info.type);
     },
-    GFXFormatInfo: function (info) {
-        return new gfx.GFXFormatInfo(info);
+    FormatInfo: function (info) {
+        return new gfx.FormatInfo(info);
     },
     // GFXMemoryStatus,
 };
