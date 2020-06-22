@@ -23,8 +23,8 @@
  THE SOFTWARE.
  ****************************************************************************/
 let Rect = new gfx.Rect();
-let gfxColor = new gfx.GFXColor();
-let gfxColorArray = [];
+let Color = new gfx.Color();
+let ColorArray = [];
 
 // Converters for converting js objects to jsb struct objects
 let _converters = {
@@ -86,18 +86,18 @@ let _converters = {
     Viewport: function (vp) {
         return vp && new gfx.Viewport(vp.left, vp.top, vp.width, vp.height, vp.minDepth, vp.maxDepth);
     },
-    GFXColor: function(color) {
+    Color: function(color) {
         if (color) {
-            Object.assign(gfxColor, color);
+            Object.assign(Color, color);
         }
-        return gfxColor;
+        return Color;
     },
-    GFXColorArray: function(colors) {
+    ColorArray: function(colors) {
         if (colors) {
             colors.forEach((t, i) => Object.assign(
-                gfxColorArray[i] || (gfxColorArray[i] = new gfx.GFXColor()), t));
+                ColorArray[i] || (ColorArray[i] = new gfx.Color()), t));
         }
-        return gfxColorArray;
+        return ColorArray;
     },
     DeviceInfo: function (info) {
         let width = cc.game.canvas.width,
@@ -118,7 +118,7 @@ let _converters = {
         return new gfx.TextureViewInfo(info);
     },
     SamplerInfo: function (info) {
-        info.borderColor = _converters.GFXColor(info.borderColor);
+        info.borderColor = _converters.Color(info.borderColor);
         return new gfx.SamplerInfo(info);
     },
     ShaderMacro: function (macro) {
@@ -198,8 +198,8 @@ let _converters = {
         }
         return new gfx.InputAssemblerInfo(jsbAttrs, info.vertexBuffers, info.indexBuffer, info.indirectBuffer);
     },
-    GFXColorAttachment: function (attachment) {
-        return new gfx.GFXColorAttachment(attachment);
+    ColorAttachment: function (attachment) {
+        return new gfx.ColorAttachment(attachment);
     },
     GFXDepthStencilAttachment: function (attachment) {
         return new gfx.GFXDepthStencilAttachment(attachment);
@@ -214,7 +214,7 @@ let _converters = {
         if (colors) {
             jsbColors = [];
             for (let i = 0; i < colors.length; ++i) {
-                jsbColors.push(_converters.GFXColorAttachment(colors[i]));
+                jsbColors.push(_converters.ColorAttachment(colors[i]));
             }
         }
         if (subPasses) {
@@ -294,7 +294,7 @@ let _converters = {
                 jsbTargets.push(_converters.GFXBlendTarget(targets[i]));
             }
         }
-        let color = _converters.GFXColor(state.blendColor);
+        let color = _converters.Color(state.blendColor);
         return new gfx.GFXBlendState(state.isA2c, state.isIndepend, color, jsbTargets);
     },
     PipelineStateInfo: function (info) {
@@ -475,12 +475,12 @@ replace(commandBufferProto, {
     initialize: replaceFunction('_initialize', _converters.CommandBufferInfo),
     setViewport: replaceFunction('_setViewport', _converters.Viewport),
     setScissor: replaceFunction('_setScissor', _converters.Rect),
-    setBlendConstants: replaceFunction('_setBlendConstants', _converters.GFXColor),
+    setBlendConstants: replaceFunction('_setBlendConstants', _converters.Color),
     beginRenderPass: replaceFunction('_beginRenderPass',
         _converters.origin,
         _converters.Rect,
         _converters.origin,
-        _converters.GFXColorArray,
+        _converters.ColorArray,
         _converters.origin,
         _converters.origin),
 });
