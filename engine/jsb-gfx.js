@@ -83,8 +83,8 @@ let _converters = {
             return jsbList;
         }
     },
-    GFXViewport: function (vp) {
-        return vp && new gfx.GFXViewport(vp.left, vp.top, vp.width, vp.height, vp.minDepth, vp.maxDepth);
+    Viewport: function (vp) {
+        return vp && new gfx.Viewport(vp.left, vp.top, vp.width, vp.height, vp.minDepth, vp.maxDepth);
     },
     GFXColor: function(color) {
         if (color) {
@@ -473,7 +473,7 @@ bufferProto.update = function(buffer, offset, size) {
 let commandBufferProto = gfx.CommandBuffer.prototype;
 replace(commandBufferProto, {
     initialize: replaceFunction('_initialize', _converters.CommandBufferInfo),
-    setViewport: replaceFunction('_setViewport', _converters.GFXViewport),
+    setViewport: replaceFunction('_setViewport', _converters.Viewport),
     setScissor: replaceFunction('_setScissor', _converters.Rect),
     setBlendConstants: replaceFunction('_setBlendConstants', _converters.GFXColor),
     beginRenderPass: replaceFunction('_beginRenderPass',
