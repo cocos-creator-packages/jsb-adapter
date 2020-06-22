@@ -207,7 +207,7 @@ let _converters = {
     GFXSubPass: function (subPass) {
         return new gfx.GFXSubPass(subPass);
     },
-    GFXRenderPassInfo: function (info) {
+    RenderPassInfo: function (info) {
         let colors = info.colorAttachments,
             subPasses = info.subPasses;
         let jsbColors, jsbSubPasses;
@@ -224,7 +224,7 @@ let _converters = {
             }
         }
         let jsbDSAttachment = _converters.GFXDepthStencilAttachment(info.depthStencilAttachment);
-        return new gfx.GFXRenderPassInfo(jsbColors, jsbDSAttachment, jsbSubPasses);
+        return new gfx.RenderPassInfo(jsbColors, jsbDSAttachment, jsbSubPasses);
     },
     FramebufferInfo: function (info) {
         return new gfx.FramebufferInfo(info);
@@ -404,7 +404,7 @@ deviceProtos.forEach(function(item, index) {
             createSampler: replaceFunction('_createSampler', _converters.GFXSamplerInfo),
             createShader: replaceFunction('_createShader', _converters.GFXShaderInfo),
             createInputAssembler: replaceFunction('_createInputAssembler', _converters.InputAssemblerInfo),
-            createRenderPass: replaceFunction('_createRenderPass', _converters.GFXRenderPassInfo),
+            createRenderPass: replaceFunction('_createRenderPass', _converters.RenderPassInfo),
             createFramebuffer: replaceFunction('_createFramebuffer', _converters.FramebufferInfo),
             createBindingLayout: replaceFunction('_createBindingLayout', _converters.BindingLayoutInfo),
             createPipelineState: replaceFunction('_createPipelineState', _converters.PipelineStateInfo),
@@ -515,9 +515,9 @@ replace(queueProto, {
     initialize: replaceFunction('_initialize', _converters.QueueInfo),
 });
 
-let renderPassProto = gfx.GFXRenderPass.prototype;
+let renderPassProto = gfx.RenderPass.prototype;
 replace(renderPassProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXRenderPassInfo),
+    initialize: replaceFunction('_initialize', _converters.RenderPassInfo),
 });
 
 let samplerProto = gfx.GFXSampler.prototype;
