@@ -121,8 +121,8 @@ let _converters = {
         info.borderColor = _converters.GFXColor(info.borderColor);
         return new gfx.SamplerInfo(info);
     },
-    GFXShaderMacro: function (macro) {
-        return new gfx.GFXShaderMacro(macro.macro, macro.value);
+    ShaderMacro: function (macro) {
+        return new gfx.ShaderMacro(macro.macro, macro.value);
     },
     GFXUniform: function (u) {
         return new gfx.GFXUniform(u.name, u.type, u.count);
@@ -141,18 +141,18 @@ let _converters = {
     GFXUniformSampler: function (sampler) {
         return new gfx.GFXUniformSampler(sampler.shaderStages, sampler.binding, sampler.name, sampler.type, sampler.count);
     },
-    GFXShaderStage: function (stage) {
+    ShaderStage: function (stage) {
         let macros = stage.macros;
         let jsbMacros;
         if (macros) {
             jsbMacros = [];
             for (let i = 0; i < macros.length; ++i) {
-                jsbMacros.push(_converters.GFXShaderMacro(macros[i]));
+                jsbMacros.push(_converters.ShaderMacro(macros[i]));
             }
         }
-        return new gfx.GFXShaderStage(stage.type, stage.source, jsbMacros);
+        return new gfx.ShaderStage(stage.type, stage.source, jsbMacros);
     },
-    GFXShaderInfo: function (info) {
+    ShaderInfo: function (info) {
         let stages = info.stages,
             attributes = info.attributes,
             blocks = info.blocks,
@@ -161,7 +161,7 @@ let _converters = {
         if (stages) {
             jsbStages = [];
             for (let i = 0; i < stages.length; ++i) {
-                jsbStages.push(_converters.GFXShaderStage(stages[i]));
+                jsbStages.push(_converters.ShaderStage(stages[i]));
             }
         }
         if (attributes) {
@@ -182,7 +182,7 @@ let _converters = {
                 jsbSamplers.push(_converters.GFXUniformSampler(samplers[i]));
             }
         }
-        return new gfx.GFXShaderInfo(info.name, jsbStages, jsbAttributes, jsbBlocks, jsbSamplers);
+        return new gfx.ShaderInfo(info.name, jsbStages, jsbAttributes, jsbBlocks, jsbSamplers);
     },
     GFXAttribute: function (attr) {
         return new gfx.GFXAttribute(attr.name, attr.format, attr.isNormalized, attr.stream, attr.isInstanced, attr.location);
@@ -402,7 +402,7 @@ deviceProtos.forEach(function(item, index) {
             createCommandBuffer: replaceFunction('_createCommandBuffer', _converters.CommandBufferInfo),
             createBuffer: replaceFunction('_createBuffer', _converters.BufferInfo),
             createSampler: replaceFunction('_createSampler', _converters.SamplerInfo),
-            createShader: replaceFunction('_createShader', _converters.GFXShaderInfo),
+            createShader: replaceFunction('_createShader', _converters.ShaderInfo),
             createInputAssembler: replaceFunction('_createInputAssembler', _converters.InputAssemblerInfo),
             createRenderPass: replaceFunction('_createRenderPass', _converters.RenderPassInfo),
             createFramebuffer: replaceFunction('_createFramebuffer', _converters.FramebufferInfo),
@@ -525,9 +525,9 @@ replace(samplerProto, {
     initialize: replaceFunction('_initialize', _converters.SamplerInfo),
 });
 
-let shaderProto = gfx.GFXShader.prototype;
+let shaderProto = gfx.Shader.prototype;
 replace(shaderProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXShaderInfo),
+    initialize: replaceFunction('_initialize', _converters.ShaderInfo),
 });
 cc.js.get(shaderProto, 'id', function () {
     return this.hash;
