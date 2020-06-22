@@ -319,7 +319,7 @@ let _converters = {
         return new gfx.GFXCommandBufferInfo(info);
     },
     GFXQueueInfo: function (info) {
-        return new gfx.GFXQueueInfo(info.type);
+        return new gfx.GFXQueueInfo(info.type, !!info.forceSync);
     },
     GFXFormatInfo: function (info) {
         return new gfx.GFXFormatInfo(info);
