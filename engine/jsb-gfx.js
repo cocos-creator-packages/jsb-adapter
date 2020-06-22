@@ -229,41 +229,14 @@ let _converters = {
     FramebufferInfo: function (info) {
         return new gfx.FramebufferInfo(info);
     },
-    Binding: function (binding) {
-        return new gfx.Binding(binding.shaderStages, binding.binding, binding.bindingType, binding.name, binding.count);
-    },
     BindingLayoutInfo: function (info) {
-        let bindings = info.bindings;
-        let jsbBindings;
-        if (bindings) {
-            jsbBindings = [];
-            for (let i = 0; i < bindings.length; ++i) {
-                jsbBindings.push(_converters.Binding(bindings[i]));
-            }
-        }
-        return new gfx.BindingLayoutInfo(jsbBindings);
+        return new gfx.GFXBindingLayoutInfo(info.shader);
     },
     BindingUnit: function (info) {
         return new gfx.BindingUnit(info);
     },
     PushConstantRange: function (range) {
         return new gfx.PushConstantRange(range.shaderType, range.offset, range.count);
-    },
-    PipelineLayoutInfo: function (info) {
-        let ranges = info.pushConstantRanges,
-            layouts = info.layouts;
-        let jsbRanges;
-        if (ranges) {
-            jsbRanges = [];
-            for (let i = 0; i < ranges.length; ++i) {
-                jsbRanges.push(_converters.PushConstantRange(ranges[i]));
-            }
-        }
-        // for (let i = 0; i < layouts.length; ++i) {
-        //     jsbLayouts.push(_converters.BindingLayout(layouts[i]));
-        // }
-        // Layouts are pointers which should be passing through directly
-        return new gfx.PipelineLayoutInfo(jsbRanges, layouts);
     },
     InputState: function (info) {
         let attrs = info.attributes;
@@ -306,7 +279,6 @@ let _converters = {
             depthStencilState: _converters.DepthStencilState(info.depthStencilState),
             blendState: _converters.BlendState(info.blendState),
             dynamicStates: info.dynamicStates,
-            layout: info.layout,
             renderPass: info.renderPass,
         }
         return new gfx.PipelineStateInfo(jsbInfo);
@@ -397,7 +369,6 @@ deviceProtos.forEach(function(item, index) {
         replace(item, {
             initialize: replaceFunction('_initialize', _converters.DeviceInfo),
             createQueue: replaceFunction('_createQueue', _converters.QueueInfo),
-            // createCommandAllocator: replaceFunction('_createCommandAllocator', _converters.GFXCommandAllocatorInfo),
             createCommandBuffer: replaceFunction('_createCommandBuffer', _converters.CommandBufferInfo),
             createBuffer: replaceFunction('_createBuffer', _converters.BufferInfo),
             createSampler: replaceFunction('_createSampler', _converters.SamplerInfo),
@@ -407,7 +378,6 @@ deviceProtos.forEach(function(item, index) {
             createFramebuffer: replaceFunction('_createFramebuffer', _converters.FramebufferInfo),
             createBindingLayout: replaceFunction('_createBindingLayout', _converters.BindingLayoutInfo),
             createPipelineState: replaceFunction('_createPipelineState', _converters.PipelineStateInfo),
-            createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.PipelineLayoutInfo),
             copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.BufferTextureCopyList),
             copyTexImagesToTexture: replaceFunction('_copyTexImagesToTexture', _converters.texImagesToBuffers, _converters.origin, _converters.BufferTextureCopyList),
         });
@@ -497,11 +467,6 @@ replace(framebufferProto, {
 let iaProto = gfx.InputAssembler.prototype;
 replace(iaProto, {
     initialize: replaceFunction('_initialize', _converters.InputAssemblerInfo),
-});
-
-let pipelineLayoutProto = gfx.PipelineLayout.prototype;
-replace(pipelineLayoutProto, {
-    initialize: replaceFunction('_initialize', _converters.PipelineLayoutInfo),
 });
 
 let pipelineStateProto = gfx.PipelineState.prototype;
