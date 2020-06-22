@@ -297,7 +297,7 @@ let _converters = {
         let color = _converters.GFXColor(state.blendColor);
         return new gfx.GFXBlendState(state.isA2c, state.isIndepend, color, jsbTargets);
     },
-    GFXPipelineStateInfo: function (info) {
+    PipelineStateInfo: function (info) {
         let jsbInfo = {
             primitive: info.primitive,
             shader: info.shader,
@@ -309,7 +309,7 @@ let _converters = {
             layout: info.layout,
             renderPass: info.renderPass,
         }
-        return new gfx.GFXPipelineStateInfo(jsbInfo);
+        return new gfx.PipelineStateInfo(jsbInfo);
     },
     GFXCommandAllocatorInfo: function (info) {
         // not available
@@ -318,8 +318,8 @@ let _converters = {
     CommandBufferInfo: function (info) {
         return new gfx.CommandBufferInfo(info);
     },
-    GFXQueueInfo: function (info) {
-        return new gfx.GFXQueueInfo(info.type);
+    QueueInfo: function (info) {
+        return new gfx.QueueInfo(info.type);
     },
     GFXFormatInfo: function (info) {
         return new gfx.GFXFormatInfo(info);
@@ -397,7 +397,7 @@ deviceProtos.forEach(function(item, index) {
     if (item !== undefined) {
         replace(item, {
             initialize: replaceFunction('_initialize', _converters.DeviceInfo),
-            createQueue: replaceFunction('_createQueue', _converters.GFXQueueInfo),
+            createQueue: replaceFunction('_createQueue', _converters.QueueInfo),
             // createCommandAllocator: replaceFunction('_createCommandAllocator', _converters.GFXCommandAllocatorInfo),
             createCommandBuffer: replaceFunction('_createCommandBuffer', _converters.CommandBufferInfo),
             createBuffer: replaceFunction('_createBuffer', _converters.BufferInfo),
@@ -407,7 +407,7 @@ deviceProtos.forEach(function(item, index) {
             createRenderPass: replaceFunction('_createRenderPass', _converters.GFXRenderPassInfo),
             createFramebuffer: replaceFunction('_createFramebuffer', _converters.FramebufferInfo),
             createBindingLayout: replaceFunction('_createBindingLayout', _converters.BindingLayoutInfo),
-            createPipelineState: replaceFunction('_createPipelineState', _converters.GFXPipelineStateInfo),
+            createPipelineState: replaceFunction('_createPipelineState', _converters.PipelineStateInfo),
             createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.PipelineLayoutInfo),
             copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.BufferTextureCopyList),
             copyTexImagesToTexture: replaceFunction('_copyTexImagesToTexture', _converters.texImagesToBuffers, _converters.origin, _converters.BufferTextureCopyList),
@@ -505,14 +505,14 @@ replace(pipelineLayoutProto, {
     initialize: replaceFunction('_initialize', _converters.PipelineLayoutInfo),
 });
 
-let pipelineStateProto = gfx.GFXPipelineState.prototype;
+let pipelineStateProto = gfx.PipelineState.prototype;
 replace(pipelineStateProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXPipelineStateInfo),
+    initialize: replaceFunction('_initialize', _converters.PipelineStateInfo),
 });
 
-let queueProto = gfx.GFXQueue.prototype;
+let queueProto = gfx.Queue.prototype;
 replace(queueProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXQueueInfo),
+    initialize: replaceFunction('_initialize', _converters.QueueInfo),
 });
 
 let renderPassProto = gfx.GFXRenderPass.prototype;
