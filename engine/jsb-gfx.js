@@ -127,7 +127,7 @@ let _converters = {
     GFXUniform: function (u) {
         return new gfx.GFXUniform(u.name, u.type, u.count);
     },
-    GFXUniformBlock: function (block) {
+    UniformBlock: function (block) {
         let uniforms = block.members;
         let jsbUniforms;
         if (uniforms) {
@@ -136,7 +136,7 @@ let _converters = {
                 jsbUniforms.push(_converters.GFXUniform(uniforms[i]));
             }
         }
-        return new gfx.GFXUniformBlock(block.shaderStages, block.binding, block.name, jsbUniforms);
+        return new gfx.UniformBlock(block.shaderStages, block.binding, block.name, jsbUniforms);
     },
     GFXUniformSampler: function (sampler) {
         return new gfx.GFXUniformSampler(sampler.shaderStages, sampler.binding, sampler.name, sampler.type, sampler.count);
@@ -173,7 +173,7 @@ let _converters = {
         if (blocks) {
             jsbBlocks = [];
             for (let i = 0; i < blocks.length; ++i) {
-                jsbBlocks.push(_converters.GFXUniformBlock(blocks[i]));
+                jsbBlocks.push(_converters.UniformBlock(blocks[i]));
             }
         }
         if (samplers) {
