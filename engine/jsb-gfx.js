@@ -187,7 +187,7 @@ let _converters = {
     GFXAttribute: function (attr) {
         return new gfx.GFXAttribute(attr.name, attr.format, attr.isNormalized, attr.stream, attr.isInstanced, attr.location);
     },
-    GFXInputAssemblerInfo: function (info) {
+    InputAssemblerInfo: function (info) {
         let attrs = info.attributes;
         let jsbAttrs;
         if (attrs) {
@@ -196,7 +196,7 @@ let _converters = {
                 jsbAttrs.push(_converters.GFXAttribute(attrs[i]));
             }
         }
-        return new gfx.GFXInputAssemblerInfo(jsbAttrs, info.vertexBuffers, info.indexBuffer, info.indirectBuffer);
+        return new gfx.InputAssemblerInfo(jsbAttrs, info.vertexBuffers, info.indexBuffer, info.indirectBuffer);
     },
     GFXColorAttachment: function (attachment) {
         return new gfx.GFXColorAttachment(attachment);
@@ -403,7 +403,7 @@ deviceProtos.forEach(function(item, index) {
             createBuffer: replaceFunction('_createBuffer', _converters.BufferInfo),
             createSampler: replaceFunction('_createSampler', _converters.GFXSamplerInfo),
             createShader: replaceFunction('_createShader', _converters.GFXShaderInfo),
-            createInputAssembler: replaceFunction('_createInputAssembler', _converters.GFXInputAssemblerInfo),
+            createInputAssembler: replaceFunction('_createInputAssembler', _converters.InputAssemblerInfo),
             createRenderPass: replaceFunction('_createRenderPass', _converters.GFXRenderPassInfo),
             createFramebuffer: replaceFunction('_createFramebuffer', _converters.FramebufferInfo),
             createBindingLayout: replaceFunction('_createBindingLayout', _converters.BindingLayoutInfo),
@@ -495,9 +495,9 @@ replace(framebufferProto, {
     initialize: replaceFunction('_initialize', _converters.FramebufferInfo),
 });
 
-let iaProto = gfx.GFXInputAssembler.prototype;
+let iaProto = gfx.InputAssembler.prototype;
 replace(iaProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXInputAssemblerInfo),
+    initialize: replaceFunction('_initialize', _converters.InputAssemblerInfo),
 });
 
 let pipelineLayoutProto = gfx.GFXPipelineLayout.prototype;
