@@ -105,7 +105,7 @@ let _converters = {
             handler = window.windowHandler;
         return new gfx.DeviceInfo(handler, width, height, info.nativeWidth, info.nativeHeight, null);
     },
-    // GFXContextInfo,
+    // ContextInfo,
     BufferInfo: function (info) {
         return new gfx.BufferInfo(info);
     },
@@ -226,8 +226,8 @@ let _converters = {
         let jsbDSAttachment = _converters.GFXDepthStencilAttachment(info.depthStencilAttachment);
         return new gfx.GFXRenderPassInfo(jsbColors, jsbDSAttachment, jsbSubPasses);
     },
-    GFXFramebufferInfo: function (info) {
-        return new gfx.GFXFramebufferInfo(info);
+    FramebufferInfo: function (info) {
+        return new gfx.FramebufferInfo(info);
     },
     GFXBinding: function (binding) {
         return new gfx.GFXBinding(binding.shaderStages, binding.binding, binding.bindingType, binding.name, binding.count);
@@ -405,7 +405,7 @@ deviceProtos.forEach(function(item, index) {
             createShader: replaceFunction('_createShader', _converters.GFXShaderInfo),
             createInputAssembler: replaceFunction('_createInputAssembler', _converters.GFXInputAssemblerInfo),
             createRenderPass: replaceFunction('_createRenderPass', _converters.GFXRenderPassInfo),
-            createFramebuffer: replaceFunction('_createFramebuffer', _converters.GFXFramebufferInfo),
+            createFramebuffer: replaceFunction('_createFramebuffer', _converters.FramebufferInfo),
             createBindingLayout: replaceFunction('_createBindingLayout', _converters.BindingLayoutInfo),
             createPipelineState: replaceFunction('_createPipelineState', _converters.GFXPipelineStateInfo),
             createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.GFXPipelineLayoutInfo),
@@ -485,14 +485,14 @@ replace(commandBufferProto, {
         _converters.origin),
 });
 
-// let contextProto = gfx.GFXContext.prototype;
+// let contextProto = gfx.Context.prototype;
 // replace(contextProto, {
-//     initialize: replaceFunction('_initialize', _converters.GFXContextInfo),
+//     initialize: replaceFunction('_initialize', _converters.ContextInfo),
 // });
 
-let framebufferProto = gfx.GFXFramebuffer.prototype;
+let framebufferProto = gfx.Framebuffer.prototype;
 replace(framebufferProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXFramebufferInfo),
+    initialize: replaceFunction('_initialize', _converters.FramebufferInfo),
 });
 
 let iaProto = gfx.GFXInputAssembler.prototype;
