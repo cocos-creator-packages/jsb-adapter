@@ -117,9 +117,9 @@ let _converters = {
     TextureViewInfo: function (info) {
         return new gfx.TextureViewInfo(info);
     },
-    GFXSamplerInfo: function (info) {
+    SamplerInfo: function (info) {
         info.borderColor = _converters.GFXColor(info.borderColor);
-        return new gfx.GFXSamplerInfo(info);
+        return new gfx.SamplerInfo(info);
     },
     GFXShaderMacro: function (macro) {
         return new gfx.GFXShaderMacro(macro.macro, macro.value);
@@ -401,7 +401,7 @@ deviceProtos.forEach(function(item, index) {
             // createCommandAllocator: replaceFunction('_createCommandAllocator', _converters.GFXCommandAllocatorInfo),
             createCommandBuffer: replaceFunction('_createCommandBuffer', _converters.CommandBufferInfo),
             createBuffer: replaceFunction('_createBuffer', _converters.BufferInfo),
-            createSampler: replaceFunction('_createSampler', _converters.GFXSamplerInfo),
+            createSampler: replaceFunction('_createSampler', _converters.SamplerInfo),
             createShader: replaceFunction('_createShader', _converters.GFXShaderInfo),
             createInputAssembler: replaceFunction('_createInputAssembler', _converters.InputAssemblerInfo),
             createRenderPass: replaceFunction('_createRenderPass', _converters.RenderPassInfo),
@@ -520,9 +520,9 @@ replace(renderPassProto, {
     initialize: replaceFunction('_initialize', _converters.RenderPassInfo),
 });
 
-let samplerProto = gfx.GFXSampler.prototype;
+let samplerProto = gfx.Sampler.prototype;
 replace(samplerProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXSamplerInfo),
+    initialize: replaceFunction('_initialize', _converters.SamplerInfo),
 });
 
 let shaderProto = gfx.GFXShader.prototype;
