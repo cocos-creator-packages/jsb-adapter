@@ -61,8 +61,8 @@ let _converters = {
         }
         return Rect;
     },
-    GFXExtent: function (extent) {
-        return extent && new gfx.GFXExtent(extent.width, extent.height, extent.depth);
+    Extent: function (extent) {
+        return extent && new gfx.Extent(extent.width, extent.height, extent.depth);
     },
     TextureSubres: function (res) {
         return res && new gfx.TextureSubres(res.mipLevel, res.baseArrayLayer, res.layerCount);
@@ -70,7 +70,7 @@ let _converters = {
     // TextureCopy,
     BufferTextureCopy: function (obj) {
         let jsbOffset = _converters.Offset(obj.texOffset);
-        let jsbExtent = _converters.GFXExtent(obj.texExtent);
+        let jsbExtent = _converters.Extent(obj.texExtent);
         let jsbSubres = _converters.TextureSubres(obj.texSubres);
         return new gfx.BufferTextureCopy(obj.buffStride, obj.buffTexHeight, jsbOffset, jsbExtent, jsbSubres);
     },
