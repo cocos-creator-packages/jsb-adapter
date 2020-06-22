@@ -109,7 +109,7 @@ let _converters = {
     BufferInfo: function (info) {
         return new gfx.BufferInfo(info);
     },
-    // GFXDrawInfo,
+    // DrawInfo,
     // GFXIndirectBuffer,
     TextureInfo: function (info) {
         return new gfx.TextureInfo(info);
