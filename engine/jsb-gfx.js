@@ -249,7 +249,7 @@ let _converters = {
     GFXPushConstantRange: function (range) {
         return new gfx.GFXPushConstantRange(range.shaderType, range.offset, range.count);
     },
-    GFXPipelineLayoutInfo: function (info) {
+    PipelineLayoutInfo: function (info) {
         let ranges = info.pushConstantRanges,
             layouts = info.layouts;
         let jsbRanges;
@@ -263,7 +263,7 @@ let _converters = {
         //     jsbLayouts.push(_converters.BindingLayout(layouts[i]));
         // }
         // Layouts are pointers which should be passing through directly
-        return new gfx.GFXPipelineLayoutInfo(jsbRanges, layouts);
+        return new gfx.PipelineLayoutInfo(jsbRanges, layouts);
     },
     GFXInputState: function (info) {
         let attrs = info.attributes;
@@ -408,7 +408,7 @@ deviceProtos.forEach(function(item, index) {
             createFramebuffer: replaceFunction('_createFramebuffer', _converters.FramebufferInfo),
             createBindingLayout: replaceFunction('_createBindingLayout', _converters.BindingLayoutInfo),
             createPipelineState: replaceFunction('_createPipelineState', _converters.GFXPipelineStateInfo),
-            createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.GFXPipelineLayoutInfo),
+            createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.PipelineLayoutInfo),
             copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.BufferTextureCopyList),
             copyTexImagesToTexture: replaceFunction('_copyTexImagesToTexture', _converters.texImagesToBuffers, _converters.origin, _converters.BufferTextureCopyList),
         });
@@ -500,9 +500,9 @@ replace(iaProto, {
     initialize: replaceFunction('_initialize', _converters.InputAssemblerInfo),
 });
 
-let pipelineLayoutProto = gfx.GFXPipelineLayout.prototype;
+let pipelineLayoutProto = gfx.PipelineLayout.prototype;
 replace(pipelineLayoutProto, {
-    initialize: replaceFunction('_initialize', _converters.GFXPipelineLayoutInfo),
+    initialize: replaceFunction('_initialize', _converters.PipelineLayoutInfo),
 });
 
 let pipelineStateProto = gfx.GFXPipelineState.prototype;
