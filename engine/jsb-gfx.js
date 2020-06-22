@@ -22,7 +22,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-let gfxRect = new gfx.GFXRect();
+let Rect = new gfx.Rect();
 let gfxColor = new gfx.GFXColor();
 let gfxColorArray = [];
 
@@ -55,11 +55,11 @@ let _converters = {
     Offset: function (offset) {
         return offset && new gfx.Offset(offset.x, offset.y, offset.z);
     },
-    GFXRect: function(rect) {
+    Rect: function(rect) {
         if (rect) {
-            Object.assign(gfxRect, rect);
+            Object.assign(Rect, rect);
         }
-        return gfxRect;
+        return Rect;
     },
     GFXExtent: function (extent) {
         return extent && new gfx.GFXExtent(extent.width, extent.height, extent.depth);
@@ -474,11 +474,11 @@ let commandBufferProto = gfx.CommandBuffer.prototype;
 replace(commandBufferProto, {
     initialize: replaceFunction('_initialize', _converters.CommandBufferInfo),
     setViewport: replaceFunction('_setViewport', _converters.GFXViewport),
-    setScissor: replaceFunction('_setScissor', _converters.GFXRect),
+    setScissor: replaceFunction('_setScissor', _converters.Rect),
     setBlendConstants: replaceFunction('_setBlendConstants', _converters.GFXColor),
     beginRenderPass: replaceFunction('_beginRenderPass',
         _converters.origin,
-        _converters.GFXRect,
+        _converters.Rect,
         _converters.origin,
         _converters.GFXColorArray,
         _converters.origin,
