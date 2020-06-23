@@ -246,8 +246,8 @@ let _converters = {
     BindingUnit: function (info) {
         return new gfx.BindingUnit(info);
     },
-    GFXPushConstantRange: function (range) {
-        return new gfx.GFXPushConstantRange(range.shaderType, range.offset, range.count);
+    PushConstantRange: function (range) {
+        return new gfx.PushConstantRange(range.shaderType, range.offset, range.count);
     },
     PipelineLayoutInfo: function (info) {
         let ranges = info.pushConstantRanges,
@@ -256,7 +256,7 @@ let _converters = {
         if (ranges) {
             jsbRanges = [];
             for (let i = 0; i < ranges.length; ++i) {
-                jsbRanges.push(_converters.GFXPushConstantRange(ranges[i]));
+                jsbRanges.push(_converters.PushConstantRange(ranges[i]));
             }
         }
         // for (let i = 0; i < layouts.length; ++i) {
