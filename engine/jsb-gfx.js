@@ -201,8 +201,8 @@ let _converters = {
     ColorAttachment: function (attachment) {
         return new gfx.ColorAttachment(attachment);
     },
-    GFXDepthStencilAttachment: function (attachment) {
-        return new gfx.GFXDepthStencilAttachment(attachment);
+    DepthStencilAttachment: function (attachment) {
+        return new gfx.DepthStencilAttachment(attachment);
     },
     GFXSubPass: function (subPass) {
         return new gfx.GFXSubPass(subPass);
@@ -223,7 +223,7 @@ let _converters = {
                 jsbSubPasses.push(_converters.GFXSubPass(subPasses[i]));
             }
         }
-        let jsbDSAttachment = _converters.GFXDepthStencilAttachment(info.depthStencilAttachment);
+        let jsbDSAttachment = _converters.DepthStencilAttachment(info.depthStencilAttachment);
         return new gfx.RenderPassInfo(jsbColors, jsbDSAttachment, jsbSubPasses);
     },
     FramebufferInfo: function (info) {
