@@ -167,7 +167,7 @@ let _converters = {
         if (attributes) {
             jsbAttributes = [];
             for (let i = 0; i < attributes.length; ++i) {
-                jsbAttributes.push(_converters.GFXAttribute(attributes[i]));
+                jsbAttributes.push(_converters.Attribute(attributes[i]));
             }
         }
         if (blocks) {
@@ -184,8 +184,8 @@ let _converters = {
         }
         return new gfx.ShaderInfo(info.name, jsbStages, jsbAttributes, jsbBlocks, jsbSamplers);
     },
-    GFXAttribute: function (attr) {
-        return new gfx.GFXAttribute(attr.name, attr.format, attr.isNormalized, attr.stream, attr.isInstanced, attr.location);
+    Attribute: function (attr) {
+        return new gfx.Attribute(attr.name, attr.format, attr.isNormalized, attr.stream, attr.isInstanced, attr.location);
     },
     InputAssemblerInfo: function (info) {
         let attrs = info.attributes;
@@ -193,7 +193,7 @@ let _converters = {
         if (attrs) {
             jsbAttrs = [];
             for (let i = 0; i < attrs.length; ++i) {
-                jsbAttrs.push(_converters.GFXAttribute(attrs[i]));
+                jsbAttrs.push(_converters.Attribute(attrs[i]));
             }
         }
         return new gfx.InputAssemblerInfo(jsbAttrs, info.vertexBuffers, info.indexBuffer, info.indirectBuffer);
@@ -271,7 +271,7 @@ let _converters = {
         if (attrs) {
             jsbAttrs = [];
             for (let i = 0; i < attrs.length; ++i) {
-                jsbAttrs.push(_converters.GFXAttribute(attrs[i]));
+                jsbAttrs.push(_converters.Attribute(attrs[i]));
             }
         }
         return new gfx.GFXInputState(jsbAttrs);
