@@ -124,8 +124,8 @@ let _converters = {
     ShaderMacro: function (macro) {
         return new gfx.ShaderMacro(macro.macro, macro.value);
     },
-    GFXUniform: function (u) {
-        return new gfx.GFXUniform(u.name, u.type, u.count);
+    Uniform: function (u) {
+        return new gfx.Uniform(u.name, u.type, u.count);
     },
     UniformBlock: function (block) {
         let uniforms = block.members;
@@ -133,7 +133,7 @@ let _converters = {
         if (uniforms) {
             jsbUniforms = [];
             for (let i = 0; i < uniforms.length; ++i) {
-                jsbUniforms.push(_converters.GFXUniform(uniforms[i]));
+                jsbUniforms.push(_converters.Uniform(uniforms[i]));
             }
         }
         return new gfx.UniformBlock(block.shaderStages, block.binding, block.name, jsbUniforms);
@@ -279,23 +279,23 @@ let _converters = {
     RasterizerState: function (info) {
         return new gfx.RasterizerState(info);
     },
-    GFXDepthStencilState: function (info) {
-        return new gfx.GFXDepthStencilState(info);
+    DepthStencilState: function (info) {
+        return new gfx.DepthStencilState(info);
     },
-    GFXBlendTarget: function (info) {
-        return new gfx.GFXBlendTarget(info);
+    BlendTarget: function (info) {
+        return new gfx.BlendTarget(info);
     },
-    GFXBlendState: function (state) {
+    BlendState: function (state) {
         let targets = state.targets;
         let jsbTargets;
         if (targets) {
             jsbTargets = [];
             for (let i = 0; i < targets.length; ++i) {
-                jsbTargets.push(_converters.GFXBlendTarget(targets[i]));
+                jsbTargets.push(_converters.BlendTarget(targets[i]));
             }
         }
         let color = _converters.Color(state.blendColor);
-        return new gfx.GFXBlendState(state.isA2c, state.isIndepend, color, jsbTargets);
+        return new gfx.BlendState(state.isA2c, state.isIndepend, color, jsbTargets);
     },
     PipelineStateInfo: function (info) {
         let jsbInfo = {
@@ -303,8 +303,8 @@ let _converters = {
             shader: info.shader,
             inputState: _converters.InputState(info.inputState),
             rasterizerState: _converters.RasterizerState(info.rasterizerState),
-            depthStencilState: _converters.GFXDepthStencilState(info.depthStencilState),
-            blendState: _converters.GFXBlendState(info.blendState),
+            depthStencilState: _converters.DepthStencilState(info.depthStencilState),
+            blendState: _converters.BlendState(info.blendState),
             dynamicStates: info.dynamicStates,
             layout: info.layout,
             renderPass: info.renderPass,
@@ -324,7 +324,6 @@ let _converters = {
     FormatInfo: function (info) {
         return new gfx.FormatInfo(info);
     },
-    // GFXMemoryStatus,
 };
 
 // Helper functions to convert the original jsb function to a wrapper function
