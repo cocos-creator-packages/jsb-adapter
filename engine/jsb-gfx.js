@@ -265,7 +265,7 @@ let _converters = {
         // Layouts are pointers which should be passing through directly
         return new gfx.PipelineLayoutInfo(jsbRanges, layouts);
     },
-    GFXInputState: function (info) {
+    InputState: function (info) {
         let attrs = info.attributes;
         let jsbAttrs;
         if (attrs) {
@@ -274,7 +274,7 @@ let _converters = {
                 jsbAttrs.push(_converters.Attribute(attrs[i]));
             }
         }
-        return new gfx.GFXInputState(jsbAttrs);
+        return new gfx.InputState(jsbAttrs);
     },
     GFXRasterizerState: function (info) {
         return new gfx.GFXRasterizerState(info);
@@ -301,7 +301,7 @@ let _converters = {
         let jsbInfo = {
             primitive: info.primitive,
             shader: info.shader,
-            inputState: _converters.GFXInputState(info.inputState),
+            inputState: _converters.InputState(info.inputState),
             rasterizerState: _converters.GFXRasterizerState(info.rasterizerState),
             depthStencilState: _converters.GFXDepthStencilState(info.depthStencilState),
             blendState: _converters.GFXBlendState(info.blendState),
