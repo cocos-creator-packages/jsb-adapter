@@ -229,8 +229,8 @@ let _converters = {
     FramebufferInfo: function (info) {
         return new gfx.FramebufferInfo(info);
     },
-    GFXBinding: function (binding) {
-        return new gfx.GFXBinding(binding.shaderStages, binding.binding, binding.bindingType, binding.name, binding.count);
+    Binding: function (binding) {
+        return new gfx.Binding(binding.shaderStages, binding.binding, binding.bindingType, binding.name, binding.count);
     },
     BindingLayoutInfo: function (info) {
         let bindings = info.bindings;
@@ -238,13 +238,13 @@ let _converters = {
         if (bindings) {
             jsbBindings = [];
             for (let i = 0; i < bindings.length; ++i) {
-                jsbBindings.push(_converters.GFXBinding(bindings[i]));
+                jsbBindings.push(_converters.Binding(bindings[i]));
             }
         }
         return new gfx.BindingLayoutInfo(jsbBindings);
     },
-    GFXBindingUnit: function (info) {
-        return new gfx.GFXBindingUnit(info);
+    BindingUnit: function (info) {
+        return new gfx.BindingUnit(info);
     },
     GFXPushConstantRange: function (range) {
         return new gfx.GFXPushConstantRange(range.shaderType, range.offset, range.count);
