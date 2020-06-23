@@ -276,8 +276,8 @@ let _converters = {
         }
         return new gfx.InputState(jsbAttrs);
     },
-    GFXRasterizerState: function (info) {
-        return new gfx.GFXRasterizerState(info);
+    RasterizerState: function (info) {
+        return new gfx.RasterizerState(info);
     },
     GFXDepthStencilState: function (info) {
         return new gfx.GFXDepthStencilState(info);
@@ -302,7 +302,7 @@ let _converters = {
             primitive: info.primitive,
             shader: info.shader,
             inputState: _converters.InputState(info.inputState),
-            rasterizerState: _converters.GFXRasterizerState(info.rasterizerState),
+            rasterizerState: _converters.RasterizerState(info.rasterizerState),
             depthStencilState: _converters.GFXDepthStencilState(info.depthStencilState),
             blendState: _converters.GFXBlendState(info.blendState),
             dynamicStates: info.dynamicStates,
