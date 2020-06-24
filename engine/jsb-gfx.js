@@ -230,7 +230,7 @@ let _converters = {
         return new gfx.FramebufferInfo(info);
     },
     BindingLayoutInfo: function (info) {
-        return new gfx.GFXBindingLayoutInfo(info.shader);
+        return new gfx.BindingLayoutInfo(info.shader);
     },
     BindingUnit: function (info) {
         return new gfx.BindingUnit(info);
@@ -282,10 +282,6 @@ let _converters = {
             renderPass: info.renderPass,
         }
         return new gfx.PipelineStateInfo(jsbInfo);
-    },
-    GFXCommandAllocatorInfo: function (info) {
-        // not available
-        return null;
     },
     CommandBufferInfo: function (info) {
         return new gfx.CommandBufferInfo(info);
@@ -434,11 +430,6 @@ bufferProto.update = function(buffer, offset, size) {
     oldUpdate.call(this, buffer, offset || 0, buffSize);
 }
 
-// let commandAllocProto = gfx.GFXCommandAllocator.prototype;
-// replace(commandAllocProto, {
-//     initialize: replaceFunction('_initialize', _converters.GFXCommandAllocatorInfo),
-// });
-
 let commandBufferProto = gfx.CommandBuffer.prototype;
 replace(commandBufferProto, {
     initialize: replaceFunction('_initialize', _converters.CommandBufferInfo),
@@ -453,11 +444,6 @@ replace(commandBufferProto, {
         _converters.origin,
         _converters.origin),
 });
-
-// let contextProto = gfx.Context.prototype;
-// replace(contextProto, {
-//     initialize: replaceFunction('_initialize', _converters.ContextInfo),
-// });
 
 let framebufferProto = gfx.Framebuffer.prototype;
 replace(framebufferProto, {
