@@ -41,8 +41,8 @@ jsb.onResume = function () {
 
 function resize (size) {
     // size should be the css style
-    size.width /= cc.view._devicePixelRatio;
-    size.height /= cc.view._devicePixelRatio;
+    size.width /= window.devicePixelRatio;
+    size.height /= window.devicePixelRatio;
     window.resize(size.width, size.height);
 }
 
