@@ -22,9 +22,9 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-let Rect = new gfx.Rect();
-let Color = new gfx.Color();
-let ColorArray = [];
+const _rect = new gfx.Rect();
+const _color = new gfx.Color();
+const _colorArray = [];
 
 // Converters for converting js objects to jsb struct objects
 let _converters = {
@@ -57,9 +57,9 @@ let _converters = {
     },
     Rect: function(rect) {
         if (rect) {
-            Object.assign(Rect, rect);
+            Object.assign(_rect, rect);
         }
-        return Rect;
+        return _rect;
     },
     Extent: function (extent) {
         return extent && new gfx.Extent(extent.width, extent.height, extent.depth);
@@ -88,16 +88,16 @@ let _converters = {
     },
     Color: function(color) {
         if (color) {
-            Object.assign(Color, color);
+            Object.assign(_color, color);
         }
-        return Color;
+        return _color;
     },
     ColorArray: function(colors) {
         if (colors) {
             colors.forEach((t, i) => Object.assign(
-                ColorArray[i] || (ColorArray[i] = new gfx.Color()), t));
+                _colorArray[i] || (_colorArray[i] = new gfx.Color()), t));
         }
-        return ColorArray;
+        return _colorArray;
     },
     DeviceInfo: function (info) {
         let width = cc.game.canvas.width,
@@ -438,8 +438,8 @@ replace(commandBufferProto, {
     setBlendConstants: replaceFunction('_setBlendConstants', _converters.Color),
     beginRenderPass: replaceFunction('_beginRenderPass',
         _converters.origin,
-        _converters.Rect,
         _converters.origin,
+        _converters.Rect,
         _converters.ColorArray,
         _converters.origin,
         _converters.origin),
