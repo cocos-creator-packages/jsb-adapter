@@ -7,18 +7,23 @@ cc.Assembler2D.prototype.updateWorldVerts = function(comp) {
         vb = local[1],
         vt = local[3];
   
+    let floatsPerVert = this.floatsPerVert;
+    let vertexOffset = 0;
     // left bottom
-    verts[0] = vl;
-    verts[1] = vb;
+    verts[vertexOffset] = vl;
+    verts[vertexOffset + 1] = vb;
+    vertexOffset += floatsPerVert;
     // right bottom
-    verts[5] = vr;
-    verts[6] = vb;
+    verts[vertexOffset] = vr;
+    verts[vertexOffset + 1] = vb;
+    vertexOffset += floatsPerVert;
     // left top
-    verts[10] = vl;
-    verts[11] = vt;
+    verts[vertexOffset] = vl;
+    verts[vertexOffset + 1] = vt;
+    vertexOffset += floatsPerVert;
     // right top
-    verts[15] = vr;
-    verts[16] = vt;
+    verts[vertexOffset] = vr;
+    verts[vertexOffset + 1] = vt;
 };
 
 let _updateColor = cc.Assembler2D.prototype.updateColor;
