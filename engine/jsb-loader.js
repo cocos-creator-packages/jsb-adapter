@@ -179,6 +179,7 @@ cc.loader.addDownloadHandlers({
     'image' : downloadImage,
     'pvr' : downloadImage,
     'pkm' : downloadImage,
+    'astc' : downloadImage,
 
     // Audio
     'mp3' : downloadAudio,
@@ -229,4 +230,5 @@ cc.loader.addLoadHandlers({
     // compressed texture
     'pvr': loadCompressedTex,
     'pkm': loadCompressedTex,
+    'astc' : loadCompressedTex,
 });

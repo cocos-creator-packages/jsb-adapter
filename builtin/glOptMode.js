@@ -413,7 +413,7 @@ function compressedTexImage2DOpt(target, level, internalformat, width, height, b
 function compressedTexSubImage2DOpt(target, level, xoffset, yoffset, width, height, format, data) {
     // console.log('GLOpt: compressedTexSubImage2D');
     flushCommands();
-    _gl.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, data);
+    _gl.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, data.byteLength, data);
 }
 
 function copyTexImage2DOpt(target, level, internalformat, x, y, width, height, border) {
