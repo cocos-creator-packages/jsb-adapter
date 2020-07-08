@@ -43,10 +43,10 @@ var cacheManager = {
 
     cachedFiles: null,
 
-    version: '1.0',
+    version: '1.1',
 
     getCache (url) {
-        return this.cachedFiles.has(url) ? this.cachedFiles.get(url).url : '';
+        return this.cachedFiles.has(url) ? `${this.cacheDir}/${this.cachedFiles.get(url).url}` : '';
     },
 
     getTemp (url) {
@@ -57,7 +57,7 @@ var cacheManager = {
         this.cacheDir = getUserDataPath() + '/' + this.cacheDir;
         var cacheFilePath = this.cacheDir + '/' + this.cachedFileName;
         var result = readJsonSync(cacheFilePath);
-        if (result instanceof Error || !result.version) {
+        if (result instanceof Error || !result.version || result.version !== this.version) {
             if (!(result instanceof Error)) rmdirSync(this.cacheDir, true);
             this.cachedFiles = new cc.AssetManager.Cache();
             makeDirSync(this.cacheDir, true);
@@ -124,9 +124,9 @@ var cacheManager = {
         cleaning = true;
         var caches = [];
         var self = this;
-        this.cachedFiles.forEach(function (val, key) {
+        this.cachedFiles.forEach((val, key) => {
             if (val.bundle === 'internal') return;
-            caches.push({ originUrl: key, url: val.url, lastTime: val.lastTime });
+            caches.push({ originUrl: key, url: this.getCache(key), lastTime: val.lastTime });
         });
         caches.sort(function (a, b) {
             return a.lastTime - b.lastTime;
@@ -153,7 +153,8 @@ var cacheManager = {
 
     removeCache (url) {
         if (this.cachedFiles.has(url)) {
-            var path = this.cachedFiles.remove(url).url;
+            var path = this.getCache(url);
+            this.cachedFiles.remove(url);
             this.writeCacheFile(function () {
                 deleteFile(path);
             });

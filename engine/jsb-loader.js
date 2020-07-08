@@ -81,12 +81,12 @@ function download (url, func, options, onFileProgress, onComplete) {
         var time = Date.now();
         var storagePath = '';
         if (options.__cacheBundleRoot__) {
-            storagePath = `${cacheManager.cacheDir}/${options.__cacheBundleRoot__}/${time}${suffix++}${cc.path.extname(url)}`;
+            storagePath = `${options.__cacheBundleRoot__}/${time}${suffix++}${cc.path.extname(url)}`;
         }
         else {
-            storagePath = `${cacheManager.cacheDir}/${time}${suffix++}${cc.path.extname(url)}`;
+            storagePath = `${time}${suffix++}${cc.path.extname(url)}`;
         }
-        downloadFile(url, storagePath, options.header, onFileProgress, function (err, path) {
+        downloadFile(url, `${cacheManager.cacheDir}/${storagePath}`, options.header, onFileProgress, function (err, path) {
             if (err) {
                 onComplete(err, null);
                 return;
@@ -109,10 +109,10 @@ function transformUrl (url, options) {
             return { url };
         }
         else {
-            var cache = cacheManager.cachedFiles.get(url);
+            var cache = cacheManager.getCache(url);
             if (cache) {
                 inCache = true;
-                url = cache.url;
+                url = cache;
             }
         }
     }
