@@ -54,8 +54,8 @@ var cacheManager = {
     },
 
     init () {
-        this.cacheDir = getUserDataPath() + '/' + this.cacheDir;
-        var cacheFilePath = this.cacheDir + '/' + this.cachedFileName;
+        this.cacheDir = getUserDataPath()  + this.cacheDir;
+        var cacheFilePath = this.cacheDir  + this.cachedFileName;
         var result = readJsonSync(cacheFilePath);
         if (result instanceof Error || !result.version) {
             if (!(result instanceof Error)) rmdirSync(this.cacheDir, true);
