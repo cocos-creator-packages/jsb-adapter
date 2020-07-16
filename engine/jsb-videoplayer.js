@@ -182,8 +182,10 @@
         let video = this._video;
         if (!video || !this._visible || this._playing) return;
 
-        video.play();
-        this._playing = true;
+        if (this._loaded) {
+            video.play();
+            this._playing = true;
+        }
     };
 
     _p.setStayOnBottom = function (enabled) {};
