@@ -98,6 +98,8 @@
         let skeletonCache = spine.retainSkeletonData(uuid);
         if (skeletonCache) {
             this._skeletonCache = skeletonCache;
+            this.width = this._skeletonCache.getWidth();
+            this.height = this._skeletonCache.getHeight();                 
             return;
         }
 
