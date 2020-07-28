@@ -63,7 +63,7 @@ var fsUtils = {
     fs,
 
     getUserDataPath () {
-        return fs.getWritablePath().replace(/(\/|\\)*$/, '');
+        return fs.getWritablePath().replace(/[\/\\]*$/, '');
     },
 
     checkFsValid () {
