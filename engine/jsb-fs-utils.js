@@ -47,7 +47,7 @@ jsb_downloader.setOnTaskError((task, errorCode, errorCodeInternal, errorStr) => 
     if (task.storagePath) {
         fsUtils.deleteFile(task.storagePath);
     }
-    cc.error(errorStr, errorCode);
+    cc.error(`Download file failed: path: ${task.requestURL} message: ${errorStr},${errorCode}`);
     onComplete(new Error(errorStr), null);
 });
 
@@ -68,7 +68,7 @@ var fsUtils = {
 
     checkFsValid () {
         if (!fs) {
-            console.warn('can not get the file system!');
+            cc.warn('can not get the file system!');
             return false;
         }
         return true;
@@ -80,6 +80,7 @@ var fsUtils = {
             onComplete && onComplete(null);
         }
         else {
+            cc.warn(`Delete file failed: path: ${filePath}`);
             onComplete && onComplete(new Error('delete file failed'));
         }
     },
@@ -93,70 +94,67 @@ var fsUtils = {
 
     saveFile (srcPath, destPath, onComplete) {
         var err = null;
-        try {
-            fs.writeDataToFile(fs.getDataFromFile(srcPath), destPath);
-            fs.removeFile(srcPath);
-        }
-        catch (e) {
-            err = e;
+        let result = fs.writeDataToFile(fs.getDataFromFile(srcPath), destPath);
+        fs.removeFile(srcPath);
+        if (!result) {
+            err = new Error(`Save file failed: path: ${srcPath}`);
+            cc.warn(err.message);
         }
         onComplete && onComplete(err);
     },
 
     copyFile (srcPath, destPath, onComplete) {
         var err = null;
-        try {
-            fs.writeDataToFile(fs.getDataFromFile(srcPath), destPath);
-        }
-        catch (e) {
-            err = e;
+        let result = fs.writeDataToFile(fs.getDataFromFile(srcPath), destPath);
+        if (!result) {
+            err = new Error(`Copy file failed: path: ${srcPath}`);
+            cc.warn(err.message);
         }
         onComplete && onComplete(err);
     },
 
     writeFile (path, data, encoding, onComplete) {
+        var result = null;
         var err = null;
-        try {
-            if (encoding === 'utf-8' || encoding === 'utf8') {
-                fs.writeStringToFile(data, path);
-            }
-            else {
-                fs.writeDataToFile(filePath);
-            }
+        if (encoding === 'utf-8' || encoding === 'utf8') {
+            result = fs.writeStringToFile(data, path);
         }
-        catch (e) {
-            err = e;
+        else {
+            result = fs.writeDataToFile(data, path);
+        }
+        if (!result) {
+            err = new Error(`Write file failed: path: ${path}`);
+            cc.warn(err.message);
         }
         onComplete && onComplete(err);
     },
 
     writeFileSync (path, data, encoding) {
-        try {
-            if (encoding === 'utf-8' || encoding === 'utf8') {
-                fs.writeStringToFile(data, path);
-            }
-            else {
-                fs.writeDataToFile(filePath);
-            }
-            return null;
+        var result = null;
+        if (encoding === 'utf-8' || encoding === 'utf8') {
+            result = fs.writeStringToFile(data, path);
         }
-        catch (e) {
-            return e;
+        else {
+            result = fs.writeDataToFile(data, path);
+        }
+
+        if (!result) {
+            cc.warn(`Write file failed: path: ${path}`);
+            return new Error(`Write file failed: path: ${path}`);
         }
     },
 
     readFile (filePath, encoding, onComplete) {
         var content = null, err = null;
-        try {
-            if (encoding === 'utf-8' || encoding === 'utf8') {
-                content = fs.getStringFromFile(filePath);
-            }
-            else {
-                content = fs.getDataFromFile(filePath);
-            }
+        if (encoding === 'utf-8' || encoding === 'utf8') {
+            content = fs.getStringFromFile(filePath);
         }
-        catch (e) {
-            err = e;
+        else {
+            content = fs.getDataFromFile(filePath);
+        }
+        if (!content) {
+            err = new Error(`Read file failed: path: ${filePath}`);
+            cc.warn(err.message);
         }
         
         onComplete && onComplete (err, content);
@@ -168,7 +166,8 @@ var fsUtils = {
             files = fs.listFiles(filePath);
         }
         catch (e) {
-            err = e;
+            cc.warn(`Read dir failed: path: ${filePath} message: ${e.message}`);
+            err = new Error(e.message);
         }
         onComplete && onComplete(err, files);
     },
@@ -189,7 +188,7 @@ var fsUtils = {
                     out = JSON.parse(text);
                 }
                 catch (e) {
-                    cc.warn('Read json failed: ' + e.message);
+                    cc.warn(`Read json failed: path: ${filePath} message: ${e.message}`);
                     err = new Error(e.message);
                 }
             }
@@ -203,29 +202,24 @@ var fsUtils = {
             return JSON.parse(str);
         }
         catch (e) {
-            cc.warn('Read json failed: ' + e.message);
+            cc.warn(`Read json failed: path: ${path} message: ${e.message}`);
             return new Error(e.message);
         }
     },
 
     makeDirSync (path, recursive) {
-        try {
-            fs.createDirectory(path);
-            return null;
-        }
-        catch (e) {
-            cc.warn('Make directory failed: ' + e.message);
-            return new Error(e.message);
+        let result = fs.createDirectory(path);
+        if (!result) {
+            cc.warn(`Make directory failed: path: ${path}`);
+            return new Error(`Make directory failed: path: ${path}`);
         }
     },
 
     rmdirSync (dirPath, recursive) {
-        try {
-            fs.removeDirectory(dirPath);
-        }
-        catch (e) {
-            cc.warn('rm directory failed: ' + e.message);
-            return new Error(e.message);
+        let result = fs.removeDirectory(dirPath);
+        if (!result) {
+            cc.warn(`rm directory failed: path: ${dirPath}`);
+            return new Error(`rm directory failed: path: ${dirPath}`);
         }
     },
 
