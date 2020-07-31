@@ -27,7 +27,7 @@
 'use strict';
 
 const cacheManager = require('./jsb-cache-manager');
-const { downloadFile, readText, readArrayBuffer, readJson } = require('./jsb-fs-utils');
+const { downloadFile, readText, readArrayBuffer, readJson, getUserDataPath } = require('./jsb-fs-utils');
 
 const REGEX = /^\w+:\/\/.*/;
 const downloader = cc.assetManager.downloader;
@@ -171,7 +171,7 @@ function downloadBundle (nameOrUrl, options, onComplete) {
     let bundleName = cc.path.basename(nameOrUrl);
     var version = options.version || cc.assetManager.downloader.bundleVers[bundleName];
     let url;
-    if (REGEX.test(nameOrUrl)) {
+    if (REGEX.test(nameOrUrl) || nameOrUrl.startsWith(getUserDataPath())) {
         url = nameOrUrl;
         cacheManager.makeBundleFolder(bundleName);
     }
