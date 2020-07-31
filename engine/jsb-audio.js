@@ -23,6 +23,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
+const cacheManager = require('./jsb-cache-manager');
 
 let Audio = cc._Audio = function (src) {
     this.src = src;
@@ -137,7 +138,7 @@ let handleVolume  = function (volume) {
             }
             else {
                 // audio delay loading
-                clip._nativeAsset = audioFilePath = clip.nativeUrl;
+                clip._nativeAsset = audioFilePath = cacheManager.getCache(clip.nativeUrl) || clip.nativeUrl;
                 clip.loaded  = true;
             }
         }

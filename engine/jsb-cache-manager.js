@@ -46,6 +46,7 @@ var cacheManager = {
     version: '1.1',
 
     getCache (url) {
+        this.updateLastTime(url);
         return this.cachedFiles.has(url) ? `${this.cacheDir}/${this.cachedFiles.get(url).url}` : '';
     },
 

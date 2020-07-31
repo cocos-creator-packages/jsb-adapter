@@ -24,6 +24,8 @@ import { RSA_NO_PADDING } from "constants";
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
+const cacheManager = require('./jsb-cache-manager');
+
 (function(){
     if (window.dragonBones === undefined || window.middleware === undefined) return;
     if (dragonBones.DragonBonesAtlasAsset === undefined) return;
@@ -314,7 +316,7 @@ import { RSA_NO_PADDING } from "constants";
         if (this.dragonBonesJson) {
             filePath = this.dragonBonesJson;
         } else {
-            filePath = this.nativeUrl;
+            filePath = cacheManager.getCache(this.nativeUrl) || this.nativeUrl;
         }
         this._factory.parseDragonBonesDataByPath(filePath, armatureKey);
         return armatureKey;
