@@ -22,6 +22,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
+const cacheManager = require('./jsb-cache-manager');
 
 (function(){
     if (window.sp === undefined || window.spine === undefined || window.middleware === undefined) return;
@@ -138,7 +139,7 @@
         if (this.skeletonJsonStr) {
             filePath = this.skeletonJsonStr;
         } else {
-            filePath = this.nativeUrl;
+            filePath = cacheManager.getCache(this.nativeUrl) || this.nativeUrl;
         }
         this._skeletonCache = spine.initSkeletonData(uuid, filePath, atlasText, jsbTextures, this.scale);
         if (this._skeletonCache) {
