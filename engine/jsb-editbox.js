@@ -116,9 +116,6 @@
 
             function onComplete (res) {
                 self.endEditing();
-                jsb.inputBox.offConfirm(onConfirm);
-                jsb.inputBox.offInput(onInput);
-                jsb.inputBox.offComplete(onComplete);
             }
 
             jsb.inputBox.onInput(onInput);
@@ -146,6 +143,9 @@
         },
 
         endEditing () {
+            jsb.inputBox.offConfirm();
+            jsb.inputBox.offInput();
+            jsb.inputBox.offComplete();
             this._editing = false;
             if (!cc.sys.isMobile) {
                 this._delegate._showLabels();
