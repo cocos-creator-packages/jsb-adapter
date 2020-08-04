@@ -33,6 +33,7 @@
     const KeyboardReturnType = EditBox.KeyboardReturnType;
     const InputMode = EditBox.InputMode;
     const InputFlag = EditBox.InputFlag;
+    const MAX_VALUE = 65535;
 
     let worldMat = cc.mat4();
 
@@ -93,7 +94,6 @@
             let delegate = this._delegate;
             let multiline = (delegate.inputMode === InputMode.ANY);
             let rect = this._getRect();
-            this.setMaxLength(delegate.maxLength);
 
             let inputTypeString = getInputType(delegate.inputMode);
             if (delegate.inputFlag === InputFlag.PASSWORD) {
@@ -105,10 +105,6 @@
             }
 
             function onInput (res) {
-                if (res.value.length > self._maxLength) {
-                    res.value = res.value.slice(0, self._maxLength);
-                }
-
                 if (delegate.string !== res.value) {
                     delegate._editBoxTextChanged(res.value);
                 }
@@ -128,7 +124,7 @@
 
             jsb.inputBox.show({
                 defaultValue: delegate.string,
-                maxLength: self._maxLength,
+                maxLength: delegate.maxLength < 0 ? MAX_VALUE : delegate.maxLength,
                 multiple: multiline,
                 confirmHold: false,
                 confirmType: getKeyboardReturnType(delegate.returnType),
@@ -152,17 +148,6 @@
             }
             jsb.inputBox.hide();
             this._delegate._editBoxEditingDidEnded();
-        },
-
-        setMaxLength (maxLength) {
-            if (!isNaN(maxLength)) {
-                if (maxLength < 0) {
-                    //we can't set Number.MAX_VALUE to input's maxLength property
-                    //so we use a magic number here, it should works at most use cases.
-                    maxLength = 65535;
-                }
-                this._maxLength = maxLength;
-            }
         },
 
         _getRect () {
