@@ -128,6 +128,10 @@ function inject () {
         window.screen.height = window.innerHeight;
         window.clientWidth = window.innerWidth;
         window.clientHeight = window.innerHeight;
+        // emit resize consistent with web behavior
+        let resizeEvent = new Event('resize');
+        resizeEvent._target = window;
+        window.dispatchEvent(resizeEvent);
     };
 
     window.focus = function() {};
