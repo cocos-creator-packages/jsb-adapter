@@ -31,6 +31,10 @@ cc.game.restart = function () {
     __restartVM();
 };
 
+jsb.onError(function (location, message, stack) {
+    console.error(location, message, stack);
+});
+
 jsb.onPause = function () {
     cc.game.emit(cc.game.EVENT_HIDE);
 };
