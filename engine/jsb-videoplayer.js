@@ -182,8 +182,13 @@
         let video = this._video;
         if (!video || !this._visible || this._playing) return;
 
-        video.play();
-        this._playing = true;
+        if (this._loaded) {
+            video.play();
+            this._playing = true;
+        }
+        else {
+            cc.warn(`Video play function only invalid after loading complete.`);
+        }
     };
 
     _p.setStayOnBottom = function (enabled) {};
