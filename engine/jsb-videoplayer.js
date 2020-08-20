@@ -50,6 +50,9 @@
         cbs.loadedmetadata = function () {
             self._loadedmeta = true;
             self._dispatchEvent(_impl.EventType.META_LOADED);
+            if (self._playing) {
+                self._video.play();
+            }
         };
         cbs.ended = function () {
             if (self._video !== video) return;
