@@ -50,6 +50,9 @@
         cbs.loadedmetadata = function () {
             self._loadedmeta = true;
             self._dispatchEvent(_impl.EventType.META_LOADED);
+            if (self._playing) {
+                self._video.play();
+            }
         };
         cbs.ended = function () {
             if (self._video !== video) return;
@@ -182,13 +185,8 @@
         let video = this._video;
         if (!video || !this._visible || this._playing) return;
 
-        if (this._loaded) {
-            video.play();
-            this._playing = true;
-        }
-        else {
-            cc.warn(`Video play function only invalid after loading complete.`);
-        }
+        video.play();
+        this._playing = true;
     };
 
     _p.setStayOnBottom = function (enabled) {};
