@@ -27,7 +27,7 @@
 'use strict';
 
 const cacheManager = require('./jsb-cache-manager');
-const { downloadFile, readText, readArrayBuffer, readJson, getUserDataPath } = require('./jsb-fs-utils');
+const { downloadFile, readText, readArrayBuffer, readJson, getUserDataPath, initJsbDownloader } = require('./jsb-fs-utils');
 
 const REGEX = /^\w+:\/\/.*/;
 const downloader = cc.assetManager.downloader;
@@ -357,5 +357,6 @@ cc.assetManager.init = function (options) {
     options.remoteBundles && options.remoteBundles.forEach(x => remoteBundles[x] = true);
     REMOTE_SERVER_ROOT = options.server || '';
     if (REMOTE_SERVER_ROOT && !REMOTE_SERVER_ROOT.endsWith('/')) REMOTE_SERVER_ROOT += '/';
+    initJsbDownloader(options.jsbDownloaderMaxTasks, options.jsbDownloaderTimeout);
     cacheManager.init();
 };

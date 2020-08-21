@@ -23,44 +23,49 @@
  THE SOFTWARE.
  ****************************************************************************/
 var fs = jsb.fileUtils;
-let jsb_downloader = new jsb.Downloader({
-    countOfMaxProcessingTasks: 32,
-    timeoutInSeconds: 10,
-    tempFileNameSuffix: '.tmp'
-});
-
+let jsb_downloader = null;
 let downloading = new cc.AssetManager.Cache();
-
-let tempDir = fs.getWritablePath() + '/temp';
-!fs.isDirectoryExist(tempDir) && fs.createDirectory(tempDir);
-
-jsb_downloader.setOnFileTaskSuccess(task => {
-    if (!downloading.has(task.requestURL)) return;
-    let { onComplete } = downloading.remove(task.requestURL);
-
-    onComplete && onComplete(null, task.storagePath);
-});
-
-jsb_downloader.setOnTaskError((task, errorCode, errorCodeInternal, errorStr) => {
-    if (!downloading.has(task.requestURL)) return;
-    let { onComplete } = downloading.remove(task.requestURL);
-    if (task.storagePath) {
-        fsUtils.deleteFile(task.storagePath);
-    }
-    cc.error(`Download file failed: path: ${task.requestURL} message: ${errorStr}, ${errorCode}`);
-    onComplete(new Error(errorStr), null);
-});
-
-jsb_downloader.setOnTaskProgress((task, bytesReceived, totalBytesReceived, totalBytesExpected) => {
-    if (!downloading.has(task.requestURL)) return;
-    let { onProgress } = downloading.get(task.requestURL);
-
-    onProgress && onProgress(totalBytesReceived, totalBytesExpected);
-});
+let tempDir = '';
 
 var fsUtils = {
 
     fs,
+
+    initJsbDownloader (jsbDownloaderMaxTasks, jsbDownloaderTimeout) {
+
+        jsb_downloader = new jsb.Downloader({
+            countOfMaxProcessingTasks: jsbDownloaderMaxTasks || 32,
+            timeoutInSeconds: jsbDownloaderTimeout || 30,
+            tempFileNameSuffix: '.tmp'
+        });
+
+        tempDir = fsUtils.getUserDataPath() + '/temp';
+        !fs.isDirectoryExist(tempDir) && fs.createDirectory(tempDir);
+        
+        jsb_downloader.setOnFileTaskSuccess(task => {
+            if (!downloading.has(task.requestURL)) return;
+            let { onComplete } = downloading.remove(task.requestURL);
+        
+            onComplete && onComplete(null, task.storagePath);
+        });
+        
+        jsb_downloader.setOnTaskError((task, errorCode, errorCodeInternal, errorStr) => {
+            if (!downloading.has(task.requestURL)) return;
+            let { onComplete } = downloading.remove(task.requestURL);
+            if (task.storagePath) {
+                fsUtils.deleteFile(task.storagePath);
+            }
+            cc.error(`Download file failed: path: ${task.requestURL} message: ${errorStr}, ${errorCode}`);
+            onComplete(new Error(errorStr), null);
+        });
+        
+        jsb_downloader.setOnTaskProgress((task, bytesReceived, totalBytesReceived, totalBytesExpected) => {
+            if (!downloading.has(task.requestURL)) return;
+            let { onProgress } = downloading.get(task.requestURL);
+        
+            onProgress && onProgress(totalBytesReceived, totalBytesExpected);
+        });
+    },
 
     getUserDataPath () {
         return fs.getWritablePath().replace(/[\/\\]*$/, '');
