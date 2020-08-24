@@ -99,15 +99,22 @@ let _converters = {
         }
         return _colorArray;
     },
+    BindingMappingInfo: function (info) {
+        return new gfx.BindingMappingInfo(info);
+    },
     DeviceInfo: function (info) {
         let width = cc.game.canvas.width,
             height = cc.game.canvas.height,
             handler = window.windowHandler;
-        return new gfx.DeviceInfo(handler, width, height, info.nativeWidth, info.nativeHeight, null);
+        let bindingMappingInfo = info.bindingMappingInfo ? _converters.BindingMappingInfo(info.bindingMappingInfo) : undefined;
+        return new gfx.DeviceInfo(handler, width, height, info.nativeWidth, info.nativeHeight, null, bindingMappingInfo);
     },
     // ContextInfo,
     BufferInfo: function (info) {
         return new gfx.BufferInfo(info);
+    },
+    BufferViewInfo: function (info) {
+        return new gfx.BufferViewInfo(info);
     },
     // DrawInfo,
     // GFXIndirectBuffer,
@@ -136,21 +143,13 @@ let _converters = {
                 jsbUniforms.push(_converters.Uniform(uniforms[i]));
             }
         }
-        return new gfx.UniformBlock(block.shaderStages, block.binding, block.name, jsbUniforms);
+        return new gfx.UniformBlock(block.set, block.binding, block.name, jsbUniforms, block.count);
     },
     UniformSampler: function (sampler) {
-        return new gfx.UniformSampler(sampler.shaderStages, sampler.binding, sampler.name, sampler.type, sampler.count);
+        return new gfx.UniformSampler(sampler);
     },
     ShaderStage: function (stage) {
-        let macros = stage.macros;
-        let jsbMacros;
-        if (macros) {
-            jsbMacros = [];
-            for (let i = 0; i < macros.length; ++i) {
-                jsbMacros.push(_converters.ShaderMacro(macros[i]));
-            }
-        }
-        return new gfx.ShaderStage(stage.type, stage.source, jsbMacros);
+        return new gfx.ShaderStage(stage);
     },
     ShaderInfo: function (info) {
         let stages = info.stages,
@@ -229,8 +228,22 @@ let _converters = {
     FramebufferInfo: function (info) {
         return new gfx.FramebufferInfo(info);
     },
-    BindingLayoutInfo: function (info) {
-        return new gfx.BindingLayoutInfo(info.shader);
+    DescriptorSetInfo: function (info) {
+        return new gfx.DescriptorSetInfo(info.layout);
+    },
+    DescriptorSetLayoutBinding: function (info) {
+        return new gfx.DescriptorSetLayoutBinding(info);
+    },
+    DescriptorSetLayoutInfo: function (info) {
+        let bindings = info.bindings;
+        let jsbBindings = [];
+        for (const binding of bindings) {
+            jsbBindings.push(_converters.DescriptorSetLayoutBinding(binding));
+        }
+        return new gfx.DescriptorSetLayoutInfo(jsbBindings);
+    },
+    PipelineLayoutInfo: function (info) {
+        return new gfx.PipelineLayoutInfo(info.setLayouts);
     },
     BindingUnit: function (info) {
         return new gfx.BindingUnit(info);
@@ -280,6 +293,7 @@ let _converters = {
             blendState: _converters.BlendState(info.blendState),
             dynamicStates: info.dynamicStates,
             renderPass: info.renderPass,
+            pipelineLayout: info.pipelineLayout,
         }
         return new gfx.PipelineStateInfo(jsbInfo);
     },
@@ -366,17 +380,27 @@ deviceProtos.forEach(function(item, index) {
             initialize: replaceFunction('_initialize', _converters.DeviceInfo),
             createQueue: replaceFunction('_createQueue', _converters.QueueInfo),
             createCommandBuffer: replaceFunction('_createCommandBuffer', _converters.CommandBufferInfo),
-            createBuffer: replaceFunction('_createBuffer', _converters.BufferInfo),
             createSampler: replaceFunction('_createSampler', _converters.SamplerInfo),
             createShader: replaceFunction('_createShader', _converters.ShaderInfo),
             createInputAssembler: replaceFunction('_createInputAssembler', _converters.InputAssemblerInfo),
             createRenderPass: replaceFunction('_createRenderPass', _converters.RenderPassInfo),
             createFramebuffer: replaceFunction('_createFramebuffer', _converters.FramebufferInfo),
-            createBindingLayout: replaceFunction('_createBindingLayout', _converters.BindingLayoutInfo),
+            createDescriptorSet: replaceFunction('_createDescriptorSet', _converters.DescriptorSetInfo),
+            createDescriptorSetLayout: replaceFunction('_createDescriptorSetLayout', _converters.DescriptorSetLayoutInfo),
+            createPipelineLayout: replaceFunction('_createPipelineLayout', _converters.PipelineLayoutInfo),
             createPipelineState: replaceFunction('_createPipelineState', _converters.PipelineStateInfo),
             copyBuffersToTexture: replaceFunction('_copyBuffersToTexture', _converters.origin, _converters.origin, _converters.BufferTextureCopyList),
             copyTexImagesToTexture: replaceFunction('_copyTexImagesToTexture', _converters.texImagesToBuffers, _converters.origin, _converters.BufferTextureCopyList),
         });
+
+        let oldDeviceCreatBufferFun = item.createBuffer;
+        item.createBuffer = function(info) {
+            if (info.buffer) {
+                return oldDeviceCreatBufferFun.call(this, _converters.BufferViewInfo(info), true);
+            } else {
+                return oldDeviceCreatBufferFun.call(this, _converters.BufferInfo(info), false);
+            }
+        }
 
         let oldDeviceCreatTextureFun = item.createTexture;
         item.createTexture = function(info) {
@@ -389,15 +413,75 @@ deviceProtos.forEach(function(item, index) {
     }
 });
 
-let bindingLayoutProto = gfx.BindingLayout.prototype;
-replace(bindingLayoutProto, {
-    initialize: replaceFunction('_initialize', _converters.BindingLayoutInfo),
+let commandBufferProto = gfx.CommandBuffer.prototype;
+replace(commandBufferProto, {
+    initialize: replaceFunction('_initialize', _converters.CommandBufferInfo),
+    setViewport: replaceFunction('_setViewport', _converters.Viewport),
+    setScissor: replaceFunction('_setScissor', _converters.Rect),
+    setBlendConstants: replaceFunction('_setBlendConstants', _converters.Color),
+    beginRenderPass: replaceFunction('_beginRenderPass',
+        _converters.origin,
+        _converters.origin,
+        _converters.Rect,
+        _converters.ColorArray,
+        _converters.origin,
+        _converters.origin),
+});
+
+let framebufferProto = gfx.Framebuffer.prototype;
+replace(framebufferProto, {
+    initialize: replaceFunction('_initialize', _converters.FramebufferInfo),
+});
+
+let iaProto = gfx.InputAssembler.prototype;
+replace(iaProto, {
+    initialize: replaceFunction('_initialize', _converters.InputAssemblerInfo),
+});
+
+let descriptorSetProto = gfx.DescriptorSet.prototype;
+replace(descriptorSetProto, {
+    initialize: replaceFunction('_initialize', _converters.DescriptorSetInfo),
+});
+
+let descriptorSetLayoutProto = gfx.DescriptorSetLayout.prototype;
+replace(descriptorSetLayoutProto, {
+    initialize: replaceFunction('_initialize', _converters.DescriptorSetLayoutInfo),
+});
+
+let pipelineLayoutProto = gfx.PipelineLayout.prototype;
+replace(pipelineLayoutProto, {
+    initialize: replaceFunction('_initialize', _converters.PipelineLayoutInfo),
+});
+
+let pipelineStateProto = gfx.PipelineState.prototype;
+replace(pipelineStateProto, {
+    initialize: replaceFunction('_initialize', _converters.PipelineStateInfo),
+});
+
+let queueProto = gfx.Queue.prototype;
+replace(queueProto, {
+    initialize: replaceFunction('_initialize', _converters.QueueInfo),
+});
+
+let renderPassProto = gfx.RenderPass.prototype;
+replace(renderPassProto, {
+    initialize: replaceFunction('_initialize', _converters.RenderPassInfo),
+});
+
+let samplerProto = gfx.Sampler.prototype;
+replace(samplerProto, {
+    initialize: replaceFunction('_initialize', _converters.SamplerInfo),
+});
+
+let shaderProto = gfx.Shader.prototype;
+replace(shaderProto, {
+    initialize: replaceFunction('_initialize', _converters.ShaderInfo),
+});
+cc.js.get(shaderProto, 'id', function () {
+    return this.hash;
 });
 
 let bufferProto = gfx.Buffer.prototype;
-replace(bufferProto, {
-    initialize: replaceFunction('_initialize', _converters.BufferInfo),
-});
 
 let oldUpdate = bufferProto.update;
 bufferProto.update = function(buffer, offset, size) {
@@ -430,58 +514,14 @@ bufferProto.update = function(buffer, offset, size) {
     oldUpdate.call(this, buffer, offset || 0, buffSize);
 }
 
-let commandBufferProto = gfx.CommandBuffer.prototype;
-replace(commandBufferProto, {
-    initialize: replaceFunction('_initialize', _converters.CommandBufferInfo),
-    setViewport: replaceFunction('_setViewport', _converters.Viewport),
-    setScissor: replaceFunction('_setScissor', _converters.Rect),
-    setBlendConstants: replaceFunction('_setBlendConstants', _converters.Color),
-    beginRenderPass: replaceFunction('_beginRenderPass',
-        _converters.origin,
-        _converters.origin,
-        _converters.Rect,
-        _converters.ColorArray,
-        _converters.origin,
-        _converters.origin),
-});
-
-let framebufferProto = gfx.Framebuffer.prototype;
-replace(framebufferProto, {
-    initialize: replaceFunction('_initialize', _converters.FramebufferInfo),
-});
-
-let iaProto = gfx.InputAssembler.prototype;
-replace(iaProto, {
-    initialize: replaceFunction('_initialize', _converters.InputAssemblerInfo),
-});
-
-let pipelineStateProto = gfx.PipelineState.prototype;
-replace(pipelineStateProto, {
-    initialize: replaceFunction('_initialize', _converters.PipelineStateInfo),
-});
-
-let queueProto = gfx.Queue.prototype;
-replace(queueProto, {
-    initialize: replaceFunction('_initialize', _converters.QueueInfo),
-});
-
-let renderPassProto = gfx.RenderPass.prototype;
-replace(renderPassProto, {
-    initialize: replaceFunction('_initialize', _converters.RenderPassInfo),
-});
-
-let samplerProto = gfx.Sampler.prototype;
-replace(samplerProto, {
-    initialize: replaceFunction('_initialize', _converters.SamplerInfo),
-});
-
-let shaderProto = gfx.Shader.prototype;
-replace(shaderProto, {
-    initialize: replaceFunction('_initialize', _converters.ShaderInfo),
-});
-cc.js.get(shaderProto, 'id', function () {
-    return this.hash;
-});
+let oldBufferInitializeFunc = bufferProto.initialize;
+bufferProto.initialize = function(info) {
+    if (info.buffer) {
+        oldBufferInitializeFunc.call(this, _converters.BufferViewInfo(info), true);
+    } else {
+        oldBufferInitializeFunc.call(this, _converters.BufferInfo(info), false);
+    }
+}
 
 let textureProto = gfx.Texture.prototype;
 let oldTextureInitializeFunc = textureProto.initialize;
