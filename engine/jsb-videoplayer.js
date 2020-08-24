@@ -361,6 +361,9 @@
         this._h = node._contentSize.height;
 
         let camera = cc.Camera.findCamera(node)._camera;
+        if (!camera) {
+            return;
+        }
 
         let canvas_width = cc.game.canvas.width;
         let canvas_height = cc.game.canvas.height;
