@@ -143,7 +143,7 @@ let _converters = {
                 jsbUniforms.push(_converters.Uniform(uniforms[i]));
             }
         }
-        return new gfx.UniformBlock(block.set, block.binding, block.name, jsbUniforms, block.count);
+        return new gfx.UniformBlock(block.set, block.binding, block.name, jsbUniforms);
     },
     UniformSampler: function (sampler) {
         return new gfx.UniformSampler(sampler);
