@@ -1,5 +1,5 @@
 /****************************************************************************
- Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2019 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos.com
 
@@ -22,15 +22,32 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-require('./jsb-reflection.js');
-require('./jsb-assets-manager.js');
 
-require('./jsb-sys.js');
-require('./jsb-game.js');
-require('./jsb-gfx.js');
-require('./jsb-loader.js');
-// require('./jsb-videoplayer.js');
-// require('./jsb-webview.js');
-require('./jsb-audio.js');
-require('./jsb-editbox.js');
-require('./jsb-pipeline.js');
+ const ForwardProto = cc.ForwardPipeline.prototype;
+
+ Object.assign(ForwardProto, {
+    activate () {
+        if (!this._nativeForward) {
+            this._nativeForward = new nr.ForwardPipeline();
+            this._nativeForward.init();
+        }
+
+        this._nativeForward.activate();
+
+        return true;
+    },
+
+    render (views) {
+        this._nativeForward.render(views);
+    }
+ })
+
+ const RootProto = cc.Root;
+
+ Object.assign(RootProto, {
+    createView (info) {
+        const view = new nr.RenderView();
+        view.initialize(info);
+        return view;
+    },
+ })
