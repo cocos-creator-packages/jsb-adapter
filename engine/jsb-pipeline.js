@@ -23,31 +23,34 @@
  THE SOFTWARE.
  ****************************************************************************/
 
- const ForwardProto = cc.ForwardPipeline.prototype;
+(function(){
+    if (!cc.ForwardPipeline) return;
+    const ForwardProto = cc.ForwardPipeline.prototype;
 
- Object.assign(ForwardProto, {
-    activate () {
-        if (!this._nativeForward) {
-            this._nativeForward = new nr.ForwardPipeline();
-            this._nativeForward.init();
+    Object.assign(ForwardProto, {
+        activate () {
+            if (!this._nativeForward) {
+                this._nativeForward = new nr.ForwardPipeline();
+                this._nativeForward.init();
+            }
+
+            this._nativeForward.activate();
+
+            return true;
+        },
+
+        render (views) {
+            this._nativeForward.render(views);
         }
+    })
 
-        this._nativeForward.activate();
+    const RootProto = cc.Root.prototype;
 
-        return true;
-    },
-
-    render (views) {
-        this._nativeForward.render(views);
-    }
- })
-
- const RootProto = cc.Root;
-
- Object.assign(RootProto, {
-    createView (info) {
-        const view = new nr.RenderView();
-        view.initialize(info);
-        return view;
-    },
- })
+    Object.assign(RootProto, {
+        createView (info) {
+            const view = new nr.RenderView();
+            view.initialize(info);
+            return view;
+        },
+    })
+})();
