@@ -251,6 +251,11 @@
     };
     _p.updateMatrix = function (node) {
         if (!this._iframe || !this._visible) return;
+        let camera = cc.Camera.findCamera(node)._camera;
+        if (!camera) {
+            return;
+        }
+        
         node.getWorldMatrix(_worldMat);
         if (this._m00 === _worldMat.m[0] && this._m01 === _worldMat.m[1] &&
             this._m04 === _worldMat.m[4] && this._m05 === _worldMat.m[5] &&
@@ -267,8 +272,6 @@
         this._m13 = _worldMat.m[13];
         this._w = node._contentSize.width;
         this._h = node._contentSize.height;
-
-        let camera = cc.Camera.findCamera(node)._camera;
 
         let canvas_width = cc.game.canvas.width;
         let canvas_height = cc.game.canvas.height;

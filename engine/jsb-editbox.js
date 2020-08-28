@@ -167,6 +167,9 @@
             node.getWorldMatrix(worldMat);
 
             let camera = cc.Camera.findCamera(node);
+            if (!camera) {
+                return new cc.Rect();
+            }
             camera.getWorldToScreenMatrix2D(cameraMat);
             cc.Mat4.multiply(cameraMat, cameraMat, worldMat);
 
