@@ -24,6 +24,8 @@
  ****************************************************************************/
 
 (function(){
+    if (cc.ForwardPipeline) return;
+    
     const typeToClass = {
         ForwardPipeline: nr.ForwardPipeline,
     }
