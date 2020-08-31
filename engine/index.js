@@ -32,6 +32,7 @@ require('./jsb-loader.js');
 require('./jsb-editbox.js');
 require('./jsb-reflection.js');
 require('./jsb-assets-manager.js');
+require('./jsb-safearea.js');
 
 if (CC_NATIVERENDERER) {
     require('./jsb-effect.js');
