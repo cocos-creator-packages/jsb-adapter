@@ -53,6 +53,14 @@ class ForwardPipeline extends nr.ForwardPipeline {
   }
 }
 
+Object.assign(ForwardPipeline.prototype, {
+  shadowMap: new cc.Shadow(),
+  ambient: new cc.Ambient(),
+  skybox: new cc.Skybox(),
+  fog: new cc.Fog(),
+  planarShadows: new cc.PlanarShadows()
+})
+
 class ForwardFlow extends nr.ForwardFlow {
   constructor() {
     super();
