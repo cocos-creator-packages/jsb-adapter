@@ -12,7 +12,7 @@ if (SafeArea) {
         },
 
         onDisable(){
-            _onDisable(this);
+            _onDisable.call(this);
             window.removeEventListener('orientationchange', this._adaptSafeAreaChangeWithThis);
             window.removeEventListener('safearea-change', this._updateAreaWithThis);
         },
