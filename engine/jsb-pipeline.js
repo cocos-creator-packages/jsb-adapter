@@ -61,6 +61,13 @@ Object.assign(ForwardPipeline.prototype, {
   planarShadows: new cc.PlanarShadows()
 })
 
+let blendStateProto = gfx.BlendState.prototype;
+let oldSetTargetFunc = blendStateProto.setTarget;
+blendStateProto.setTarget = function(index, target) {
+    const jsbTarget = new gfx.BlendTarget(target);
+    oldSetTargetFunc.call(this, index, jsbTarget);
+}
+
 class ForwardFlow extends nr.ForwardFlow {
   constructor() {
     super();
