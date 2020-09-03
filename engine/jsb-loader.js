@@ -46,6 +46,8 @@ let suffix = 0;
 let REMOTE_SERVER_ROOT = '';
 let remoteBundles = {};
 
+const failureMap = {};
+const maxRetryCountFromBreakpoint = 5;
 const loadedScripts = {};
 
 function downloadScript (url, options, onComplete) {
@@ -80,7 +82,11 @@ function download (url, func, options, onFileProgress, onComplete) {
     else {
         var time = Date.now();
         var storagePath = '';
-        if (options.__cacheBundleRoot__) {
+        var failureRecord = failureMap[url];
+        if (failureRecord) {
+            storagePath = failureRecord.storagePath;
+        }
+        else if (options.__cacheBundleRoot__) {
             storagePath = `${options.__cacheBundleRoot__}/${time}${suffix++}${cc.path.extname(url)}`;
         }
         else {
@@ -88,9 +94,19 @@ function download (url, func, options, onFileProgress, onComplete) {
         }
         downloadFile(url, `${cacheManager.cacheDir}/${storagePath}`, options.header, onFileProgress, function (err, path) {
             if (err) {
+                if (failureRecord) {
+                    failureRecord.retryCount++;
+                    if (failureRecord.retryCount >= maxRetryCountFromBreakpoint) {
+                        delete failureMap[url];
+                    }
+                }
+                else {
+                    failureMap[url] = { retryCount: 0, storagePath };
+                }
                 onComplete(err, null);
                 return;
             }
+            delete failureMap[url];
             func(path, options, function (err, data) {
                 if (!err) {
                     cacheManager.cacheFile(url, storagePath, options.__cacheBundleRoot__);
