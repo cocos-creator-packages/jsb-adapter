@@ -52,9 +52,6 @@ var fsUtils = {
         jsb_downloader.setOnTaskError((task, errorCode, errorCodeInternal, errorStr) => {
             if (!downloading.has(task.requestURL)) return;
             let { onComplete } = downloading.remove(task.requestURL);
-            if (task.storagePath) {
-                fsUtils.deleteFile(task.storagePath);
-            }
             cc.error(`Download file failed: path: ${task.requestURL} message: ${errorStr}, ${errorCode}`);
             onComplete(new Error(errorStr), null);
         });
