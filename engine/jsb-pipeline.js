@@ -58,7 +58,6 @@ Object.assign(ForwardPipeline.prototype, {
   ambient: new cc.Ambient(),
   skybox: new cc.Skybox(),
   fog: new cc.Fog(),
-  planarShadows: new cc.PlanarShadows()
 })
 
 let blendStateProto = gfx.BlendState.prototype;
