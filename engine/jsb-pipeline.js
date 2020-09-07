@@ -53,13 +53,6 @@ class ForwardPipeline extends nr.ForwardPipeline {
   }
 }
 
-Object.assign(ForwardPipeline.prototype, {
-  shadowMap: new cc.Shadow(),
-  ambient: new cc.Ambient(),
-  skybox: new cc.Skybox(),
-  fog: new cc.Fog(),
-})
-
 let blendStateProto = gfx.BlendState.prototype;
 let oldSetTargetFunc = blendStateProto.setTarget;
 blendStateProto.setTarget = function(index, target) {
