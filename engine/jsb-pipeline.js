@@ -41,6 +41,10 @@ class ForwardPipeline extends nr.ForwardPipeline {
   }
 
   init() {
+    this.fog = new cc.Fog();
+    this.ambient = new cc.Ambient();
+    this.skybox = new cc.Skybox();
+    this.shadows = new cc.Shadows();
     for (let i = 0; i < this._flows.length; i++) {
       this._flows[i].init();
     }
