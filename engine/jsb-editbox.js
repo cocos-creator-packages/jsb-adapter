@@ -24,11 +24,11 @@
  ****************************************************************************/
 
 (function () {
-    if (!(cc && cc.EditBox)) {
+    if (!(cc && cc.EditBoxComponent)) {
         return;
     }
 
-    const EditBox = cc.EditBox;
+    const EditBox = cc.EditBoxComponent;
     const js = cc.js;
     const KeyboardReturnType = EditBox.KeyboardReturnType;
     const InputMode = EditBox.InputMode;
