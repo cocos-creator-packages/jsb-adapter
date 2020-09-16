@@ -233,11 +233,6 @@
             };
             video.addEventListener(_impl._polyfill.event, cb);
         }
-        if (_impl._polyfill.autoplayAfterOperation && this.isPlaying()) {
-            setTimeout(function () {
-                video.play();
-            }, 20);
-        }
     };
 
     _p.isPlaying = function () {
