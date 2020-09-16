@@ -400,16 +400,21 @@ const cacheManager = require('./jsb-cache-manager');
                 this.animationName = '';
             }
 
+            var oldArmature = this._armature;
             if (this._armature) {
                 if (!this.isAnimationCached()) {
                     this._factory.remove(this._armature);
                 }
-                this._armature.dispose();
                 this._armature = null;
             }
             this._nativeDisplay = null;
             
             this._refresh();
+            
+            if (oldArmature != this._armature) {
+                this._armature.dispose();
+            }
+            
             if (this._armature && !this.isAnimationCached()) {
                 this._factory.add(this._armature);
             }
