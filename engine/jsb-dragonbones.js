@@ -412,7 +412,7 @@ const cacheManager = require('./jsb-cache-manager');
             this._refresh();
             
             if (oldArmature != this._armature) {
-                this._armature.dispose();
+                oldArmature.dispose();
             }
             
             if (this._armature && !this.isAnimationCached()) {
