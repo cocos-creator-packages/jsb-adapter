@@ -411,7 +411,7 @@ const cacheManager = require('./jsb-cache-manager');
             
             this._refresh();
             
-            if (oldArmature != this._armature) {
+            if (oldArmature && oldArmature != this._armature) {
                 oldArmature.dispose();
             }
             
