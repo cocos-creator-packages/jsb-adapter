@@ -73,7 +73,9 @@
 
     const BaseClass = EditBox._EditBoxImpl;
     function JsbEditBoxImpl () {
-        BaseClass.call(this);
+        // Manual construction
+        this._editing = false;
+        this._delegate = null;
     }
 
     js.extend(JsbEditBoxImpl, BaseClass);
