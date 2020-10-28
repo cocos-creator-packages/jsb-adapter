@@ -189,7 +189,7 @@ function downloadBundle (nameOrUrl, options, onComplete) {
         cacheManager.makeBundleFolder(bundleName);
     }
     else {
-        if (downloader.remoteBundles[bundleName]) {
+        if (downloader.remoteBundles.indexOf(bundleName) !== -1) {
             url = `${downloader.remoteServerAddress}remote/${bundleName}`;
             cacheManager.makeBundleFolder(bundleName);
         }
