@@ -119,6 +119,7 @@ let handleVolume  = function (volume) {
         volume: 1
     };
     var _effect = {
+        idArray: [],
         volume: 1
     };
 
@@ -174,7 +175,9 @@ let handleVolume  = function (volume) {
         return audioEngine.getState(_music.id) === audioEngine.AudioState.PLAYING;
     };
     audioEngine.playEffect = function (filePath, loop) {
-        return audioEngine.play(filePath, loop || false, _effect.volume);
+        var effectId = audioEngine.play(filePath, loop || false, _effect.volume);
+        _effect.idArray.push(effectId);
+        return effectId;
     };
     audioEngine.setEffectsVolume = function (volume) {
         _effect.volume = handleVolume(volume);
@@ -186,33 +189,35 @@ let handleVolume  = function (volume) {
         return audioEngine.pause(audioID);
     };
     audioEngine.pauseAllEffects = function () {
-        var musicPlay = audioEngine.getState(_music.id) === audioEngine.AudioState.PLAYING;
-        audioEngine.pauseAll();
-        if (musicPlay) {
-            audioEngine.resume(_music.id);
+        var length = _effect.idArray.length;
+        for (var i = 0; i < length; i++) {
+            audioEngine.pause(_effect.idArray[i]);
         }
     };
     audioEngine.resumeEffect = function (id) {
         audioEngine.resume(id);
     };
     audioEngine.resumeAllEffects = function () {
-        var musicPaused = audioEngine.getState(_music.id) === audioEngine.AudioState.PAUSED;
-        audioEngine.resumeAll();
-        if (musicPaused && audioEngine.getState(_music.id) === audioEngine.AudioState.PLAYING) {
-            audioEngine.pause(_music.id);
+        var length = _effect.idArray.length;
+        for (var i = 0; i < length; i++) {
+            audioEngine.resume(_effect.idArray[i]);
         }
     };
     audioEngine.stopEffect = function (id) {
+        var length = _effect.idArray.length;
+        for (var i = 0; i < length; i++) {
+            if (_effect.idArray[i] === id) {
+                _effect.idArray.slice(i, id);
+            }
+        }
         return audioEngine.stop(id);
     };
     audioEngine.stopAllEffects = function () {
-        var musicPlaying = audioEngine.getState(_music.id) === audioEngine.AudioState.PLAYING;
-        var currentTime = audioEngine.getCurrentTime(_music.id);
-        audioEngine.stopAll();
-        if (musicPlaying) {
-            _music.id = audioEngine.play(_music.clip, _music.loop);
-            audioEngine.setCurrentTime(_music.id, currentTime);
+        var length = _effect.idArray.length;
+        for (var i = 0; i < length; i++) {
+            audioEngine.stop(_effect.idArray[i]);
         }
+        _effect.idArray = [];
     };
 
     // Unnecessary on native platform
