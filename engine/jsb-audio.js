@@ -189,18 +189,20 @@ let handleVolume  = function (volume) {
         return audioEngine.pause(audioID);
     };
     audioEngine.pauseAllEffects = function () {
-        var length = _effect.idArray.length;
-        for (var i = 0; i < length; i++) {
-            audioEngine.pause(_effect.idArray[i]);
+        var musicPlay = audioEngine.getState(_music.id) === audioEngine.AudioState.PLAYING;
+        audioEngine.pauseAll();
+        if (musicPlay) {
+            audioEngine.resume(_music.id);
         }
     };
     audioEngine.resumeEffect = function (id) {
         audioEngine.resume(id);
     };
     audioEngine.resumeAllEffects = function () {
-        var length = _effect.idArray.length;
-        for (var i = 0; i < length; i++) {
-            audioEngine.resume(_effect.idArray[i]);
+        var musicPaused = audioEngine.getState(_music.id) === audioEngine.AudioState.PAUSED;
+        audioEngine.resumeAll();
+        if (musicPaused && audioEngine.getState(_music.id) === audioEngine.AudioState.PLAYING) {
+            audioEngine.pause(_music.id);
         }
     };
     audioEngine.stopEffect = function (id) {
