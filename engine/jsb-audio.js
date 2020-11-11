@@ -209,7 +209,7 @@ let handleVolume  = function (volume) {
         var length = _effect.idArray.length;
         for (var i = 0; i < length; i++) {
             if (_effect.idArray[i] === id) {
-                _effect.idArray.splice(i, id);
+                _effect.idArray.splice(i, 1, id);
                 break;
             }
         }
