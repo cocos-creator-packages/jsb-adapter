@@ -53,6 +53,10 @@ cc.js.mixin(proto, {
         this.setUseModel(mask._type !== Mask.Type.IMAGE_STENCIL);
         this.setImageStencil(mask._type === Mask.Type.IMAGE_STENCIL);
 
+        if (mask._graphics) {
+            mask._graphics._assembler.setUseModel(mask._type !== Mask.Type.IMAGE_STENCIL);
+        }
+
         mask.node._renderFlag |= cc.RenderFlow.FLAG_UPDATE_RENDER_DATA;
     }
 }, renderer.MaskAssembler.prototype);
