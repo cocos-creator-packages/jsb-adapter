@@ -5,6 +5,7 @@
     let nativeProto = renderer.SlicedSprite3D.prototype;
 
     Object.assign(proto, {
-        _extendNative: nativeProto.ctor
+        _extendNative: nativeProto.ctor,
+        updateWorldVerts: cc.Assembler3D.updateWorldVerts
     })
 })()

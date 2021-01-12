@@ -5,6 +5,7 @@
 
     Object.assign(proto, { 
         updateWorldVerts (sprite) {
+            let z = sprite.node.z;
             let local = this._local;
             let localX = local.x, localY = local.y;
             let world = this._renderData.vDatas[0];
@@ -22,25 +23,25 @@
                     let padding = 6;
                     world[vertexOffset] = x;
                     world[vertexOffset + 1] = y;
-                    world[vertexOffset + 2] = 0;
+                    world[vertexOffset + 2] = z;
                     vertexOffset += padding;
 
                     // right bottom
                     world[vertexOffset] = x1;
                     world[vertexOffset + 1] = y;
-                    world[vertexOffset + 2] = 0;
+                    world[vertexOffset + 2] = z;
                     vertexOffset += padding;
 
                     // left top
                     world[vertexOffset] = x;
                     world[vertexOffset + 1] = y1;
-                    world[vertexOffset + 2] = 0;
+                    world[vertexOffset + 2] = z;
                     vertexOffset += padding;
 
                     // right top
                     world[vertexOffset] = x1;
                     world[vertexOffset + 1] = y1;
-                    world[vertexOffset + 2] = 0; 
+                    world[vertexOffset + 2] = z; 
                     vertexOffset += padding;
                 }
             }
