@@ -288,11 +288,11 @@
         return video.getFrameHeight();
     };
 
-    _p.getVideoTexData = function () {
+    _p.pushFrameDataToTexture2D = function (texid) {
         let video = this._video;
-        if (!video) return null;
+        if (!video) return;
 
-        return video.getVideoTexData();
+        video.pushFrameDataToTexture2D(texid);
     };
 
     _p.getVideoTexDataSize = function () {
@@ -302,11 +302,18 @@
         return video.getVideoTexDataSize();
     };
 
+    _p.setShowRawFrame = function (show) {
+        let video = this._video;
+        if (!video) return;
+
+        video.setShowRawFrame(show);
+    };
+
     _p.update = function () {
         let video = this._video;
-        if (!video) return -1;
+        if (!video) return;
 
-        return video.update();
+        video.update();
     };
 
     _p.setKeepAspectRatioEnabled = function (isEnabled) {
