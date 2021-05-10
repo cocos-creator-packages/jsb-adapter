@@ -288,11 +288,11 @@
         return video.getFrameHeight();
     };
 
-    _p.pushFrameDataToTexture2D = function (texid) {
+    _p.pushFrameDataToTexture2D = function (tex) {
         let video = this._video;
         if (!video) return;
 
-        video.pushFrameDataToTexture2D(texid);
+        video.pushFrameDataToTexture2D(tex);
     };
 
     _p.getVideoTexDataSize = function () {

@@ -210,10 +210,6 @@ Object.defineProperty(_p, "_width", _tmpGetSetDesc);
 _tmpGetSetDesc.get = _p.getHeight;
 Object.defineProperty(_p, "_height", _tmpGetSetDesc);
 
-_p.getTextureId = function() {
-    return this.getTextureIdNative();
-}
-
 /**
  * FrameBuffer
  */
