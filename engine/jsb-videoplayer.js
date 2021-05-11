@@ -260,6 +260,62 @@
         return video.currentTime();
     };
 
+    _p.getFrame = function () {
+        let video = this._video;
+        if (!video) return;
+
+        video.getFrame();
+    };
+
+    _p.getFrameChannel = function () {
+        let video = this._video;
+        if (!video) return 0;
+
+        return video.getFrameChannel();
+    };
+
+    _p.getFrameWidth = function () {
+        let video = this._video;
+        if (!video) return 0;
+
+        return video.getFrameWidth();
+    };
+    
+    _p.getFrameHeight = function () {
+        let video = this._video;
+        if (!video) return 0;
+
+        return video.getFrameHeight();
+    };
+
+    _p.pushFrameDataToTexture2D = function (tex) {
+        let video = this._video;
+        if (!video) return;
+
+        video.pushFrameDataToTexture2D(tex);
+    };
+
+    _p.getVideoTexDataSize = function () {
+        let video = this._video;
+        if (!video) return 0;
+
+        return video.getVideoTexDataSize();
+    };
+
+    _p.setShowRawFrame = function (show) {
+        let video = this._video;
+        if (!video) return;
+
+        video.setShowRawFrame(show);
+    };
+
+    _p.update = function () {
+        let video = this._video;
+        if (!video) return;
+
+        video.update();
+    };
+
     _p.setKeepAspectRatioEnabled = function (isEnabled) {
         if (!this._video) {
             return false;
