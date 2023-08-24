@@ -131,11 +131,6 @@
     };
 
     _p.createDomElementIfNeeded = function () {
-        if (!jsb.VideoPlayer) {
-            cc.warn('VideoPlayer is not supported.');
-            return null;
-        }
-
         if (!this._video) {
             this._video = new VideoPlayer();
         }
