@@ -25,7 +25,7 @@
 
 require('./jsb-sys.js');
 require('./jsb-game.js');
-if(window.oh)
+if (window.oh)
     require('./jsb-videoplayer-openharmony.js');
 else 
     require('./jsb-videoplayer.js');
