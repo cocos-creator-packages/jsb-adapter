@@ -61,7 +61,7 @@ function downloadScript (url, options, onComplete) {
     download(url, function (src, options, onComplete) {
         if (globalThis.oh) {
             globalThis.oh.loadModule(src);
-        }else{
+        } else {
             window.require(src);
         }
         loadedScripts[url] = true;
