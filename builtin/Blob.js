@@ -165,7 +165,7 @@
 				// decode UTF-16 to binary string
 				if (globalThis.oh) {
 					bb.push(decodeURI(encodeURIComponent(data)));
-				}else{
+				} else {
 					bb.push(unescape(encodeURIComponent(data)));
 				}
 			}
