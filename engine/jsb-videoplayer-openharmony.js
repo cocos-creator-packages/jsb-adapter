@@ -143,6 +143,16 @@
             video.setVisible(false)
 
             let cbs = this.__eventListeners;
+            
+            video.removeEventListener("loadedmetadata", cbs.loadedmetadata);
+            video.removeEventListener("ended", cbs.ended);
+            video.removeEventListener("play", cbs.play);
+            video.removeEventListener("pause", cbs.pause);
+            video.removeEventListener("click", cbs.click);
+            video.removeEventListener("canplay", cbs.onCanPlay);
+            video.removeEventListener("canplaythrough", cbs.onCanPlay);
+            video.removeEventListener("suspend", cbs.onCanPlay);
+            
             cbs.loadedmetadata = null;
             cbs.ended = null;
             cbs.play = null;
