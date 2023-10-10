@@ -35,7 +35,7 @@
     var _topLeft = new vec3();
     var _bottomRight = new vec3();
 
-    let kWebViewTag = 0;
+    let kVideoTag = 0;
     let videoPlayers = [];
     const VideoEvent = {
         PLAYING: 0,
@@ -490,7 +490,7 @@
             this._events = {};
             this._currentTime = 0;
             this._duration = 0;
-            this._videoIndex = kWebViewTag++;
+            this._videoIndex = kVideoTag++;
             this._matViewProj_temp = new mat4();
             window.oh.postMessage("createVideo", this._videoIndex);
             videoPlayers.push(this);
