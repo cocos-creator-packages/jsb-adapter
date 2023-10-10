@@ -228,7 +228,7 @@
         let video = this._video;
         if (!video || !this._visible) return;
         // TODO(qgh) : In the openharmony platform, there is no stop event when the video stops, instead a pause event is sent. 
-	// We can't ignore the pause event here.
+        // We can't ignore the pause event here.
         // this._ignorePause = true;
         video.seekTo(0);
         video.stop();
