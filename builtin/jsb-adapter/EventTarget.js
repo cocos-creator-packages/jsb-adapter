@@ -286,8 +286,29 @@ class EventTarget {
     }
 }
 
+const _openHarmonyTouchs = new Map();
 function touchEventHandlerFactory(type) {
     return (touches) => {
+        if (globalThis.oh) {
+            const touchID = "" + touches[0].identifier;
+            if (type === "touchmove") {
+                const value = { ...touches[0] };
+                _openHarmonyTouchs.set(touchID, value);
+                if (_openHarmonyTouchs.size > 1) {
+                    var count = 0;
+                    _openHarmonyTouchs.forEach(function (value, key) {
+                        touches[count] = value;
+                        count++;
+                    });
+                }
+            }
+            else if (type === "touchend" || type === "touchcancel") {
+                if (_openHarmonyTouchs.has(touchID)) {
+                    _openHarmonyTouchs.delete(touchID);
+                }
+            }
+        }
+        
         const touchEvent = new TouchEvent(type)
 
         touchEvent.touches = touches;
