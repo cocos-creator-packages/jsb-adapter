@@ -477,14 +477,15 @@
         }
     });
 
-
-    window.oh.onVideoEvent = (tag, ev, args) => {
-        videoPlayers.forEach(player => {
-            if (player.index == tag) {
-                player.dispatchEvent(ev, args);
+    jsb.onVideoEvent = (args) => {
+        const data = JSON.parse(args);
+        videoPlayers.forEach(function(player) {
+            if (player.index == data.videoTag) {
+               player.dispatchEvent(data.videoEvent, data.args);
             }
         });
     };
+
     class VideoPlayer {
         constructor() {
             this._events = {};
