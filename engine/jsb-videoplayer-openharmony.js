@@ -69,8 +69,9 @@
                 self._video.play();
             }
         };
-        cbs.ended = function () {
+        cbs.ended = function (args = 0) {
             if (self._video !== video) return;
+            self._video._currentTime = args;
             self._playing = false;
             self._dispatchEvent(_impl.EventType.COMPLETED);
         };
@@ -99,10 +100,11 @@
         video.addEventListener("click", cbs.click);
         video.addEventListener("stoped", cbs.stoped);
 
-        function onCanPlay() {
+        function onCanPlay(args = 0) {
             if (this._loaded)
                 return;
 
+            this._video._duration = args;
             this._loaded = true;
             this._dispatchEvent(_impl.EventType.READY_TO_PLAY);
             this._updateVisibility();
@@ -571,7 +573,7 @@
                     evString = "suspend";
                     break;
                 case VideoEvent.UPDATE:
-                    evString = "update";
+                    evString = "play";
                     break;
                 case VideoEvent.QUIT_FULLSCREEN:
                     evString = "suspend";
