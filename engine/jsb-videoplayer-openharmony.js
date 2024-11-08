@@ -69,14 +69,14 @@
                 self._video.play();
             }
         };
-        cbs.ended = function (args = 0) {
+        cbs.ended = function () {
             if (self._video !== video) return;
-            self._video._currentTime = args;
             self._playing = false;
             self._dispatchEvent(_impl.EventType.COMPLETED);
         };
-        cbs.play = function () {
+        cbs.play = function (args = 0) {
             if (self._video !== video) return;
+            self._video._currentTime = args;
             self._playing = true;
             self._dispatchEvent(_impl.EventType.PLAYING);
         };
