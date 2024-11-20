@@ -100,6 +100,7 @@
         video.addEventListener("loadedmetadata", cbs.loadedmetadata);
         video.addEventListener("ended", cbs.ended);
         video.addEventListener("play", cbs.play);
+        video.addEventListener("update", cbs.update);
         video.addEventListener("pause", cbs.pause);
         video.addEventListener("click", cbs.click);
         video.addEventListener("stoped", cbs.stoped);
