@@ -79,6 +79,11 @@
             self._playing = true;
             self._dispatchEvent(_impl.EventType.PLAYING);
         };
+        // receive openharmony onUpdate event transmission
+        cbs.update = function (args = 0) {
+            if (self._video !== video) return;
+            self._video._currentTime = args;
+        };
         cbs.pause = function () {
             if (self._ignorePause || self._video !== video) return;
             self._playing = false;
@@ -95,14 +100,16 @@
         video.addEventListener("loadedmetadata", cbs.loadedmetadata);
         video.addEventListener("ended", cbs.ended);
         video.addEventListener("play", cbs.play);
+        video.addEventListener("update", cbs.update);
         video.addEventListener("pause", cbs.pause);
         video.addEventListener("click", cbs.click);
         video.addEventListener("stoped", cbs.stoped);
 
-        function onCanPlay() {
+        function onCanPlay(args = 0) {
             if (this._loaded)
                 return;
 
+            this._video._duration = args;
             this._loaded = true;
             this._dispatchEvent(_impl.EventType.READY_TO_PLAY);
             this._updateVisibility();
@@ -147,6 +154,7 @@
             video.removeEventListener("loadedmetadata", cbs.loadedmetadata);
             video.removeEventListener("ended", cbs.ended);
             video.removeEventListener("play", cbs.play);
+            video.removeEventListener("update", cbs.update);
             video.removeEventListener("pause", cbs.pause);
             video.removeEventListener("click", cbs.click);
             video.removeEventListener("canplay", cbs.onCanPlay);
