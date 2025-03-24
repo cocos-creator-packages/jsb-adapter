@@ -45,6 +45,13 @@ class HTMLCanvasElement extends HTMLElement {
         this._premultiplied = false;
     }
 
+    _destroy () {
+        if (this._context2D) {
+            this._context2D._setCanvasBufferUpdatedCallback(null);
+            this._context2D = null;
+        }
+    }
+    
     //REFINE: implement opts.
     getContext(name, opts) {
         var self = this;
