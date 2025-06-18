@@ -23,11 +23,11 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-var nativeLightProto = renderer.Light.prototype;
-var _setNode = nativeLightProto.setNode;
-cc.js.mixin(nativeLightProto, {
-    setNode (node) {
-        this._node = node;
-        _setNode.call(this, node);
-    }
-});
+// var nativeLightProto = renderer.Light.prototype;
+// var _setNode = nativeLightProto.setNode;
+// cc.js.mixin(nativeLightProto, {
+//     setNode (node) {
+//         this._node = node;
+//         _setNode.call(this, node);
+//     }
+// });

@@ -206,16 +206,21 @@ function downloadBundle (nameOrUrl, options, onComplete) {
         if (err) {
             return onComplete(err, null);
         }
+        
         let out = response;
         out && (out.base = url + '/');
 
-        var js = `${url}/index.${version ? version + '.' : ''}${out.encrypted ? 'jsc' : `js`}`;
-        downloadScript(js, options, function (err) {
-            if (err) {
-                return onComplete(err, null);
-            }
-            onComplete(err, out);
-        });
+        if (CC_STANDALONE_SCRIPTS) {
+            onComplete(null, out);
+        } else {
+            var js = `${url}/index.${version ? version + '.' : ''}${out.encrypted ? 'jsc' : `js`}`;
+            downloadScript(js, options, function (err) {
+                if (err) {
+                    return onComplete(err, null);
+                }
+                onComplete(err, out);
+            });
+        }
     });
 };
 
@@ -245,7 +250,7 @@ function parsePlist (url, options, onComplete) {
     });
 }
 
-parser.parsePVRTex = downloader.downloadDomImage;
+// parser.parsePVRTex = downloader.downloadDomImage;
 parser.parsePKMTex = downloader.downloadDomImage;
 parser.parseASTCTex = downloader.downloadDomImage;
 downloader.downloadScript = downloadScript;
@@ -262,10 +267,10 @@ downloader.register({
     '.jpeg' : downloadAsset,
     '.gif' : downloadAsset,
     '.ico' : downloadAsset,
-    '.tiff' : downloadAsset,
-    '.webp' : downloadAsset,
+    // '.tiff' : downloadAsset,
+    // '.webp' : downloadAsset,
     '.image' : downloadAsset,
-    '.pvr' : downloadAsset,
+    // '.pvr' : downloadAsset,
     '.pkm' : downloadAsset,
     '.astc': downloadAsset,
 
@@ -324,11 +329,11 @@ parser.register({
     '.jpeg' : downloader.downloadDomImage,
     '.gif' : downloader.downloadDomImage,
     '.ico' : downloader.downloadDomImage,
-    '.tiff' : downloader.downloadDomImage,
-    '.webp' : downloader.downloadDomImage,
+    // '.tiff' : downloader.downloadDomImage,
+    // '.webp' : downloader.downloadDomImage,
     '.image' : downloader.downloadDomImage,
     // compressed texture
-    '.pvr': downloader.downloadDomImage,
+    // '.pvr': downloader.downloadDomImage,
     '.pkm': downloader.downloadDomImage,
     '.astc': downloader.downloadDomImage,
 

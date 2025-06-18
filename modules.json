@@ -131,18 +131,6 @@
     "dependencies": ["WebGL Renderer"]
   },
   {
-    "name": "VideoPlayer",
-    "entries": [
-      "./engine/jsb-videoplayer.js"
-    ]
-  },
-  {
-    "name": "WebView",
-    "entries": [
-      "./engine/jsb-webview.js"
-    ]
-  },
-  {
     "name": "Audio",
     "entries": [
       "./engine/jsb-audio.js"

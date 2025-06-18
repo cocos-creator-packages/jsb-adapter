@@ -41,13 +41,11 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         this._zOrderPtr = spaceInfo.zOrder;
         this._cullingMaskPtr = spaceInfo.cullingMask;
         this._opacityPtr = spaceInfo.opacity;
-        this._is3DPtr = spaceInfo.is3D;
         this._skewPtr = spaceInfo.skew;
         this._isVisitingTraversal = false;
 
         owner._proxy = this;
         this.updateOpacity();
-        this.update3DNode();
         this.updateZOrder();
         this.updateCullingMask();
         this.updateSkew();
@@ -58,7 +56,6 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
         this.setName(this._owner._name);
         this.updateParent();
         this.updateOpacity();
-        this.update3DNode();
         this.updateZOrder();
         this.updateSkew();
         this.updateCullingMask();
@@ -104,11 +101,6 @@ cc.js.mixin(renderer.NodeProxy.prototype, {
     updateOpacity () {
         this._opacityPtr[0] = this._owner.opacity;
         this._dirtyPtr[0] |= RenderFlow.FLAG_OPACITY;
-    },
-
-    update3DNode () {
-        this._is3DPtr[0] = this._owner.is3DNode ? 0x1 : 0x0;
-        this._dirtyPtr[0] |= RenderFlow.FLAG_LOCAL_TRANSFORM;
     },
 
     updateSkew () {

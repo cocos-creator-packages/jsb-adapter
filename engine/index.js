@@ -25,11 +25,9 @@
 
 require('./jsb-sys.js');
 require('./jsb-game.js');
-require('./jsb-videoplayer.js');
-require('./jsb-webview.js');
 require('./jsb-audio.js');
 require('./jsb-loader.js');
-require('./jsb-editbox.js');
+// require('./jsb-editbox.js');
 require('./jsb-reflection.js');
 require('./jsb-assets-manager.js');
 require('./jsb-safearea.js');
@@ -38,7 +36,7 @@ if (CC_NATIVERENDERER) {
     require('./jsb-effect.js');
     require('./jsb-effect-variant.js');
     require('./scene/camera.js');
-    require('./scene/light.js');
+    // require('./scene/light.js');
     require('./scene/node-proxy.js');
     require('./scene/render-flow.js');
     // must be required after render flow
@@ -51,7 +49,6 @@ if (CC_NATIVERENDERER) {
 
         require('./assemblers/assembler.js');
         require('./assemblers/assembler-2d.js');
-        require('./assemblers/assembler-3d.js');
 
         require('./assemblers/sprite/index.js');
         require('./assemblers/label/index.js');
@@ -59,12 +56,11 @@ if (CC_NATIVERENDERER) {
         require('./assemblers/graphics-assembler.js');
         require('./assemblers/motion-streak.js');
         require('./assemblers/mesh-renderer.js');
-        require('./assemblers/particle-3d-assembler.js');
 
         require('./jsb-dragonbones.js');
         require('./jsb-spine-skeleton.js');
         require('./jsb-particle.js');
-        require('./jsb-tiledmap.js');
+        // require('./jsb-tiledmap.js');
         require('./jsb-skin-mesh.js');
     });
 }
