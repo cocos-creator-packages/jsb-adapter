@@ -50,6 +50,57 @@ const failureMap = {};
 const maxRetryCountFromBreakpoint = 5;
 const loadedScripts = {};
 
+function downloadBundleStandaloneScript (url, options, onComplete) {
+    if (typeof options === 'function') {
+        onComplete = options;
+        options = null;
+    }
+
+    if (loadedScripts[url]) return onComplete && onComplete();
+
+    download(url, function (src, options, onComplete) {
+        window.__cjsRequire(src);
+        loadedScripts[url] = true;
+        onComplete && onComplete(null);
+    }, options, options.onFileProgress, onComplete);
+}
+
+function downloadBundleStandaloneScripts(bundle, options, onComplete) {
+    const tag = 'standalone-scripts';
+    const jsList = [];
+    for (const uuid in bundle.scripts) {
+        const script = bundle.scripts[uuid];
+        const version = script[1];
+        const js = `${bundle.base}${tag}/${script[0]}.${version ? version + '.' : ''}${bundle.encrypted ? 'jsc' : `js`}`;
+        if (!jsList.includes(js)) {
+            jsList.push(js);
+        }
+    }
+    if (0 === jsList.length) {
+        return onComplete(null, bundle);
+    }
+    // update standalone config, the code in main.js
+    window.__updateStandaloneConfigWithBundle(bundle);
+
+    let errorList = [];
+    for (let i = 0; i < jsList.length; i++) {
+        downloadBundleStandaloneScript(jsList[i], options, (err) => {
+            if (err) {
+                errorList.push(err);
+                return;
+            }
+            if (i === jsList.length - 1) {
+                if (errorList.length > 0) {
+                    err = errorList.join(', ');
+                    onComplete(err, null);
+                } else {
+                    onComplete(err, bundle);
+                }
+            }
+        });
+    }
+}
+
 function downloadScript (url, options, onComplete) {
     if (typeof options === 'function') {
         onComplete = options;
@@ -209,9 +260,9 @@ function downloadBundle (nameOrUrl, options, onComplete) {
         
         let out = response;
         out && (out.base = url + '/');
-
-        if (CC_STANDALONE_SCRIPTS) {
-            onComplete(null, out);
+        if (CC_STANDALONE_SCRIPTS && !remoteBundles[bundleName]) {
+            // skip remote bundle
+            downloadBundleStandaloneScripts(out, options, onComplete)
         } else {
             var js = `${url}/index.${version ? version + '.' : ''}${out.encrypted ? 'jsc' : `js`}`;
             downloadScript(js, options, function (err) {
