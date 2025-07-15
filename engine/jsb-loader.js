@@ -50,21 +50,6 @@ const failureMap = {};
 const maxRetryCountFromBreakpoint = 5;
 const loadedScripts = {};
 
-function downloadBundleStandaloneScript (url, options, onComplete) {
-    if (typeof options === 'function') {
-        onComplete = options;
-        options = null;
-    }
-
-    if (loadedScripts[url]) return onComplete && onComplete();
-
-    download(url, function (src, options, onComplete) {
-        window.__cjsRequire(src);
-        loadedScripts[url] = true;
-        onComplete && onComplete(null);
-    }, options, options.onFileProgress, onComplete);
-}
-
 function downloadBundleStandaloneScripts(bundle, options, onComplete) {
     const tag = 'standalone-scripts';
     const jsList = [];
@@ -82,23 +67,7 @@ function downloadBundleStandaloneScripts(bundle, options, onComplete) {
     // update standalone config, the code in main.js
     window.__updateStandaloneConfigWithBundle(bundle);
 
-    let errorList = [];
-    for (let i = 0; i < jsList.length; i++) {
-        downloadBundleStandaloneScript(jsList[i], options, (err) => {
-            if (err) {
-                errorList.push(err);
-                return;
-            }
-            if (i === jsList.length - 1) {
-                if (errorList.length > 0) {
-                    err = errorList.join(', ');
-                    onComplete(err, null);
-                } else {
-                    onComplete(err, bundle);
-                }
-            }
-        });
-    }
+    onComplete(null, bundle);
 }
 
 function downloadScript (url, options, onComplete) {
