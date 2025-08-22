@@ -214,7 +214,7 @@ function downloadBundle (nameOrUrl, options, onComplete) {
         out && (out.base = url + '/');
 
         // Js files in remote bundle will be packaged into the local assets directory, since ark engine cannot execute remote JavaScript 
-        globalThis.oh && remoteBundles[bundleName] && (url = `assets/${bundleName}`);
+        globalThis.oh && globalThis.scriptEngineType == "napi" && remoteBundles[bundleName] && (url = `assets/${bundleName}`);
         var js = `${url}/index.${version ? version + '.' : ''}${out.encrypted ? 'jsc' : `js`}`;
         downloadScript(js, options, function (err) {
             if (err) {
